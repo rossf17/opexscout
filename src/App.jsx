@@ -385,11 +385,106 @@ function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, catego
   );
 }
 
+function ProductDetail({ product, onBack }) {
+  return (
+    <div style={{ padding: "0 0 32px" }}>
+      <button style={{ ...S.backBtn, marginBottom: 20 }} onClick={onBack}>← Back to products</button>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px", marginBottom: 4 }}>{product.name}</div>
+          <div style={{ fontSize: 13, color: "#475569", marginBottom: 12 }}>{product.tagline}</div>
+          <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
+        </div>
+        <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px", textDecoration: "none", flexShrink: 0 }}>
+          View on vendor site →
+        </a>
+      </div>
+
+      {product.youtube_id && (
+        <div style={{ marginBottom: 24, borderRadius: 12, overflow: "hidden", background: "#000", aspectRatio: "16/9", width: "100%" }}>
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube.com/embed/${product.youtube_id}`}
+            title={product.name}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ display: "block" }}
+          />
+        </div>
+      )}
+
+      {product.description && (
+        <div style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24, background: "#0d1526", borderRadius: 12, padding: 20, border: "1px solid rgba(255,255,255,0.06)" }}>
+          {product.description}
+        </div>
+      )}
+
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Specifications</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginBottom: 20 }}>
+        {product.payload && product.payload !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Payload</div><div style={S.specVal}>{product.payload}</div></div>}
+        {product.reach && product.reach !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Reach</div><div style={S.specVal}>{product.reach}</div></div>}
+        {product.axes && <div style={S.specItem}><div style={S.specLabel}>Axes</div><div style={S.specVal}>{product.axes}</div></div>}
+        {product.repeatability && <div style={S.specItem}><div style={S.specLabel}>Repeatability</div><div style={S.specVal}>{product.repeatability}</div></div>}
+        {product.speed && <div style={S.specItem}><div style={S.specLabel}>Speed / Rate</div><div style={S.specVal}>{product.speed}</div></div>}
+        {product.throughput && <div style={S.specItem}><div style={S.specLabel}>Throughput</div><div style={S.specVal}>{product.throughput}</div></div>}
+        {product.navigation && <div style={S.specItem}><div style={S.specLabel}>Navigation</div><div style={S.specVal}>{product.navigation}</div></div>}
+        {product.battery && <div style={S.specItem}><div style={S.specLabel}>Battery</div><div style={S.specVal}>{product.battery}</div></div>}
+        {product.ip_rating && <div style={S.specItem}><div style={S.specLabel}>IP Rating</div><div style={S.specVal}>{product.ip_rating}</div></div>}
+        {product.weight && <div style={S.specItem}><div style={S.specLabel}>Robot weight</div><div style={S.specVal}>{product.weight}</div></div>}
+        {product.mounting && <div style={S.specItem}><div style={S.specLabel}>Mounting</div><div style={S.specVal}>{product.mounting}</div></div>}
+        {product.deployment && <div style={S.specItem}><div style={S.specLabel}>Deployment</div><div style={S.specVal}>{product.deployment}</div></div>}
+        {product.density && <div style={S.specItem}><div style={S.specLabel}>Storage density</div><div style={S.specVal}>{product.density}</div></div>}
+        {product.temp_range && <div style={S.specItem}><div style={S.specLabel}>Temp range</div><div style={S.specVal}>{product.temp_range}</div></div>}
+        {product.accuracy && <div style={S.specItem}><div style={S.specLabel}>Accuracy</div><div style={S.specVal}>{product.accuracy}</div></div>}
+        {product.memory && <div style={S.specItem}><div style={S.specLabel}>Memory</div><div style={S.specVal}>{product.memory}</div></div>}
+        {product.io_capacity && <div style={S.specItem}><div style={S.specLabel}>I/O capacity</div><div style={S.specVal}>{product.io_capacity}</div></div>}
+        {product.comms && <div style={S.specItem}><div style={S.specLabel}>Communications</div><div style={S.specVal}>{product.comms}</div></div>}
+      </div>
+
+      {product.highlights && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Key highlights</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+            {product.highlights.map(h => (
+              <div key={h} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#94a3b8" }}>
+                <span style={{ color: "#f59e0b", fontWeight: 700 }}>✓</span> {h}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {product.applications && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Applications</div>
+          <div style={{ ...S.tags, marginBottom: 20 }}>
+            {product.applications.map(a => <span key={a} style={S.tag}>{a}</span>)}
+          </div>
+        </>
+      )}
+
+      {product.variants && product.variants.length > 1 && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Available variants</div>
+          <div style={S.tags}>
+            {product.variants.map(v => <span key={v} style={{ ...S.tag, color: "#94a3b8" }}>{v}</span>)}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function ProductsTab({ slug }) {
   const vendorProducts = allProducts[slug] || [];
   const [activeCat, setActiveCat] = useState("All");
+  const [activeProduct, setActiveProduct] = useState(null);
   const cats = ["All", ...new Set(vendorProducts.map(p => p.category))];
   const filtered = activeCat === "All" ? vendorProducts : vendorProducts.filter(p => p.category === activeCat);
+
+  if (activeProduct) return <ProductDetail product={activeProduct} onBack={() => setActiveProduct(null)} />;
 
   if (vendorProducts.length === 0) return (
     <div style={{ textAlign: "center", padding: "48px 0" }}>
@@ -408,39 +503,31 @@ function ProductsTab({ slug }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map(p => (
-          <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)", padding: 16 }}>
+          <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)", padding: 16, cursor: "pointer", transition: "border-color 0.15s" }}
+            onClick={() => setActiveProduct(p)}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"}
+          >
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 3 }}>{p.name}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5" }}>{p.name}</div>
+                  {p.youtube_id && <span style={{ fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>▶ VIDEO</span>}
+                </div>
                 <div style={{ fontSize: 12, color: "#475569" }}>{p.tagline}</div>
               </div>
-              <span style={{ ...S.tag, flexShrink: 0, marginLeft: 12, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{p.category}</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginBottom: 12 }}>
-              {p.payload && p.payload !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Payload</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.payload}</div></div>}
-              {p.reach && p.reach !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Reach</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.reach}</div></div>}
-              {p.speed && <div style={S.specItem}><div style={S.specLabel}>Speed / Rate</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.speed}</div></div>}
-              {p.throughput && <div style={S.specItem}><div style={S.specLabel}>Throughput</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.throughput}</div></div>}
-              {p.repeatability && <div style={S.specItem}><div style={S.specLabel}>Repeatability</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.repeatability}</div></div>}
-              {p.axes && <div style={S.specItem}><div style={S.specLabel}>Axes</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.axes}</div></div>}
-              {p.navigation && <div style={S.specItem}><div style={S.specLabel}>Navigation</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.navigation}</div></div>}
-              {p.battery && <div style={S.specItem}><div style={S.specLabel}>Battery</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.battery}</div></div>}
-              {p.ip_rating && <div style={S.specItem}><div style={S.specLabel}>IP Rating</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.ip_rating}</div></div>}
-              {p.deployment && <div style={S.specItem}><div style={S.specLabel}>Deployment</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.deployment}</div></div>}
-            </div>
-            {p.highlights && (
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-                {p.highlights.map(h => (
-                  <span key={h} style={{ fontSize: 11, color: "#64748b", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 6, padding: "2px 8px" }}>✓ {h}</span>
-                ))}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
+                <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{p.category}</span>
+                <span style={{ color: "#475569", fontSize: 16 }}>›</span>
               </div>
-            )}
-            {p.variants && p.variants.length > 1 && (
-              <div style={{ fontSize: 11, color: "#475569", marginBottom: 8 }}>
-                <span style={{ fontWeight: 600 }}>Variants: </span>{p.variants.join(" · ")}
-              </div>
-            )}
-            <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#f59e0b", textDecoration: "none" }}>View on vendor site →</a>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
+              {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
+              {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
+              {p.throughput && <span style={{ fontSize: 11, color: "#64748b" }}>Throughput: <strong style={{ color: "#94a3b8" }}>{p.throughput}</strong></span>}
+              {p.axes && <span style={{ fontSize: 11, color: "#64748b" }}>Axes: <strong style={{ color: "#94a3b8" }}>{p.axes}</strong></span>}
+            </div>
           </div>
         ))}
       </div>

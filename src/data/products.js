@@ -17,6 +17,8 @@ export const products = {
       highlights: ["Highest payload in class", "Integrated vision option", "Compact footprint for payload"],
       url: "https://www.fanucamerica.com/products/robots/series/m-410-robot",
       variants: ["M-410iC/185", "M-410iC/315", "M-410iC/500"],
+      youtube_id: "Kz8BcGGnptU",
+      description: "The FANUC M-410iC is the industry workhorse for end-of-line palletizing and depalletizing. Available in multiple payload configurations from 185kg to 500kg, it handles everything from beverage cases to heavy industrial loads. The 4-axis wrist design maximizes speed while the compact footprint fits brownfield DC environments. Integrated iRVision enables mixed-SKU depalletizing without fixed tooling changes. With a 99.98% uptime record across tens of thousands of installations, it's the most proven palletizing robot in North America.",
     },
     {
       id: "fanuc-r2000ic",
@@ -34,6 +36,8 @@ export const products = {
       highlights: ["Most versatile heavy payload robot", "10+ variants available", "Proven in automotive"],
       url: "https://www.fanucamerica.com/products/robots/series/r-2000-robot",
       variants: ["R-2000iC/100P", "R-2000iC/165F", "R-2000iC/270F"],
+      youtube_id: "6bHkFpHWBkk",
+      description: "The R-2000iC is FANUC's flagship heavy-payload 6-axis robot, available in over 10 variants covering payloads from 100kg to 270kg and reaches from 2.6m to 3.5m. Originally developed for automotive spot welding, it has become the standard for heavy material handling, press tending, and large part assembly across industries. The slim arm design allows deep access into fixtures and tight work cells. Floor, inverted, and angle mounting options maximize flexibility in existing facilities.",
     },
     {
       id: "fanuc-crx",
@@ -51,6 +55,8 @@ export const products = {
       highlights: ["No safety fencing required", "Tablet-based teaching", "Long lifecycle — 8 year maintenance free"],
       url: "https://www.fanucamerica.com/products/robots/series/crx-collaborative-robot",
       variants: ["CRX-10iA", "CRX-10iA/L", "CRX-25iA"],
+      youtube_id: "hbMPEJhJAIE",
+      description: "The CRX series is FANUC's answer to the growing collaborative robot market, combining the reliability FANUC is known for with the ease of use demanded by modern manufacturers. Hand-guided teaching via drag-and-drop tablet interface means programming takes hours, not days. The CRX can work alongside humans without safety fencing when properly risk-assessed, enabling flexible deployment without facility modifications. The 8-year maintenance-free design dramatically reduces total cost of ownership compared to competing cobots.",
     },
     {
       id: "fanuc-lr-mate",
@@ -68,6 +74,8 @@ export const products = {
       highlights: ["Smallest footprint in class", "High speed — 4,000 mm/s", "Food grade option available"],
       url: "https://www.fanucamerica.com/products/robots/series/lr-mate-robot",
       variants: ["LR Mate 200iD/4S", "LR Mate 200iD/7L", "LR Mate 200iD/14L"],
+      youtube_id: "Y4SegxksHHE",
+      description: "The LR Mate 200iD is FANUC's most compact 6-axis robot, often called a 'mini industrial robot' for its ability to deliver full industrial performance in a desktop-sized footprint. At just 27kg, it can be mounted in any orientation and relocated between work cells easily. Despite its small size, it achieves ±0.01mm repeatability — making it suitable for precision electronics assembly, pharmaceutical handling, and quality inspection. A cleanroom variant and a food-grade version with stainless steel and IP69K protection are available.",
     },
   ],
 
@@ -89,6 +97,8 @@ export const products = {
       highlights: ["800kg pod capacity", "Compatible with 2-sided picking stations", "Proven at 500+ sites globally"],
       url: "https://www.geekplus.com/products/shelf-to-person",
       variants: ["P800", "P800 Pro"],
+      youtube_id: "NxBNRSxMlVY",
+      description: "The Geek+ P800 is the backbone of most Geek+ goods-to-person installations worldwide. The robot navigates via QR code grid with SLAM fallback, carrying pods weighing up to 800kg directly to picking stations. Picking stations can be configured single or double-sided, with ergonomic working heights reducing associate fatigue. The P800 Pro adds enhanced speed and battery performance for 24/7 operations. With deployments at over 500 sites globally including major retailers and 3PLs, it's one of the most proven GTP platforms available.",
     },
     {
       id: "geekplus-r500",
@@ -106,6 +116,8 @@ export const products = {
       highlights: ["Up to 30,000 sorts/hr per system", "Compact — works on existing floors", "Real-time rerouting"],
       url: "https://www.geekplus.com/products/sorting-robot",
       variants: ["R500", "R500 Plus"],
+      youtube_id: "SaGgwJ8VNFU",
+      description: "The R500 sorting system replaces traditional fixed loop sorters with a flexible fleet of autonomous robots that sort parcels, polybags, and cartons across a grid of destination chutes. Unlike fixed conveyor sorters, the R500 system can be reconfigured overnight to add new sort destinations — a critical advantage for e-commerce operations with seasonal peak swings. Throughput scales linearly by adding robots rather than replacing the entire system. Real-time traffic management prevents collisions and optimizes routing dynamically.",
     },
     {
       id: "geekplus-t500",
@@ -123,6 +135,8 @@ export const products = {
       highlights: ["Works with standard pallets", "No infrastructure changes required", "Integrates with ERP/WMS"],
       url: "https://www.geekplus.com/products/pallet-amr",
       variants: ["T500", "T1500"],
+      youtube_id: "3wKPDSCFPCQ",
+      description: "The Geek+ T500 pallet AMR automates the movement of standard GMA pallets through receiving, storage, and outbound staging areas without any floor modifications or fixed conveyors. The robot uses a combination of SLAM navigation and QR code anchors for high accuracy in dynamic warehouse environments. At 1,500kg payload capacity, it handles fully loaded pallets. The T1500 variant adds a laser-guided pallet fork for automatic pallet pickup from racking, enabling fully autonomous inbound and putaway workflows.",
     },
     {
       id: "geekplus-m1",
@@ -140,6 +154,8 @@ export const products = {
       highlights: ["Follows picker through warehouse", "2-3x pick rate improvement", "No QR codes needed"],
       url: "https://www.geekplus.com/products/mobile-picking",
       variants: ["M1 Pro"],
+      youtube_id: "NxBNRSxMlVY",
+      description: "The M1 Pro is Geek+'s follow-me picking robot that eliminates the walking time that accounts for 60-70% of a picker's shift in conventional operations. Associates pick into the M1 Pro's totes as it autonomously follows them through pick zones. When full, the robot autonomously delivers to packing stations while a fresh robot arrives for the next zone. Unlike goods-to-person which requires dedicated infrastructure, the M1 Pro works in existing fixed-rack environments without any facility modifications, making it ideal for brownfield DC upgrades.",
     },
   ],
 
@@ -161,6 +177,8 @@ export const products = {
       highlights: ["Mobile — no fixed installation", "Works in unstructured trailers", "Computer vision for mixed SKU"],
       url: "https://bostondynamics.com/products/stretch/",
       variants: ["Stretch"],
+      youtube_id: "yYUuWWnfRsk",
+      description: "Stretch is Boston Dynamics' purpose-built case-handling robot designed to solve one of the hardest problems in warehouse automation: unloading trucks. Unlike fixed depalletizers that require structured, consistent loads, Stretch's mobile base drives directly into trailers and its 7-axis arm with computer vision handles the chaotic, mixed-SKU reality of real inbound freight. The proprietary suction gripper handles cases from 1kg to 23kg across a wide range of sizes and packaging types. At 800 cases per hour, Stretch matches or exceeds manual unloading rates while eliminating one of the most physically demanding jobs in the DC.",
     },
     {
       id: "bd-spot",
@@ -178,6 +196,8 @@ export const products = {
       highlights: ["Navigates stairs and uneven terrain", "360° sensor suite", "Autonomous inspection routes"],
       url: "https://bostondynamics.com/products/spot/",
       variants: ["Spot", "Spot Enterprise"],
+      youtube_id: "wlkCQXHEgjA",
+      description: "Spot is the world's most capable legged robot, designed for inspection and data collection in environments that wheeled robots can't access. In industrial settings, Spot autonomously patrols facilities on programmed routes, reading gauges, detecting thermal anomalies, and building 3D maps — all without human intervention. The 360° sensor suite captures LiDAR, visual, and thermal data simultaneously. Spot Enterprise adds autonomous docking and charging for continuous multi-shift operation. Used extensively in oil & gas, power generation, and large-scale manufacturing for predictive maintenance programs.",
     },
   ],
 
@@ -199,6 +219,8 @@ export const products = {
       highlights: ["Most deployed cobot in the world", "500+ UR+ ecosystem end effectors", "No safety fencing required"],
       url: "https://www.universal-robots.com/products/ur5-robot/",
       variants: ["UR5e"],
+      youtube_id: "DfMJSLPFuuE",
+      description: "The UR5e is the most widely deployed collaborative robot in the world, with over 50,000 units installed across virtually every industry. Its 5kg payload and 850mm reach cover the vast majority of assembly, pick & place, and machine tending applications encountered in light manufacturing and electronics. The force/torque sensor built into the wrist enables compliant assembly tasks and safe human collaboration. The UR+ ecosystem provides over 500 certified end effectors, vision systems, and software plugins — meaning almost any application has a pre-validated hardware solution available off the shelf.",
     },
     {
       id: "ur-ur10e",
@@ -216,11 +238,13 @@ export const products = {
       highlights: ["Longest reach in standard cobot class", "Ideal for pallet-level work", "Easy redeployment"],
       url: "https://www.universal-robots.com/products/ur10-robot/",
       variants: ["UR10e"],
+      youtube_id: "aVPMBBKMnOg",
+      description: "The UR10e extends the UR platform to 12.5kg payload and 1,300mm reach — making it the go-to cobot for end-of-line palletizing, large assembly operations, and applications requiring work across a wide area without repositioning the robot base. Its 1.3m reach allows it to stack pallets up to approximately 1.4m height when floor-mounted. Like all UR cobots, it requires no safety fencing when properly risk-assessed and can be redeployed to new tasks by operators without robotics expertise using the intuitive PolyScope interface.",
     },
     {
       id: "ur-ur20",
       name: "UR20",
-      tagline: "High payload cobot for heavy palletizing and industrial tasks",
+      tagline: "High payload cobot — 20kg collaborative arm for heavy palletizing",
       category: "Collaborative Robot",
       payload: "20 kg",
       reach: "1,750 mm",
@@ -233,6 +257,8 @@ export const products = {
       highlights: ["20kg payload breaks traditional cobot ceiling", "Fastest cobot in class at this payload", "Same UR interface"],
       url: "https://www.universal-robots.com/products/ur20-robot/",
       variants: ["UR20"],
+      youtube_id: "UBPxGBWFqbQ",
+      description: "The UR20 represents a step change in the cobot market, pushing payload from the traditional 10-16kg ceiling up to 20kg while maintaining the collaborative safety ratings and ease of use the UR platform is known for. At 1,750mm reach, it can build full euro-pallet stacks from floor level. It's also the fastest robot in its class, with joint speeds optimized for high-throughput palletizing cycles. Manufacturers who previously had to choose between cobot flexibility and industrial robot payload no longer face that tradeoff.",
     },
     {
       id: "ur-ur30",
@@ -250,6 +276,8 @@ export const products = {
       highlights: ["Highest payload cobot available", "Safe for human collaboration at 30kg", "Same UR ecosystem"],
       url: "https://www.universal-robots.com/products/ur30-robot/",
       variants: ["UR30"],
+      youtube_id: "UBPxGBWFqbQ",
+      description: "The UR30 is the most powerful collaborative robot Universal Robots has ever built, delivering 30kg payload in the familiar UR form factor. It targets applications like heavy bin handling, large part assembly, and high-payload machine tending that previously required traditional industrial robots with safety fencing. The 30kg capacity combined with collaborative safety ratings opens up human-robot collaboration in heavy manufacturing environments for the first time. All existing UR+ ecosystem accessories and PolyScope programming tools carry over directly.",
     },
     {
       id: "ur-ur3e",
@@ -267,6 +295,8 @@ export const products = {
       highlights: ["360° rotation on all axes", "Smallest footprint in UR family", "Ideal for bench-top tasks"],
       url: "https://www.universal-robots.com/products/ur3-robot/",
       variants: ["UR3e"],
+      youtube_id: "DfMJSLPFuuE",
+      description: "The UR3e is the smallest member of the UR e-Series, designed for precision light assembly, screwdriving, and lab automation tasks on benchtops and in tight work cells. Its unique feature is unlimited rotation on all wrist joints — enabling continuous screw tightening and cable routing tasks without joint limit interruptions. At just 11.2kg, it can be mounted on a table, wall, ceiling, or custom fixture without structural reinforcement. Electronics manufacturers, pharmaceutical labs, and watchmakers use the UR3e for the most delicate, precision-critical automation tasks.",
     },
   ],
 
@@ -288,6 +318,8 @@ export const products = {
       highlights: ["Eliminates manual dock labor", "Works in standard 53-ft trailers", "No trailer modification needed"],
       url: "https://sliprobotics.com/slipbot",
       variants: ["SlipBot Gen 2"],
+      youtube_id: "F0aAaHlh4H8",
+      description: "SlipBot automates the loading and unloading of standard 53-foot trailers — one of the most labor-intensive and injury-prone jobs in distribution. The system deploys directly into the trailer from the dock door and uses a conveyor-based transfer mechanism to move cases autonomously onto the dock's conveyor system. A full trailer that takes a human team 45-60 minutes to unload is processed in under 5 minutes. Unlike fixed dock automation systems, SlipBot works with any standard trailer without modification, making it viable for operations receiving trailers from multiple carriers and shippers.",
     },
   ],
 
@@ -309,6 +341,8 @@ export const products = {
       highlights: ["2-3x pick rate lift over manual", "Associate follows bot — no training required", "Hot-swap battery = 24/7 operation"],
       url: "https://locusrobotics.com/locusbot/",
       variants: ["LocusBot"],
+      youtube_id: "UPUCnSuCKhk",
+      description: "LocusBot redefines the picking workflow by having associates follow the robot rather than the robot following the associate. The bot navigates autonomously to the optimal pick location and presents the associate with clear pick instructions via its screen. The associate picks and places into the bot's totes, then the bot routes to the next pick or to a packing station autonomously. Hot-swap batteries eliminate downtime between shifts. The system's adaptive routing algorithm continuously optimizes paths based on real-time floor congestion, delivering consistent 2-3x productivity lift over manual cart picking.",
     },
     {
       id: "locus-vector",
@@ -326,6 +360,8 @@ export const products = {
       highlights: ["Works alongside LocusBots in same fleet", "Single software platform", "No floor modifications"],
       url: "https://locusrobotics.com/vector/",
       variants: ["Locus Vector"],
+      youtube_id: "UPUCnSuCKhk",
+      description: "Locus Vector extends the Locus platform from unit-pick to pallet-level transport, enabling a single vendor to cover both picking and bulk material movement. At 680kg payload, it handles fully loaded GMA pallets. Critically, Vector runs on the same Locus Origin software platform as LocusBots — meaning the fleet is managed from a single interface with unified traffic management. This simplifies operations significantly compared to deploying two separate AMR systems from different vendors. Vector is particularly effective for replenishment workflows that connect bulk storage to active pick zones.",
     },
   ],
 
@@ -346,6 +382,8 @@ export const products = {
       highlights: ["Industry standard in North America", "Logix Designer software", "Seamless Studio 5000 integration"],
       url: "https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/programmable-controllers/large-controllers/controllogix.html",
       variants: ["1756-L81E", "1756-L82E", "1756-L83E", "1756-L84E", "1756-L85E"],
+      youtube_id: "kDxEqPl5vF8",
+      description: "The ControlLogix 5580 is the top-tier PLC in Rockwell's Allen-Bradley lineup, designed for large, complex manufacturing systems with demanding speed, capacity, and redundancy requirements. With up to 40MB of memory and support for 128,000+ I/O points, it handles the most complex discrete manufacturing, batch processing, and motion control applications. The chassis-based architecture allows mixing of multiple controller types, I/O modules, and communication adapters in a single backplane. Redundant controller configurations provide hot-standby failover for safety-critical production environments.",
     },
     {
       id: "rockwell-compactlogix",
@@ -362,6 +400,8 @@ export const products = {
       highlights: ["Compact form factor", "Integrated motion control", "Same Logix programming environment"],
       url: "https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/programmable-controllers/small-controllers/compactlogix.html",
       variants: ["5069-L306ER", "5069-L310ER", "5069-L320ER"],
+      youtube_id: "kDxEqPl5vF8",
+      description: "The CompactLogix 5380 delivers ControlLogix-class performance in a compact, DIN-rail mountable form factor optimized for standalone machines and mid-complexity systems. It uses the identical Studio 5000 Logix Designer programming environment as ControlLogix, meaning engineers need only one skillset across their entire installed base. Integrated EtherNet/IP with DLR (Device Level Ring) support provides network redundancy without additional hardware. Built-in motion control supports up to 16 axes for coordinated multi-axis applications in packaging and assembly.",
     },
     {
       id: "rockwell-factorytalk",
@@ -377,6 +417,8 @@ export const products = {
       highlights: ["Native integration with Allen-Bradley hardware", "Pre-built dashboards", "Edge to cloud architecture"],
       url: "https://www.rockwellautomation.com/en-us/products/software/factorytalk/analyticsplatform.html",
       variants: ["FactoryTalk Analytics for Devices", "FactoryTalk Analytics for IIoT"],
+      youtube_id: "kDxEqPl5vF8",
+      description: "FactoryTalk Analytics is Rockwell's industrial AI and analytics platform that turns raw machine data into actionable production intelligence. Native connectors to Allen-Bradley PLCs and drives allow deployment without custom integration work — data flows automatically from the control layer to dashboards and ML models. Pre-built analytics for OEE, energy, and quality provide immediate value out of the box. The edge-to-cloud architecture processes time-sensitive analytics locally while aggregating fleet-wide data in the cloud for trend analysis and benchmarking across multiple sites.",
     },
   ],
 
@@ -397,6 +439,8 @@ export const products = {
       highlights: ["Highest storage density available", "100% inventory accuracy", "Modular — can expand in place"],
       url: "https://www.dematic.com/en-us/products/technologies/autostore/",
       variants: ["AutoStore R5 Robot", "AutoStore B1 Robot"],
+      youtube_id: "F_gu8NKWB8I",
+      description: "AutoStore is the world's most space-efficient storage and retrieval system, stacking bins up to 16 levels high in an aluminum grid structure with robots navigating on top. The system stores 4-5x more SKUs in the same footprint as conventional shelving by eliminating all aisles — robots access any bin from above. Throughput scales by adding more robots without modifying the grid. The system achieves 100% inventory accuracy with every pick confirmed by bin-level sensors. Dematic is one of the largest global AutoStore integrators, with hundreds of installations in e-commerce, pharma, grocery, and fashion.",
     },
     {
       id: "dematic-multishuttle",
@@ -412,6 +456,8 @@ export const products = {
       highlights: ["Works in ambient and cold chain", "Handles mixed SKU totes", "Integrates with GTP stations"],
       url: "https://www.dematic.com/en-us/products/technologies/multishuttle/",
       variants: ["Multishuttle 2", "Multishuttle Flex"],
+      youtube_id: "4tBFelSjxOA",
+      description: "The Dematic Multishuttle is a rail-guided shuttle system that provides high-speed buffering, sequencing, and retrieval of totes and cartons in temperature ranges from -28°C to +40°C. Each aisle operates independently with multiple shuttles, achieving over 1,000 tote movements per hour per aisle. The system excels at order sequencing — presenting orders to packing stations in the exact sequence needed for optimal packing without manual sorting. Cold chain capability without performance degradation makes it the preferred solution for grocery, fresh food, and pharmaceutical distribution where ambient AS/RS systems fail.",
     },
     {
       id: "dematic-ipoint",
@@ -426,6 +472,8 @@ export const products = {
       highlights: ["Integrated put-to-light", "Ergonomic working height", "Works with Multishuttle and AutoStore"],
       url: "https://www.dematic.com/en-us/products/technologies/goods-to-person/",
       variants: ["iPoint Standard", "iPoint Pro"],
+      youtube_id: "F_gu8NKWB8I",
+      description: "The Dematic iPoint GTP workstation is the human interface layer of Dematic's automated storage systems, designed to maximize pick rates while minimizing ergonomic strain. Adjustable working heights, integrated put-to-light displays, and large presentation windows allow operators to achieve 400-800 picks per hour — 3-5x the rate of conventional pick-to-cart methods. The iPoint Pro adds dual-zone presentation for simultaneous multi-order picking, further increasing throughput without additional labor. Compatible with both Multishuttle and AutoStore as the upstream storage and retrieval system.",
     },
   ],
 
@@ -445,6 +493,8 @@ export const products = {
       highlights: ["Handles irregular items", "Quiet operation vs. pop-up sorters", "Integrated barcode scanning"],
       url: "https://intelligrated.honeywell.com/en-US/pages/sortation.html",
       variants: ["CrossBelt Sorter", "Sliding Shoe Sorter", "Tilt Tray Sorter"],
+      youtube_id: "6W0DXoUqark",
+      description: "Honeywell Intelligrated's sortation portfolio covers the full range from medium-speed sliding shoe sorters to ultra-high-rate cross-belt systems capable of 30,000 units per hour. Cross-belt sorters use individually motorized carrier belts to gently sort irregular items, polybags, and fragile goods that traditional pop-up wheel sorters damage. Sliding shoe sorters provide a cost-effective solution for carton and case sortation at mid-range throughputs. All systems integrate with Honeywell's Momentum WCS for real-time sort plan management and divert confirmation. In-line barcode scanning and weighing provide automatic exception handling.",
     },
     {
       id: "hi-conveyor",
@@ -459,6 +509,8 @@ export const products = {
       highlights: ["Zero-pressure accumulation available", "In-house controls via Momentum WCS", "Modular design for brownfield"],
       url: "https://intelligrated.honeywell.com/en-US/pages/conveyor.html",
       variants: ["Belt Conveyor", "Roller Conveyor", "Zero-Pressure Accumulation"],
+      youtube_id: "6W0DXoUqark",
+      description: "Honeywell Intelligrated's conveyor systems form the material flow backbone of large-scale DCs, moving cartons, totes, and polybags between receiving, storage, picking, packing, and shipping at speeds up to 3 m/s. Zero-pressure accumulation conveyors prevent product contact and jamming in buffer zones, protecting fragile goods and reducing maintenance. As a full-system integrator, Honeywell designs, manufactures, and controls the entire conveyor network from a single source — eliminating the integration complexity of multi-vendor systems. The modular design enables staged installation in brownfield facilities without full operational shutdowns.",
     },
     {
       id: "hi-momentum",
@@ -474,6 +526,8 @@ export const products = {
       highlights: ["Real-time material tracking", "Native to Honeywell equipment", "Open API for WMS integration"],
       url: "https://intelligrated.honeywell.com/en-US/pages/momentum-wcs.html",
       variants: ["Momentum WCS Standard", "Momentum WCS Enterprise"],
+      youtube_id: "6W0DXoUqark",
+      description: "Momentum WCS is Honeywell Intelligrated's warehouse control system, sitting between the WMS and physical automation equipment to manage real-time material flow. It tracks every carton and tote through the facility, orchestrates sorter divert decisions, manages conveyor speeds and accumulation zones, and dispatches labor to exceptions. Native integration with Honeywell conveyor and sortation equipment eliminates the integration layer required when using third-party WCS products. Open REST APIs connect to any WMS or ERP. Momentum Enterprise adds advanced analytics, predictive maintenance alerts, and multi-site management capabilities.",
     },
   ],
 };
