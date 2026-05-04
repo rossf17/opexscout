@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { vendors, categories, industries } from "./data/vendors";
+import { products as allProducts } from "./data/products";
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
 const Icon = ({ d, size = 16 }) => (
@@ -422,11 +423,74 @@ function DetailPage({ vendor, setPage, selected, setSelected }) {
         <div style={S.detailBody}>
           <div style={S.detailMain}>
             <div style={S.tabs}>
-              {[["overview", "Overview"], ["specs", "Specs & Capabilities"], ["reviews", "Reviews"], ["cases", "Case Studies"]].map(([t, label]) => (
+              {[["overview", "Overview"], ["products", "Products"], ["specs", "Specs & Capabilities"], ["reviews", "Reviews"], ["cases", "Case Studies"]].map(([t, label]) => (
                 <div key={t} style={{ ...S.tab, ...(tab === t ? S.tabActive : {}) }} onClick={() => setTab(t)}>{label}</div>
               ))}
             </div>
             <div style={S.tabContent}>
+              {tab === "products" && (() => {
+                const vendorProducts = allProducts[vendor.slug] || [];
+                const [activeCat, setActiveCat] = useState("All");
+                const cats = ["All", ...new Set(vendorProducts.map(p => p.category))];
+                const filtered = activeCat === "All" ? vendorProducts : vendorProducts.filter(p => p.category === activeCat);
+                return (
+                  <>
+                    {vendorProducts.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "48px 0", color: "#475569" }}>
+                        <div style={{ fontSize: 32, marginBottom: 12 }}>📦</div>
+                        <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8 }}>Product listings coming soon</div>
+                        <div style={{ fontSize: 12, color: "#475569" }}>This vendor hasn't claimed their listing yet.</div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+                          {cats.map(c => (
+                            <div key={c} style={{ ...S.chip, ...(activeCat === c ? S.chipActive : {}), fontSize: 11, padding: "4px 12px" }} onClick={() => setActiveCat(c)}>{c}</div>
+                          ))}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                          {filtered.map(p => (
+                            <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)", padding: 16 }}>
+                              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+                                <div>
+                                  <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 3 }}>{p.name}</div>
+                                  <div style={{ fontSize: 12, color: "#475569" }}>{p.tagline}</div>
+                                </div>
+                                <span style={{ ...S.tag, flexShrink: 0, marginLeft: 12, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{p.category}</span>
+                              </div>
+                              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginBottom: 12 }}>
+                                {p.payload && p.payload !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Payload</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.payload}</div></div>}
+                                {p.reach && p.reach !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Reach</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.reach}</div></div>}
+                                {p.speed && <div style={S.specItem}><div style={S.specLabel}>Speed / Rate</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.speed}</div></div>}
+                                {p.throughput && <div style={S.specItem}><div style={S.specLabel}>Throughput</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.throughput}</div></div>}
+                                {p.repeatability && <div style={S.specItem}><div style={S.specLabel}>Repeatability</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.repeatability}</div></div>}
+                                {p.axes && <div style={S.specItem}><div style={S.specLabel}>Axes</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.axes}</div></div>}
+                                {p.navigation && <div style={S.specItem}><div style={S.specLabel}>Navigation</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.navigation}</div></div>}
+                                {p.battery && <div style={S.specItem}><div style={S.specLabel}>Battery</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.battery}</div></div>}
+                                {p.ip_rating && <div style={S.specItem}><div style={S.specLabel}>IP Rating</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.ip_rating}</div></div>}
+                                {p.deployment && <div style={S.specItem}><div style={S.specLabel}>Deployment</div><div style={{ ...S.specVal, fontSize: 13 }}>{p.deployment}</div></div>}
+                              </div>
+                              {p.highlights && (
+                                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                                  {p.highlights.map(h => (
+                                    <span key={h} style={{ fontSize: 11, color: "#64748b", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 6, padding: "2px 8px" }}>✓ {h}</span>
+                                  ))}
+                                </div>
+                              )}
+                              {p.variants && p.variants.length > 1 && (
+                                <div style={{ fontSize: 11, color: "#475569", marginBottom: 8 }}>
+                                  <span style={{ fontWeight: 600 }}>Variants: </span>{p.variants.join(" · ")}
+                                </div>
+                              )}
+                              <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#f59e0b", textDecoration: "none" }}>View on vendor site →</a>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
               {tab === "overview" && (
                 <>
                   <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24 }}>{vendor.desc}</p>
