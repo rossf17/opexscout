@@ -28,7 +28,26 @@
     </script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #0b1220; }
+      body { background: #0b1220; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      html { scroll-behavior: smooth; }
+      input:focus, select:focus, textarea:focus { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.08); outline: none; }
+      button { transition: all 0.15s ease; }
+      button:hover:not(:disabled) { filter: brightness(1.08); }
+      button:active:not(:disabled) { transform: translateY(1px); }
+      a { transition: opacity 0.15s ease; }
+      a:hover { opacity: 0.85; }
+      ::selection { background: rgba(245,158,11,0.3); color: #fff; }
+      [data-vendor-card]:hover { transform: translateY(-2px); border-color: rgba(245,158,11,0.25) !important; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: #0b1220; }
+      ::-webkit-scrollbar-thumb { background: #1a2a45; border-radius: 6px; }
+      ::-webkit-scrollbar-thumb:hover { background: #2a3a55; }
+      @media (max-width: 900px) {
+        h1 { font-size: 32px !important; }
+      }
+      @media (max-width: 700px) {
+        nav { padding: 0 16px !important; }
+      }
     </style>
   </head>
   <body>

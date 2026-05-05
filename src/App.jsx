@@ -162,8 +162,9 @@ const S = {
 const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
 const LEAD_LOG_KEY = "opexscout_local_lead_log";
 
-function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "") {
+function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "", vendorLogo = "") {
   const text = String(label || "Product").slice(0, 36);
+  const logo = String(vendorLogo || "").slice(0, 3);
   const catIcons = {
     "Palletizing": "📦", "Depalletizing": "📦", "AMR": "🤖", "Collaborative Robot": "🦾",
     "Cobot": "🦾", "Industrial Robot": "⚙️", "Conveyor": "🔄", "Sortation": "🔄",
@@ -172,29 +173,55 @@ function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "") {
   };
   const icon = Object.entries(catIcons).find(([k]) => category?.includes(k))?.[1] || "⚙️";
   const color = vendorColor || "#1a3a5c";
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675">
-    <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${color};stop-opacity:0.15"/><stop offset="100%" style="stop-color:#0b1220;stop-opacity:1"/></linearGradient></defs>
-    <rect width="100%" height="100%" fill="#0b1220"/>
-    <rect width="100%" height="100%" fill="url(#g)"/>
-    <rect x="1" y="1" width="1198" height="673" rx="0" fill="none" stroke="${color}" stroke-width="2" stroke-opacity="0.2"/>
-    <text x="600" y="260" text-anchor="middle" font-size="96" font-family="Arial">${icon}</text>
-    <text x="600" y="360" text-anchor="middle" fill="#e8edf5" font-size="42" font-family="Arial, sans-serif" font-weight="700">${text}</text>
-    <text x="600" y="415" text-anchor="middle" fill="#475569" font-size="22" font-family="Arial, sans-serif">Official product image coming soon</text>
-    <text x="600" y="580" text-anchor="middle" fill="${color}" font-size="18" font-family="Arial, sans-serif" font-weight="700" opacity="0.6">OpEx Scout</text>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+    <defs>
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:${color};stop-opacity:0.25"/>
+        <stop offset="50%" style="stop-color:#0d1526;stop-opacity:1"/>
+        <stop offset="100%" style="stop-color:#0b1220;stop-opacity:1"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="50%" cy="40%" r="40%">
+        <stop offset="0%" style="stop-color:${color};stop-opacity:0.15"/>
+        <stop offset="100%" style="stop-color:${color};stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="675" fill="#0b1220"/>
+    <rect width="1200" height="675" fill="url(#bgGrad)"/>
+    <rect width="1200" height="675" fill="url(#glow)"/>
+    <g opacity="0.04">
+      <line x1="0" y1="100" x2="1200" y2="100" stroke="#ffffff" stroke-width="1"/>
+      <line x1="0" y1="200" x2="1200" y2="200" stroke="#ffffff" stroke-width="1"/>
+      <line x1="0" y1="300" x2="1200" y2="300" stroke="#ffffff" stroke-width="1"/>
+      <line x1="0" y1="400" x2="1200" y2="400" stroke="#ffffff" stroke-width="1"/>
+      <line x1="0" y1="500" x2="1200" y2="500" stroke="#ffffff" stroke-width="1"/>
+      <line x1="0" y1="600" x2="1200" y2="600" stroke="#ffffff" stroke-width="1"/>
+      <line x1="200" y1="0" x2="200" y2="675" stroke="#ffffff" stroke-width="1"/>
+      <line x1="400" y1="0" x2="400" y2="675" stroke="#ffffff" stroke-width="1"/>
+      <line x1="600" y1="0" x2="600" y2="675" stroke="#ffffff" stroke-width="1"/>
+      <line x1="800" y1="0" x2="800" y2="675" stroke="#ffffff" stroke-width="1"/>
+      <line x1="1000" y1="0" x2="1000" y2="675" stroke="#ffffff" stroke-width="1"/>
+    </g>
+    <circle cx="600" cy="290" r="100" fill="${color}" fill-opacity="0.12" stroke="${color}" stroke-width="2" stroke-opacity="0.3"/>
+    <text x="600" y="320" text-anchor="middle" font-size="80" font-family="Arial">${icon}</text>
+    <text x="600" y="430" text-anchor="middle" fill="#e8edf5" font-size="36" font-family="Arial, sans-serif" font-weight="700" letter-spacing="-0.5">${text}</text>
+    <text x="600" y="475" text-anchor="middle" fill="#64748b" font-size="18" font-family="Arial, sans-serif" font-weight="500">${category || "Product"}</text>
+    <line x1="500" y1="540" x2="700" y2="540" stroke="${color}" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="600" y="580" text-anchor="middle" fill="${color}" font-size="13" font-family="Arial, sans-serif" font-weight="700" letter-spacing="2" opacity="0.7">OPEX SCOUT</text>
+    <text x="600" y="605" text-anchor="middle" fill="#475569" font-size="12" font-family="Arial, sans-serif">Awaiting vendor-supplied imagery</text>
   </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-function getProductImage(product, vendorColor) {
+function getProductImage(product, vendor) {
   if (product?.image) return product.image;
   if (product?.gallery?.length) return product.gallery[0];
-  return makePlaceholderDataUri(product?.name || "Product", vendorColor, product?.category || "");
+  return makePlaceholderDataUri(product?.name || "Product", vendor?.color, product?.category || "", vendor?.logo);
 }
 
 // Reusable image component with automatic fallback to placeholder
 function ProductImg({ product, vendor, style, onClick }) {
-  const placeholder = makePlaceholderDataUri(product?.name || "Product", vendor?.color, product?.category);
-  const [src, setSrc] = useState(getProductImage(product, vendor?.color));
+  const placeholder = makePlaceholderDataUri(product?.name || "Product", vendor?.color, product?.category, vendor?.logo);
+  const [src, setSrc] = useState(getProductImage(product, vendor));
   return (
     <img
       src={src}
@@ -434,7 +461,8 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
   const profile = getProfileScore(vendor);
   return (
     <div
-      style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}), boxShadow: selected ? "0 0 0 2px #f59e0b" : "none" }}
+      data-vendor-card
+      style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}), boxShadow: selected ? "0 0 0 2px #f59e0b" : "none", transition: "all 0.18s ease" }}
       onClick={onClick}
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
@@ -665,7 +693,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
         <div style={{ height: 16 }} />
       </div>
 
-      <div style={{ padding: "20px 28px" }}>
+      <div style={{ padding: "20px 28px", maxWidth: 1400, margin: "0 auto", width: "100%" }}>
         {selected.length > 0 && (
           <div style={S.compareBar}>
             <span style={{ color: "#94a3b8" }}><strong style={{ color: "#e8edf5" }}>{selected.length}</strong> vendor{selected.length > 1 ? "s" : ""} selected for comparison</span>
@@ -1012,6 +1040,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                   <span style={{ ...S.tag, color: "#94a3b8" }}>Commercial model: {inferCommercialModel(vendor)}</span>
                   <span style={{ ...S.tag, color: "#94a3b8" }}>Implementation: {inferImplementationLevel(vendor)}</span>
                 </div>
+                <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>Pricing tiers are estimates based on industry research. Get exact pricing from {vendor.name}.</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
@@ -1085,16 +1114,21 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                     </div>
                   </div>
                   {vendor.strengths && vendor.weaknesses && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-                      <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Strengths</div>
-                        {vendor.strengths.map((s, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#22c55e', flexShrink: 0, marginTop: 1 }}>+</span>{s}</div>))}
+                    <>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                        <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Strengths</div>
+                          {vendor.strengths.map((s, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#22c55e', flexShrink: 0, marginTop: 1 }}>+</span>{s}</div>))}
+                        </div>
+                        <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Watch-outs</div>
+                          {vendor.weaknesses.map((w, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }}>−</span>{w}</div>))}
+                        </div>
                       </div>
-                      <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Watch-outs</div>
-                        {vendor.weaknesses.map((w, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }}>−</span>{w}</div>))}
+                      <div style={{ marginBottom: 24, padding: '8px 12px', fontSize: 11, color: '#475569', background: 'rgba(255,255,255,0.02)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.04)', lineHeight: 1.5 }}>
+                        <strong style={{ color: '#64748b' }}>Note:</strong> Strengths and watch-outs are based on industry research, public sources, and practitioner observations. Validate against your specific use case during evaluation.
                       </div>
-                    </div>
+                    </>
                   )}
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Industries served</div>
                   <div style={{ ...S.tags, marginBottom: 20 }}>{vendor.industry.map(i => <span key={i} style={S.tag}>{i}</span>)}</div>
@@ -1110,22 +1144,29 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
               )}
               {tab === 'reviews' && (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                    <div style={{ fontSize: 40, fontWeight: 800, color: '#f59e0b' }}>{vendor.rating.toFixed(1)}</div>
-                    <div>
-                      <Stars rating={vendor.rating} />
-                      <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>Practitioner notes and early review intake</div>
+                  <div style={{ background: '#0d1526', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: 32, textAlign: 'center' }}>
+                    <div style={{ fontSize: 32, marginBottom: 12 }}>📝</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#e8edf5', marginBottom: 8 }}>Be the first to review {vendor.name}</div>
+                    <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 16, maxWidth: 460, margin: '0 auto 20px' }}>
+                      OpEx Scout publishes practitioner reviews from operations professionals who have actually deployed and worked with vendor solutions. We don't fabricate ratings — every review is from a verified practitioner with relevant experience.
                     </div>
+                    <button style={{ ...S.btnPrimary, width: 'auto', padding: '10px 22px' }} onClick={() => setPage('reviews')}>Submit a review</button>
                   </div>
-                  <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>These notes are provided as early practitioner input or public-source observations until formally verified. Use them as a starting point, not a substitute for qualification.</div>
-                  {vendor.reviews_data.map((r, i) => (<div key={i} style={S.review}><div style={S.reviewHead}><span style={S.reviewAuthor}>{r.author}</span><span style={S.reviewRating}><StarIcon /> {r.rating.toFixed(1)}</span></div><div style={S.reviewText}>{r.text}</div></div>))}
+                  <div style={{ marginTop: 20, padding: 14, background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.12)', borderRadius: 10, fontSize: 12, color: '#94a3b8', lineHeight: 1.7 }}>
+                    <strong style={{ color: '#f59e0b' }}>Why no reviews yet?</strong> OpEx Scout is in early access. Rather than synthesize fake reviews, we're building a verified practitioner review program. If you've deployed a {vendor.name} solution, sharing your experience helps other operators make better decisions.
+                  </div>
                 </>
               )}
               {tab === 'cases' && (
                 <>
-                  {[{ title: 'Reference format — brownfield DC deployment', badge: 'Format', body: `Use this section to summarize customer use cases, throughput context, timeline, and implementation outcomes for ${vendor.name}.` }, { title: 'Reference format — operations improvement summary', badge: '', body: `Add public case-study snapshots that explain the application, the scope, and the operational results in plain language.` }].map((c, i) => (
-                    <div key={i} style={{ ...S.review, borderLeft: i === 0 ? '3px solid #f59e0b' : 'none', borderRadius: i === 0 ? '0 10px 10px 0' : 10 }}><div style={S.reviewHead}><span style={S.reviewAuthor}>{c.title}</span>{c.badge && <span style={{ ...S.featuredBadge, position: 'static' }}>Example format</span>}</div><div style={S.reviewText}>{c.body}</div></div>
-                  ))}
+                  <div style={{ background: '#0d1526', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: 32, textAlign: 'center' }}>
+                    <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#e8edf5', marginBottom: 8 }}>Case studies coming soon</div>
+                    <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 16, maxWidth: 460, margin: '0 auto 20px' }}>
+                      Verified case studies from {vendor.name} deployments will appear here. Until they're added, view official case studies on the vendor's website.
+                    </div>
+                    <a href={`https://${vendor.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: 'auto', padding: '10px 22px', textDecoration: 'none', display: 'inline-block' }}>Visit {vendor.name} →</a>
+                  </div>
                 </>
               )}
             </div>
@@ -1153,8 +1194,11 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                     <div style={{ height: 8, borderRadius: 99, background: "#0b1220", overflow: "hidden", marginBottom: 10 }}>
                       <div style={{ height: "100%", width: `${profile.score}%`, background: profile.color }} />
                     </div>
-                    <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.7, marginBottom: 10 }}>
                       {profile.missing.length ? `Next profile upgrades: ${profile.missing.join(", ")}.` : "This profile has the core buyer-research fields needed for evaluation."}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#475569", paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                      <span style={{ cursor: "pointer", color: "#f59e0b" }} onClick={() => setPage("methodology")}>How we build vendor profiles →</span>
                     </div>
                   </>
                 );
@@ -1868,6 +1912,71 @@ function AboutPage({ setPage }) {
   );
 }
 
+function MethodologyPage({ setPage }) {
+  return (
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 28px" }}>
+      <button style={S.backBtn} onClick={() => setPage('home')}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Methodology</div>
+      <div style={S.listTitle}>How OpEx Scout builds vendor profiles</div>
+      <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 28 }}>
+        OpEx Scout is independent — we don't take payment from vendors to influence rankings, hide weaknesses, or manufacture reviews. Here's exactly how the data on this site is created and where it comes from.
+      </p>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>Where vendor data comes from</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          Profiles are built from a combination of public-source research, vendor websites, MODEX and ProMat exhibitor materials, customer case studies published by the vendor, public earnings calls and product launches, and direct practitioner observations from automation deployments. When a vendor claims their listing, they can correct, expand, or add additional product detail.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>How pricing tiers are determined</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          Pricing tiers ($, $$, $$$, $$$$, RaaS) are estimates based on industry research, RFP responses we've reviewed, and conversations with practitioners. They're meant as directional guidance for budget planning — not vendor quotes. Always validate exact pricing directly with the vendor based on your specific scope, integration requirements, and volume.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>How strengths and weaknesses are written</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          Strengths and watch-outs reflect what we've seen in industry research, deployment patterns, and public practitioner discussions. They're directional — meaning the right starting points for evaluation, not absolute truths. Every operation is different. A weakness for one buyer may be irrelevant for another. Use the watch-outs to build better RFI questions, not to disqualify vendors.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>How reviews work</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          OpEx Scout does not fabricate reviews. Until verified practitioner reviews are submitted for a vendor, that vendor's review tab will show "Be the first to review." When practitioners do submit reviews, we verify the submitter has relevant operational experience before publishing. Reviewers can choose to remain anonymous on the public site.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>How the Find Solution wizard ranks vendors</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          The wizard scores vendors against your inputs using: category fit (must match your use case), industry served, keyword overlap with the vendor's positioning, brownfield/greenfield experience, and budget alignment. Vendors clearly outside your stated budget range are penalized heavily. The ranking is meant to surface a starting shortlist — not replace deeper qualification.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, marginBottom: 16 }}>
+        <div style={S.sideCardTitle}>What's coming next</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+          Verified practitioner reviews, official vendor product imagery, real case study summaries linked from vendor sites, integration matrix between WMS/ERP/automation platforms, and editorial articles written by working IEs and operations leaders. As content expands, we'll continue making it clear what's research-based and what's verified.
+        </div>
+      </div>
+
+      <div style={{ ...S.sideCard, background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 8 }}>Found something wrong?</div>
+        <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7, marginBottom: 12 }}>
+          If you spot inaccurate information, missing context, or outdated details on any vendor profile, let us know. Vendors can claim and correct their listings directly. Buyers and practitioners can flag issues anytime.
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button style={{ ...S.navCta, fontFamily: 'inherit' }} onClick={() => setPage('contact')}>Report an issue</button>
+          <button style={{ ...S.btnSecondary, width: 'auto' }} onClick={() => setPage('list')}>Claim a vendor listing</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function VendorsPage({ setPage }) {
   return (
@@ -1983,6 +2092,7 @@ function SiteFooter({ setPage }) {
           <div style={{ fontSize: 12, color: '#475569', marginTop: 8, maxWidth: 420 }}>Automation vendor intelligence for warehouse, manufacturing, and industrial teams.</div>
         </div>
         <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 12, color: '#94a3b8' }}>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('methodology')}>Methodology</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('contact')}>Contact</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('vendors')}>Vendor program</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('lead-ops')}>Lead ops</span>
@@ -2265,6 +2375,7 @@ export default function App() {
     reviews: "Submit a Review — OpEx Scout",
     list: "List Your Company — OpEx Scout",
     about: "About — OpEx Scout",
+    methodology: "Methodology — OpEx Scout",
   };
 
   // Navigate with scroll-to-top and browser history
@@ -2323,6 +2434,7 @@ export default function App() {
       {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={navigate} removeProduct={removeProductFromCompare} openDetail={openDetail} />}
       {page === "list" && <ListPage setPage={navigate} />}
       {page === "vendors" && <VendorsPage setPage={navigate} />}
+      {page === "methodology" && <MethodologyPage setPage={navigate} />}
       {page === "about" && <AboutPage setPage={navigate} />}
       {page === "reviews" && <ReviewPage setPage={navigate} />}
       {page === "lead-ops" && <LeadOpsPage setPage={navigate} />}
