@@ -162,29 +162,46 @@ const S = {
 const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
 const LEAD_LOG_KEY = "opexscout_local_lead_log";
 
-function makePlaceholderDataUri(label, bg = "#0f1c30", fg = "#e8edf5") {
-  const safe = encodeURIComponent(String(label || "OpEx Scout").slice(0, 60));
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="${bg}"/><rect x="32" y="32" width="1136" height="611" rx="24" fill="#131f35" stroke="rgba(255,255,255,0.12)"/><text x="60" y="120" fill="#f59e0b" font-size="32" font-family="Arial, sans-serif" font-weight="700">OpEx Scout</text><text x="60" y="210" fill="${fg}" font-size="48" font-family="Arial, sans-serif" font-weight="700">${safe}</text><text x="60" y="280" fill="#94a3b8" font-size="24" font-family="Arial, sans-serif">Automation product profile</text></svg>`;
+function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "") {
+  const text = String(label || "Product").slice(0, 36);
+  const catIcons = {
+    "Palletizing": "📦", "Depalletizing": "📦", "AMR": "🤖", "Collaborative Robot": "🦾",
+    "Cobot": "🦾", "Industrial Robot": "⚙️", "Conveyor": "🔄", "Sortation": "🔄",
+    "AS/RS": "🏗️", "WMS": "💻", "Dock": "🚛", "Vision": "👁️", "Sensor": "📡",
+    "Labor": "👷", "Simulation": "📊", "AGV": "🚚", "Inspection": "🔍",
+  };
+  const icon = Object.entries(catIcons).find(([k]) => category?.includes(k))?.[1] || "⚙️";
+  const color = vendorColor || "#1a3a5c";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675">
+    <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${color};stop-opacity:0.15"/><stop offset="100%" style="stop-color:#0b1220;stop-opacity:1"/></linearGradient></defs>
+    <rect width="100%" height="100%" fill="#0b1220"/>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <rect x="1" y="1" width="1198" height="673" rx="0" fill="none" stroke="${color}" stroke-width="2" stroke-opacity="0.2"/>
+    <text x="600" y="260" text-anchor="middle" font-size="96" font-family="Arial">${icon}</text>
+    <text x="600" y="360" text-anchor="middle" fill="#e8edf5" font-size="42" font-family="Arial, sans-serif" font-weight="700">${text}</text>
+    <text x="600" y="415" text-anchor="middle" fill="#475569" font-size="22" font-family="Arial, sans-serif">Official product image coming soon</text>
+    <text x="600" y="580" text-anchor="middle" fill="${color}" font-size="18" font-family="Arial, sans-serif" font-weight="700" opacity="0.6">OpEx Scout</text>
+  </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-function getProductImage(product) {
+function getProductImage(product, vendorColor) {
   if (product?.image) return product.image;
   if (product?.gallery?.length) return product.gallery[0];
-  return makePlaceholderDataUri(product?.name || "Product");
+  return makePlaceholderDataUri(product?.name || "Product", vendorColor, product?.category || "");
 }
 
 // Reusable image component with automatic fallback to placeholder
-function ProductImg({ product, style, onClick }) {
-  const placeholder = makePlaceholderDataUri(product?.name || "Product");
-  const src = getProductImage(product);
+function ProductImg({ product, vendor, style, onClick }) {
+  const placeholder = makePlaceholderDataUri(product?.name || "Product", vendor?.color, product?.category);
+  const [src, setSrc] = useState(getProductImage(product, vendor?.color));
   return (
     <img
       src={src}
       alt={product?.name || "Product"}
       style={style}
       onClick={onClick}
-      onError={e => { e.target.onerror = null; e.target.src = placeholder; }}
+      onError={() => setSrc(placeholder)}
     />
   );
 }
@@ -732,12 +749,12 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
       <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 20, marginBottom: 20 }}>
         <div>
           <div style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 10 }}>
-            <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name); }} />
+            <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name, vendor?.color, product.category); }} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
             {gallery.slice(0, 4).map((img, idx) => (
               <button key={img} onClick={() => setActiveImage(img)} style={{ padding: 0, borderRadius: 8, overflow: "hidden", border: activeImage === img ? "2px solid #f59e0b" : "1px solid rgba(255,255,255,0.08)", background: "#0d1526", cursor: "pointer" }}>
-                <img src={img} alt={`${product.name} media ${idx + 1}`} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name); }} />
+                <img src={img} alt={`${product.name} media ${idx + 1}`} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name, vendor?.color, product.category); }} />
               </button>
             ))}
           </div>
@@ -919,7 +936,7 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
           const isSelected = selectedProducts?.find(sp => sp.product.id === p.id);
           return (
             <div key={p.id} style={{ background: "#0d1526", borderRadius: 14, border: `1px solid ${isSelected ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.07)"}`, overflow: "hidden", cursor: "pointer" }}>
-              <ProductImg product={p} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onClick={() => setActiveProduct(p)} />
+              <ProductImg product={p} vendor={vendor} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onClick={() => setActiveProduct(p)} />
               <div style={{ padding: 16 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
                   <div style={{ flex: 1 }} onClick={() => setActiveProduct(p)}>
@@ -1031,7 +1048,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                         {vendorProducts.map(p => (
                           <div key={p.id} onClick={() => setTab('products')} style={{ background: '#0d1526', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}>
-                            <ProductImg product={p} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'contain', display: 'block' }} />
+                            <ProductImg product={p} vendor={vendor} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'contain', display: 'block' }} />
                             <div style={{ padding: 12 }}>
                               <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 700, marginBottom: 4 }}>{p.name}</div>
                               <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>{p.category}</div>
