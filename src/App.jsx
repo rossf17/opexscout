@@ -604,6 +604,45 @@ function DetailPage({ vendor, setPage, selected, setSelected }) {
                       <div key={l} style={S.metric}><div style={S.metricN}>{n}</div><div style={S.metricL}>{l}</div></div>
                     ))}
                   </div>
+
+                  {(vendor.best_for || vendor.not_for) && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+                      {vendor.best_for && (
+                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>✓ Best for</div>
+                          <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{vendor.best_for}</div>
+                        </div>
+                      )}
+                      {vendor.not_for && (
+                        <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>✗ Not ideal for</div>
+                          <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{vendor.not_for}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {vendor.strengths && vendor.weaknesses && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+                      <div style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Strengths</div>
+                        {vendor.strengths.map((s, i) => (
+                          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
+                            <span style={{ color: "#22c55e", flexShrink: 0, marginTop: 1 }}>+</span>{s}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Weaknesses</div>
+                        {vendor.weaknesses.map((w, i) => (
+                          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
+                            <span style={{ color: "#ef4444", flexShrink: 0, marginTop: 1 }}>−</span>{w}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Industries Served</div>
                   <div style={{ ...S.tags, marginBottom: 20 }}>{vendor.industry.map(i => <span key={i} style={S.tag}>{i}</span>)}</div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>WMS / System Integrations</div>
@@ -727,6 +766,7 @@ function ComparePage({ selected, setPage, setDetailVendor }) {
     { label: "Installations", fn: v => v.installs },
     { label: "Employees", fn: v => v.employees },
     { label: "Rating", fn: v => `${v.rating}/5 (${v.reviews} reviews)` },
+    { label: "Price range", fn: v => v.price_range || "N/A" },
     { label: "Industries", fn: v => v.industry.slice(0, 3).join(", ") },
     { label: "Integrations", fn: v => v.integrations.slice(0, 3).join(", ") },
   ];
@@ -764,6 +804,46 @@ function ComparePage({ selected, setPage, setDetailVendor }) {
               {sel.map(v => (
                 <td key={v.id} style={S.compareTd}>
                   <div style={S.tags}>{v.tags.slice(0, 3).map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td style={{ ...S.compareTd, fontWeight: 600, color: "#22c55e", fontSize: 12 }}>✓ Best for</td>
+              {sel.map(v => (
+                <td key={v.id} style={{ ...S.compareTd, background: "rgba(34,197,94,0.03)" }}>
+                  <span style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>{v.best_for || "—"}</span>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td style={{ ...S.compareTd, fontWeight: 600, color: "#ef4444", fontSize: 12 }}>✗ Not ideal for</td>
+              {sel.map(v => (
+                <td key={v.id} style={{ ...S.compareTd, background: "rgba(239,68,68,0.03)" }}>
+                  <span style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>{v.not_for || "—"}</span>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td style={{ ...S.compareTd, fontWeight: 600, color: "#22c55e", fontSize: 12 }}>Strengths</td>
+              {sel.map(v => (
+                <td key={v.id} style={{ ...S.compareTd, background: "rgba(34,197,94,0.03)" }}>
+                  {v.strengths ? v.strengths.slice(0, 3).map((s, i) => (
+                    <div key={i} style={{ fontSize: 11, color: "#64748b", marginBottom: 5, lineHeight: 1.5 }}>
+                      <span style={{ color: "#22c55e" }}>+ </span>{s}
+                    </div>
+                  )) : "—"}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td style={{ ...S.compareTd, fontWeight: 600, color: "#ef4444", fontSize: 12 }}>Weaknesses</td>
+              {sel.map(v => (
+                <td key={v.id} style={{ ...S.compareTd, background: "rgba(239,68,68,0.03)" }}>
+                  {v.weaknesses ? v.weaknesses.slice(0, 3).map((w, i) => (
+                    <div key={i} style={{ fontSize: 11, color: "#64748b", marginBottom: 5, lineHeight: 1.5 }}>
+                      <span style={{ color: "#ef4444" }}>− </span>{w}
+                    </div>
+                  )) : "—"}
                 </td>
               ))}
             </tr>
