@@ -385,7 +385,8 @@ function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, catego
   );
 }
 
-function ProductDetail({ product, onBack }) {
+function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedProducts }) {
+  const isSelected = selectedProducts?.find(sp => sp.product.id === product.id);
   return (
     <div style={{ padding: "0 0 32px" }}>
       <button style={{ ...S.backBtn, marginBottom: 20 }} onClick={onBack}>← Back to products</button>
@@ -395,9 +396,23 @@ function ProductDetail({ product, onBack }) {
           <div style={{ fontSize: 13, color: "#475569", marginBottom: 12 }}>{product.tagline}</div>
           <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
         </div>
-        <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px", textDecoration: "none", flexShrink: 0 }}>
-          View on vendor site →
-        </a>
+        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+          {addProductToCompare && vendor && (
+            <button
+              onClick={() => !isSelected && addProductToCompare(product, vendor)}
+              style={{
+                padding: "9px 16px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
+                background: isSelected ? "rgba(245,158,11,0.15)" : "transparent",
+                color: isSelected ? "#f59e0b" : "#94a3b8", cursor: isSelected ? "default" : "pointer", fontWeight: isSelected ? 600 : 400
+              }}
+            >
+              {isSelected ? "✓ Added to compare" : "+ Add to compare"}
+            </button>
+          )}
+          <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px", textDecoration: "none", flexShrink: 0 }}>
+            View on vendor site →
+          </a>
+        </div>
       </div>
 
       {product.youtube_id && (
@@ -477,14 +492,15 @@ function ProductDetail({ product, onBack }) {
   );
 }
 
-function ProductsTab({ slug }) {
+function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
   const vendorProducts = allProducts[slug] || [];
+  const vendor = vendors.find(v => v.slug === slug);
   const [activeCat, setActiveCat] = useState("All");
   const [activeProduct, setActiveProduct] = useState(null);
   const cats = ["All", ...new Set(vendorProducts.map(p => p.category))];
   const filtered = activeCat === "All" ? vendorProducts : vendorProducts.filter(p => p.category === activeCat);
 
-  if (activeProduct) return <ProductDetail product={activeProduct} onBack={() => setActiveProduct(null)} />;
+  if (activeProduct) return <ProductDetail product={activeProduct} onBack={() => setActiveProduct(null)} addProductToCompare={addProductToCompare} vendor={vendor} selectedProducts={selectedProducts} />;
 
   if (vendorProducts.length === 0) return (
     <div style={{ textAlign: "center", padding: "48px 0" }}>
@@ -502,40 +518,51 @@ function ProductsTab({ slug }) {
         ))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {filtered.map(p => (
-          <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)", padding: 16, cursor: "pointer", transition: "border-color 0.15s" }}
-            onClick={() => setActiveProduct(p)}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"}
-          >
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5" }}>{p.name}</div>
-                  {p.youtube_id && <span style={{ fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>▶ VIDEO</span>}
+        {filtered.map(p => {
+          const isSelected = selectedProducts?.find(sp => sp.product.id === p.id);
+          return (
+            <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: `1px solid ${isSelected ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.07)"}`, padding: 16, cursor: "pointer", transition: "border-color 0.15s" }}
+              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; }}
+              onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+                <div style={{ flex: 1 }} onClick={() => setActiveProduct(p)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5" }}>{p.name}</div>
+                    {p.youtube_id && <span style={{ fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>▶ VIDEO</span>}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#475569" }}>{p.tagline}</div>
                 </div>
-                <div style={{ fontSize: 12, color: "#475569" }}>{p.tagline}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); isSelected ? null : addProductToCompare(p, vendor); }}
+                    style={{
+                      padding: "4px 10px", fontSize: 11, borderRadius: 6, border: "none", cursor: isSelected ? "default" : "pointer",
+                      background: isSelected ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.06)",
+                      color: isSelected ? "#f59e0b" : "#64748b", fontWeight: isSelected ? 600 : 400
+                    }}
+                  >
+                    {isSelected ? "✓ Added" : "+ Compare"}
+                  </button>
+                  <span style={{ color: "#475569", fontSize: 16, cursor: "pointer" }} onClick={() => setActiveProduct(p)}>›</span>
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{p.category}</span>
-                <span style={{ color: "#475569", fontSize: 16 }}>›</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} onClick={() => setActiveProduct(p)}>
+                {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
+                {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
+                {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
+                {p.throughput && <span style={{ fontSize: 11, color: "#64748b" }}>Throughput: <strong style={{ color: "#94a3b8" }}>{p.throughput}</strong></span>}
+                {p.axes && <span style={{ fontSize: 11, color: "#64748b" }}>Axes: <strong style={{ color: "#94a3b8" }}>{p.axes}</strong></span>}
               </div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
-              {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
-              {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
-              {p.throughput && <span style={{ fontSize: 11, color: "#64748b" }}>Throughput: <strong style={{ color: "#94a3b8" }}>{p.throughput}</strong></span>}
-              {p.axes && <span style={{ fontSize: 11, color: "#64748b" }}>Axes: <strong style={{ color: "#94a3b8" }}>{p.axes}</strong></span>}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );
 }
 
-function DetailPage({ vendor, setPage, selected, setSelected }) {
+function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts }) {
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
   const [rfiLoading, setRfiLoading] = useState(false);
@@ -595,7 +622,7 @@ function DetailPage({ vendor, setPage, selected, setSelected }) {
               ))}
             </div>
             <div style={S.tabContent}>
-              {tab === "products" && <ProductsTab slug={vendor.slug} />}
+              {tab === "products" && <ProductsTab slug={vendor.slug} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
               {tab === "overview" && (
                 <>
                   <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24 }}>{vendor.desc}</p>
@@ -943,11 +970,219 @@ function AboutPage({ setPage }) {
 }
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
+function ProductCompareBar({ selectedProducts, removeProduct, onCompare, onClear }) {
+  return (
+    <div style={{
+      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+      background: "#0d1526", borderTop: "1px solid rgba(245,158,11,0.3)",
+      padding: "12px 28px", display: "flex", alignItems: "center", justifyContent: "space-between",
+      boxShadow: "0 -4px 24px rgba(0,0,0,0.4)"
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 13, color: "#f59e0b", fontWeight: 600 }}>Comparing {selectedProducts.length} product{selectedProducts.length > 1 ? "s" : ""}</span>
+        <div style={{ display: "flex", gap: 8 }}>
+          {selectedProducts.map(({ product, vendorName, vendorColor, vendorLogo, product: p }) => (
+            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 6, background: "#131f35", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 10px" }}>
+              <div style={{ width: 18, height: 18, borderRadius: 4, background: vendorColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 700, color: "#fff" }}>{vendorLogo}</div>
+              <span style={{ fontSize: 12, color: "#94a3b8", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
+              <button onClick={() => removeProduct(p.id)} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: "0 0 0 4px" }}>×</button>
+            </div>
+          ))}
+          {[...Array(Math.max(0, 4 - selectedProducts.length))].map((_, i) => (
+            <div key={i} style={{ width: 120, height: 32, borderRadius: 8, border: "1px dashed rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 11, color: "#334155" }}>+ add product</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={onClear} style={{ padding: "8px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#64748b", fontSize: 13, cursor: "pointer" }}>Clear</button>
+        <button onClick={onCompare} disabled={selectedProducts.length < 2} style={{ padding: "8px 20px", background: selectedProducts.length < 2 ? "#1e2d45" : "#f59e0b", border: "none", borderRadius: 8, color: selectedProducts.length < 2 ? "#475569" : "#0b1220", fontSize: 13, fontWeight: 700, cursor: selectedProducts.length < 2 ? "not-allowed" : "pointer" }}>
+          Compare Products ({selectedProducts.length})
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ProductComparePage({ selectedProducts, setPage, removeProduct, setDetailVendor }) {
+  if (selectedProducts.length < 2) return (
+    <div style={{ textAlign: "center", padding: "80px 32px", color: "#475569" }}>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
+      <div style={{ fontSize: 16, color: "#94a3b8", marginBottom: 8 }}>Select at least 2 products to compare</div>
+      <button style={{ ...S.btnSecondary, width: "auto", marginTop: 16 }} onClick={() => setPage("directory")}>Browse vendors</button>
+    </div>
+  );
+
+  // Collect all spec keys across selected products
+  const specKeys = [
+    { label: "Vendor", fn: p => p.vendorName },
+    { label: "Category", fn: p => p.product.category },
+    { label: "Payload", fn: p => p.product.payload },
+    { label: "Reach", fn: p => p.product.reach },
+    { label: "Axes", fn: p => p.product.axes },
+    { label: "Speed / Rate", fn: p => p.product.speed },
+    { label: "Throughput", fn: p => p.product.throughput },
+    { label: "Repeatability", fn: p => p.product.repeatability },
+    { label: "Navigation", fn: p => p.product.navigation },
+    { label: "Battery", fn: p => p.product.battery },
+    { label: "IP Rating", fn: p => p.product.ip_rating },
+    { label: "Mounting", fn: p => p.product.mounting },
+    { label: "Deployment", fn: p => p.product.deployment },
+    { label: "Temp range", fn: p => p.product.temp_range },
+    { label: "Accuracy", fn: p => p.product.accuracy },
+    { label: "Storage height", fn: p => p.product.height },
+    { label: "Density", fn: p => p.product.density },
+    { label: "Memory", fn: p => p.product.memory },
+    { label: "I/O Capacity", fn: p => p.product.io_capacity },
+  ].filter(row => selectedProducts.some(p => row.fn(p) && row.fn(p) !== "N/A" && row.fn(p) !== null));
+
+  const highlightBest = (key, values) => {
+    // For payload/reach/throughput/speed — higher is usually better
+    const higherBetter = ["Payload", "Reach", "Throughput", "Speed / Rate"];
+    if (!higherBetter.includes(key)) return values.map(() => false);
+    const nums = values.map(v => {
+      if (!v) return -1;
+      const m = String(v).match(/[\d,.]+/);
+      return m ? parseFloat(m[0].replace(",", "")) : -1;
+    });
+    const max = Math.max(...nums);
+    return nums.map(n => n === max && max > -1);
+  };
+
+  return (
+    <div style={{ background: "#0b1220", minHeight: "100vh", paddingBottom: 80 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 28px" }}>
+        <button style={S.backBtn} onClick={() => setPage("directory")}><ArrowLeft /> Back to directory</button>
+        <div style={{ fontSize: 24, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px", marginBottom: 6 }}>Product comparison</div>
+        <div style={{ fontSize: 13, color: "#475569", marginBottom: 28 }}>{selectedProducts.length} products selected · Click any product to view full detail</div>
+
+        {/* Product headers */}
+        <div style={{ display: "grid", gridTemplateColumns: `180px repeat(${selectedProducts.length}, 1fr)`, gap: 0, marginBottom: 0 }}>
+          <div />
+          {selectedProducts.map(({ product: p, vendorName, vendorColor, vendorLogo, vendorSlug }) => (
+            <div key={p.id} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderBottom: "none", borderRadius: "12px 12px 0 0", padding: "16px", margin: "0 4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 6, background: vendorColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{vendorLogo}</div>
+                <span style={{ fontSize: 11, color: "#475569" }}>{vendorName}</span>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
+              <div style={{ fontSize: 11, color: "#475569", marginBottom: 10 }}>{p.category}</div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button onClick={() => removeProduct(p.id)} style={{ flex: 1, padding: "5px 0", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, color: "#475569", fontSize: 11, cursor: "pointer" }}>Remove</button>
+                <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "5px 0", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, color: "#f59e0b", fontSize: 11, cursor: "pointer", textAlign: "center", textDecoration: "none" }}>Vendor site</a>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Spec rows */}
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ ...S.compareTable, borderCollapse: "separate", borderSpacing: "4px 0" }}>
+            <tbody>
+              {specKeys.map(row => {
+                const values = selectedProducts.map(p => row.fn(p));
+                const best = highlightBest(row.label, values);
+                return (
+                  <tr key={row.label}>
+                    <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, width: 180, background: "#0d1526", borderRadius: 0 }}>{row.label}</td>
+                    {values.map((v, i) => (
+                      <td key={i} style={{ ...S.compareTd, background: best[i] ? "rgba(34,197,94,0.06)" : "#0f1c30", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <span style={{ fontSize: 13, color: best[i] ? "#22c55e" : "#94a3b8", fontWeight: best[i] ? 600 : 400 }}>
+                          {v && v !== "N/A" && v !== null ? String(v) : <span style={{ color: "#334155" }}>—</span>}
+                        </span>
+                        {best[i] && <span style={{ fontSize: 10, color: "#22c55e", marginLeft: 6, fontWeight: 600 }}>▲ highest</span>}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+
+              {/* Highlights row */}
+              <tr>
+                <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, background: "#0d1526" }}>Key highlights</td>
+                {selectedProducts.map(({ product: p }, i) => (
+                  <td key={i} style={{ ...S.compareTd, background: "#0f1c30", verticalAlign: "top" }}>
+                    {p.highlights ? p.highlights.map((h, j) => (
+                      <div key={j} style={{ fontSize: 11, color: "#64748b", marginBottom: 5 }}>
+                        <span style={{ color: "#f59e0b" }}>✓ </span>{h}
+                      </div>
+                    )) : <span style={{ color: "#334155" }}>—</span>}
+                  </td>
+                ))}
+              </tr>
+
+              {/* Applications row */}
+              <tr>
+                <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, background: "#0d1526" }}>Applications</td>
+                {selectedProducts.map(({ product: p }, i) => (
+                  <td key={i} style={{ ...S.compareTd, background: "#0f1c30" }}>
+                    <div style={S.tags}>
+                      {p.applications ? p.applications.map(a => <span key={a} style={S.tag}>{a}</span>) : <span style={{ color: "#334155" }}>—</span>}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+
+              {/* Variants row */}
+              <tr>
+                <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, background: "#0d1526" }}>Variants</td>
+                {selectedProducts.map(({ product: p }, i) => (
+                  <td key={i} style={{ ...S.compareTd, background: "#0f1c30" }}>
+                    <span style={{ fontSize: 12, color: "#64748b" }}>{p.variants ? p.variants.join(" · ") : "—"}</span>
+                  </td>
+                ))}
+              </tr>
+
+              {/* Video row */}
+              <tr>
+                <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, background: "#0d1526", verticalAlign: "top", paddingTop: 20 }}>Product video</td>
+                {selectedProducts.map(({ product: p }, i) => (
+                  <td key={i} style={{ ...S.compareTd, background: "#0f1c30", padding: 12 }}>
+                    {p.youtube_id ? (
+                      <div style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "16/9" }}>
+                        <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${p.youtube_id}`} title={p.name} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ display: "block" }} />
+                      </div>
+                    ) : <span style={{ fontSize: 12, color: "#334155" }}>No video available</span>}
+                  </td>
+                ))}
+              </tr>
+
+              {/* CTA row */}
+              <tr>
+                <td style={{ ...S.compareTd, background: "#0d1526" }} />
+                {selectedProducts.map(({ product: p }, i) => (
+                  <td key={i} style={{ ...S.compareTd, background: "#0f1c30" }}>
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, display: "block", textAlign: "center", textDecoration: "none", fontSize: 12, padding: "8px 12px" }}>
+                      View on vendor site →
+                    </a>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [page, setPage] = useState("home");
   const [detailVendor, setDetailVendor] = useState(null);
   const [selected, setSelected] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [selectedProducts, setSelectedProducts] = useState([]); // [{product, vendorName, vendorSlug, vendorColor, vendorLogo}]
+
+  const addProductToCompare = (product, vendor) => {
+    if (selectedProducts.length >= 4) return;
+    if (selectedProducts.find(p => p.product.id === product.id)) return;
+    setSelectedProducts(prev => [...prev, { product, vendorName: vendor.name, vendorSlug: vendor.slug, vendorColor: vendor.color, vendorLogo: vendor.logo }]);
+  };
+
+  const removeProductFromCompare = (productId) => {
+    setSelectedProducts(prev => prev.filter(p => p.product.id !== productId));
+  };
 
   return (
     <div style={S.app}>
@@ -955,10 +1190,14 @@ export default function App() {
       <NavBar page={page} setPage={setPage} />
       {page === "home" && <HomePage setPage={setPage} setCategoryFilter={setCategoryFilter} />}
       {page === "directory" && <DirectoryPage setPage={setPage} setDetailVendor={setDetailVendor} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
-      {page === "detail" && <DetailPage vendor={detailVendor} setPage={setPage} selected={selected} setSelected={setSelected} />}
+      {page === "detail" && <DetailPage vendor={detailVendor} setPage={setPage} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "compare" && <ComparePage selected={selected} setPage={setPage} setDetailVendor={setDetailVendor} />}
+      {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={setPage} removeProduct={removeProductFromCompare} setDetailVendor={setDetailVendor} />}
       {page === "list" && <ListPage setPage={setPage} />}
       {page === "about" && <AboutPage setPage={setPage} />}
+      {selectedProducts.length > 0 && page !== "product-compare" && (
+        <ProductCompareBar selectedProducts={selectedProducts} removeProduct={removeProductFromCompare} onCompare={() => setPage("product-compare")} onClear={() => setSelectedProducts([])} />
+      )}
     </div>
   );
 }
