@@ -538,6 +538,22 @@ function ProductsTab({ slug }) {
 function DetailPage({ vendor, setPage, selected, setSelected }) {
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
+  const [rfiLoading, setRfiLoading] = useState(false);
+  const [rfiData, setRfiData] = useState({ name: "", company: "", email: "", project: "New DC / greenfield build", description: "" });
+
+  const submitRfi = async () => {
+    if (!rfiData.name || !rfiData.email || !rfiData.company) return;
+    setRfiLoading(true);
+    try {
+      const res = await fetch("https://formspree.io/f/mgodkjpy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ ...rfiData, vendor: vendor.name, _subject: `OpEx Scout RFI — ${vendor.name} from ${rfiData.company}` }),
+      });
+      if (res.ok) setRfiSent(true);
+    } catch (e) { console.error(e); }
+    setRfiLoading(false);
+  };
 
   if (!vendor) return null;
 
@@ -664,14 +680,14 @@ function DetailPage({ vendor, setPage, selected, setSelected }) {
                 </div>
               ) : (
                 <>
-                  <label style={S.rfiLabel}>Name</label>
-                  <input style={S.rfiInput} placeholder="Jane Smith" />
-                  <label style={S.rfiLabel}>Company</label>
-                  <input style={S.rfiInput} placeholder="Acme Logistics" />
-                  <label style={S.rfiLabel}>Email</label>
-                  <input style={S.rfiInput} placeholder="jane@acme.com" type="email" />
+                  <label style={S.rfiLabel}>Name *</label>
+                  <input style={S.rfiInput} placeholder="Jane Smith" value={rfiData.name} onChange={e => setRfiData(d => ({ ...d, name: e.target.value }))} />
+                  <label style={S.rfiLabel}>Company *</label>
+                  <input style={S.rfiInput} placeholder="Acme Logistics" value={rfiData.company} onChange={e => setRfiData(d => ({ ...d, company: e.target.value }))} />
+                  <label style={S.rfiLabel}>Email *</label>
+                  <input style={S.rfiInput} placeholder="jane@acme.com" type="email" value={rfiData.email} onChange={e => setRfiData(d => ({ ...d, email: e.target.value }))} />
                   <label style={S.rfiLabel}>Project type</label>
-                  <select style={S.rfiInput}>
+                  <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}>
                     <option>New DC / greenfield build</option>
                     <option>Brownfield retrofit</option>
                     <option>Capacity expansion</option>
@@ -680,8 +696,10 @@ function DetailPage({ vendor, setPage, selected, setSelected }) {
                     <option>Manufacturing automation</option>
                   </select>
                   <label style={S.rfiLabel}>Brief description</label>
-                  <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} placeholder="Describe your application, throughput needs, timeline..." />
-                  <button style={S.btnPrimary} onClick={() => setRfiSent(true)}>Submit RFI</button>
+                  <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} placeholder="Describe your application, throughput needs, timeline..." value={rfiData.description} onChange={e => setRfiData(d => ({ ...d, description: e.target.value }))} />
+                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>
+                    {rfiLoading ? "Submitting..." : "Submit RFI"}
+                  </button>
                 </>
               )}
             </div>
