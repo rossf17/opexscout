@@ -1,5 +1,5 @@
 //v2
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { vendors, categories, industries } from "./data/vendors";
 import { products as allProducts } from "./data/products";
 
