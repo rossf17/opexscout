@@ -22,6 +22,29 @@ const BuildingIcon = () => <Icon d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4" size={
 const PhoneIcon = () => <Icon d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.5 19.79 19.79 0 01.1 4.18 2 2 0 012.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.29 6.29l1.45-.87a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" size={15} />;
 const GlobeIcon = () => <Icon d="M12 2a10 10 0 100 20A10 10 0 0012 2zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" size={15} />;
 
+function PriceBadge({ tier, large = false }) {
+  if (!tier) return null;
+  const configs = {
+    "$":    { bg: "rgba(34,197,94,0.12)",  border: "rgba(34,197,94,0.25)",  color: "#22c55e", label: "$ — Under $50k typical" },
+    "$$":   { bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.25)", color: "#f59e0b", label: "$$ — $50k–$200k typical" },
+    "$$$":  { bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.25)", color: "#f97316", label: "$$$ — $200k–$500k typical" },
+    "$$$$": { bg: "rgba(239,68,68,0.12)",  border: "rgba(239,68,68,0.25)",  color: "#ef4444", label: "$$$$ — $500k+ typical" },
+    "RaaS": { bg: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.25)", color: "#818cf8", label: "RaaS — Subscription / per-robot-per-month" },
+  };
+  const c = configs[tier] || configs["$$$$"];
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 4,
+      fontSize: large ? 13 : 11, fontWeight: 700,
+      padding: large ? "5px 12px" : "2px 8px",
+      borderRadius: large ? 8 : 6,
+      background: c.bg, border: `1px solid ${c.border}`, color: c.color,
+    }}>
+      {c.label}
+    </span>
+  );
+}
+
 // ─── STYLES ───────────────────────────────────────────────────────────────────
 const S = {
   // Layout
@@ -394,7 +417,15 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
         <div>
           <div style={{ fontSize: 22, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px", marginBottom: 4 }}>{product.name}</div>
           <div style={{ fontSize: 13, color: "#475569", marginBottom: 12 }}>{product.tagline}</div>
-          <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
+            {product.price_range && <PriceBadge tier={product.price_range} large={true} />}
+          </div>
+          {product.price_notes && (
+            <div style={{ marginTop: 10, fontSize: 12, color: "#475569", background: "#0d1526", borderRadius: 8, padding: "8px 12px", border: "1px solid rgba(255,255,255,0.05)" }}>
+              💡 <strong style={{ color: "#64748b" }}>Pricing context:</strong> {product.price_notes}
+            </div>
+          )}
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           {addProductToCompare && vendor && (
@@ -547,7 +578,8 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
                   <span style={{ color: "#475569", fontSize: 16, cursor: "pointer" }} onClick={() => setActiveProduct(p)}>›</span>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} onClick={() => setActiveProduct(p)}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }} onClick={() => setActiveProduct(p)}>
+                {p.price_range && <PriceBadge tier={p.price_range} />}
                 {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
                 {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
                 {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
@@ -1018,6 +1050,7 @@ function ProductComparePage({ selectedProducts, setPage, removeProduct, setDetai
   const specKeys = [
     { label: "Vendor", fn: p => p.vendorName },
     { label: "Category", fn: p => p.product.category },
+    { label: "Price range", fn: p => p.product.price_range },
     { label: "Payload", fn: p => p.product.payload },
     { label: "Reach", fn: p => p.product.reach },
     { label: "Axes", fn: p => p.product.axes },
@@ -1088,10 +1121,16 @@ function ProductComparePage({ selectedProducts, setPage, removeProduct, setDetai
                     <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, width: 180, background: "#0d1526", borderRadius: 0 }}>{row.label}</td>
                     {values.map((v, i) => (
                       <td key={i} style={{ ...S.compareTd, background: best[i] ? "rgba(34,197,94,0.06)" : "#0f1c30", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <span style={{ fontSize: 13, color: best[i] ? "#22c55e" : "#94a3b8", fontWeight: best[i] ? 600 : 400 }}>
-                          {v && v !== "N/A" && v !== null ? String(v) : <span style={{ color: "#334155" }}>—</span>}
-                        </span>
-                        {best[i] && <span style={{ fontSize: 10, color: "#22c55e", marginLeft: 6, fontWeight: 600 }}>▲ highest</span>}
+                        {row.label === "Price range" ? (
+                          <PriceBadge tier={v} />
+                        ) : (
+                          <>
+                            <span style={{ fontSize: 13, color: best[i] ? "#22c55e" : "#94a3b8", fontWeight: best[i] ? 600 : 400 }}>
+                              {v && v !== "N/A" && v !== null ? String(v) : <span style={{ color: "#334155" }}>—</span>}
+                            </span>
+                            {best[i] && <span style={{ fontSize: 10, color: "#22c55e", marginLeft: 6, fontWeight: 600 }}>▲ highest</span>}
+                          </>
+                        )}
                       </td>
                     ))}
                   </tr>
