@@ -920,7 +920,7 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
   );
 }
 
-function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts }) {
+function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts, detailBackPage = "directory", detailBackLabel = "directory" }) {
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
   const [rfiLoading, setRfiLoading] = useState(false);
