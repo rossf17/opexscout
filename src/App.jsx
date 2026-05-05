@@ -1473,6 +1473,7 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
 
     // Category match — strongest signal
     if (selectedUse.categories.includes(v.category)) score += 8;
+    else return -1; // Must be in right category to appear at all
 
     // Industry match
     if ((v.industry || []).includes(form.facility)) score += 4;
@@ -1486,12 +1487,16 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
       if (text.includes("brownfield") || specText.includes("yes")) score += 3;
     }
 
-    // Budget fit — penalize vendors that are clearly too expensive or too cheap
+    // Budget — hard penalty if clearly out of range
     const vTier = priceTiers[v.price_range] || 3;
-    const diff = Math.abs(vTier - budgetTier);
-    if (diff === 0) score += 3;
-    else if (diff === 1) score += 1;
-    else if (diff >= 2) score -= 2;
+    if (form.budget !== "Unknown") {
+      const diff = vTier - budgetTier;
+      if (diff === 0) score += 3;
+      else if (diff === 1) score += 1;
+      else if (diff === -1) score += 1;
+      else if (diff >= 2) score -= 6; // Too expensive — strong penalty
+      else if (diff <= -2) score -= 2; // Too cheap — mild penalty
+    }
 
     // Featured vendors get slight boost
     if (v.featured) score += 1;
@@ -1501,7 +1506,7 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
 
   const vendorMatches = vendors
     .map(v => ({ v, score: scoreVendor(v) }))
-    .filter(x => x.score > 3)
+    .filter(x => x.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 6)
     .map(x => x.v);
@@ -1510,15 +1515,20 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
     const vendor = vendors.find(v => v.slug === slug);
     return (items || []).map(product => ({ product, vendor })).filter(r => r.vendor);
   }).map(row => {
+    // Must be in right vendor category
+    if (!selectedUse.categories.includes(row.vendor.category)) return { ...row, score: -1 };
     const text = [row.product.name, row.product.tagline, row.product.category, ...(row.product.applications || []), row.vendor.name, row.vendor.category].join(" ").toLowerCase();
-    let score = 0;
+    let score = 4; // Base score for category match
     selectedUse.terms.forEach(t => { if (text.includes(t)) score += 2; });
-    if (selectedUse.categories.includes(row.vendor.category)) score += 3;
     if ((row.vendor.industry || []).includes(form.facility)) score += 2;
-    // Budget fit on product price
-    const pTier = priceTiers[row.product.price_range] || 3;
-    if (Math.abs(pTier - budgetTier) === 0) score += 2;
-    else if (Math.abs(pTier - budgetTier) >= 2) score -= 1;
+    // Budget fit on product price — hard penalty
+    if (form.budget !== "Unknown" && row.product.price_range) {
+      const pTier = priceTiers[row.product.price_range] || 3;
+      const diff = pTier - budgetTier;
+      if (diff === 0) score += 3;
+      else if (Math.abs(diff) === 1) score += 1;
+      else if (diff >= 2) score -= 5; // Too expensive
+    }
     return { ...row, score };
   }).filter(x => x.score > 2).sort((a, b) => b.score - a.score).slice(0, 6);
 
@@ -1597,7 +1607,10 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
               <span style={{ fontSize: 11, color: "#475569" }}>Ranked by fit score</span>
             </div>
             {vendorMatches.length === 0 ? (
-              <div style={{ fontSize: 13, color: "#475569", padding: "16px 0" }}>No strong matches for this combination — try adjusting budget or use case.</div>
+              <div style={{ fontSize: 13, color: "#475569", padding: "20px 0" }}>
+                <div style={{ color: "#f59e0b", fontWeight: 600, marginBottom: 6 }}>No strong matches for this combination.</div>
+                <div>Most {form.useCase} vendors are priced above {form.budget}. Try increasing your budget range or changing the use case to see results.</div>
+              </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {vendorMatches.map((v, i) => (
