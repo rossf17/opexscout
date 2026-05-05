@@ -158,6 +158,237 @@ const S = {
   pricingDesc: { fontSize: 12, color: "#475569" },
 };
 
+
+const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
+const LEAD_LOG_KEY = "opexscout_local_lead_log";
+
+function makePlaceholderDataUri(label, bg = "#0f1c30", fg = "#e8edf5") {
+  const safe = encodeURIComponent(String(label || "OpEx Scout").slice(0, 60));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="${bg}"/><rect x="32" y="32" width="1136" height="611" rx="24" fill="#131f35" stroke="rgba(255,255,255,0.12)"/><text x="60" y="120" fill="#f59e0b" font-size="32" font-family="Arial, sans-serif" font-weight="700">OpEx Scout</text><text x="60" y="210" fill="${fg}" font-size="48" font-family="Arial, sans-serif" font-weight="700">${safe}</text><text x="60" y="280" fill="#94a3b8" font-size="24" font-family="Arial, sans-serif">Automation product profile</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function getProductImage(product) {
+  if (product?.image) return product.image;
+  if (product?.gallery?.length) return product.gallery[0];
+  return makePlaceholderDataUri(product?.name || "Product");
+}
+
+function getProductGallery(product) {
+  const items = [];
+  if (product?.image) items.push(product.image);
+  if (product?.gallery?.length) items.push(...product.gallery);
+  const deduped = [...new Set(items)].filter(Boolean);
+  return deduped.length ? deduped : [makePlaceholderDataUri(product?.name || "Product")];
+}
+
+function getMediaStatus(product) {
+  const hasOfficialImage = Boolean(product?.image || product?.gallery?.length);
+  const hasVideo = Boolean(product?.youtube_id || product?.videoUrl);
+  const hasSpec = Boolean(product?.specSheetUrl || product?.catalogUrl);
+  if (hasOfficialImage && hasVideo && hasSpec) return { label: "Media complete", color: "#22c55e", bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.24)" };
+  if (hasOfficialImage && hasSpec) return { label: "Photo + specs", color: "#f59e0b", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.24)" };
+  if (hasOfficialImage) return { label: "Official image", color: "#818cf8", bg: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.24)" };
+  if (hasVideo && hasSpec) return { label: "Video + specs", color: "#38bdf8", bg: "rgba(56,189,248,0.1)", border: "rgba(56,189,248,0.22)" };
+  if (hasVideo) return { label: "Video only", color: "#38bdf8", bg: "rgba(56,189,248,0.1)", border: "rgba(56,189,248,0.22)" };
+  return { label: "Needs official image", color: "#ef4444", bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.2)" };
+}
+
+function MediaBadge({ product }) {
+  const status = getMediaStatus(product);
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 999, background: status.bg, border: `1px solid ${status.border}`, color: status.color, letterSpacing: "0.02em" }}>
+      {status.label}
+    </span>
+  );
+}
+
+function readLeadLog() {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(LEAD_LOG_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function writeLeadLog(items) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LEAD_LOG_KEY, JSON.stringify(items));
+  } catch {}
+}
+
+function recordLead(entry) {
+  const current = readLeadLog();
+  current.unshift(entry);
+  writeLeadLog(current.slice(0, 150));
+}
+
+async function submitLeadForm(payload, meta = {}) {
+  const timestamp = new Date().toISOString();
+  const entry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    timestamp,
+    status: "new",
+    ...meta,
+    ...payload,
+  };
+  recordLead(entry);
+  const body = {
+    ...payload,
+    ...meta,
+    _timestamp: timestamp,
+    _page_url: typeof window !== "undefined" ? window.location.href : "",
+  };
+  const res = await fetch(FORM_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.ok;
+}
+
+const categoryPlaybooks = {
+  "AMR / Mobile Robots": {
+    deployment: "8–16 weeks pilot; 3–6 months full rollout",
+    roi: "12–24 month payback is typical when travel reduction and labor redeployment are clear.",
+    commercial: "Often sold as capex or RaaS, depending on fleet size and software scope.",
+    questions: [
+      "What WMS and order profiles has this system already integrated with?",
+      "How does the fleet behave during Wi-Fi loss, congestion, and battery peaks?",
+      "What throughput assumptions are required to hit the stated ROI?",
+    ],
+  },
+  "Dock Automation": {
+    deployment: "3–6 month implementation depending on dock readiness and trailer mix",
+    roi: "Fastest ROI when inbound or outbound dock volume is high and labor is constrained.",
+    commercial: "Usually project-based capex with installation and change-management scope.",
+    questions: [
+      "What trailer conditions and dock profiles are out of scope?",
+      "How much floor prep or dock modification is required?",
+      "What labor and cycle-time assumptions drive the business case?",
+    ],
+  },
+  "Industrial Robotics": {
+    deployment: "4–8 month project timeline including tooling, controls, and commissioning",
+    roi: "Most compelling when uptime, repeatability, and safety improvements matter more than flexibility.",
+    commercial: "Capex-driven with tooling, controls, and integration often exceeding robot-only cost.",
+    questions: [
+      "Who owns controls integration, guarding, and commissioning?",
+      "What spares, support SLA, and training are included?",
+      "How flexible is the cell if SKU mix changes next year?",
+    ],
+  },
+  "Conveyor & Sortation": {
+    deployment: "6–12 month project with design, controls, FAT, and phased cutover",
+    roi: "Best for sustained volume growth and network-standardized operations.",
+    commercial: "Large project capex with software, controls, and installation bundled.",
+    questions: [
+      "How are peak rates validated before go-live?",
+      "What are the maintenance and spare-parts expectations?",
+      "What is the fallback operating mode during controls faults?",
+    ],
+  },
+  "WMS Platforms": {
+    deployment: "6–18 month implementation depending on site count and process complexity",
+    roi: "Value usually comes from process discipline, inventory accuracy, and scalability rather than labor alone.",
+    commercial: "Subscription or license-based, with implementation often equal to or above first-year software cost.",
+    questions: [
+      "Which core workflows are native versus customized?",
+      "How many sites and process variants has the team deployed recently?",
+      "What reporting and integration work must the customer own?",
+    ],
+  },
+};
+
+function getVendorPlaybook(vendor) {
+  return categoryPlaybooks[vendor?.category] || {
+    deployment: "Project timing depends on solution complexity, systems integration, and site readiness.",
+    roi: "ROI should be validated against labor, throughput, quality, and uptime assumptions.",
+    commercial: "Commercial structure varies by equipment, software, and integration scope.",
+    questions: [
+      "What assumptions are built into the business case?",
+      "What implementation resources are required from the customer?",
+      "How is support handled after go-live?",
+    ],
+  };
+}
+
+function inferCommercialModel(vendor) {
+  if (vendor?.price_range === "RaaS") return "RaaS / subscription";
+  if (vendor?.category === "WMS Platforms" || vendor?.category === "Labor Management") return "Software subscription + implementation";
+  return "Capex project + integration";
+}
+
+function inferImplementationLevel(vendor) {
+  const cat = vendor?.category || "";
+  if (["Conveyor & Sortation", "AS/RS & Storage", "Systems Integration"].includes(cat)) return "High";
+  if (["Industrial Robotics", "Dock Automation", "WMS Platforms", "Manufacturing Automation"].includes(cat)) return "Medium to high";
+  return "Medium";
+}
+
+
+function getVendorProducts(vendor) {
+  return allProducts[vendor?.slug] || [];
+}
+
+function getProfileScore(vendor) {
+  const productCount = getVendorProducts(vendor).length;
+  const checks = [
+    Boolean(vendor?.desc && vendor.desc.length > 120),
+    Boolean(vendor?.best_for),
+    Boolean(vendor?.not_for),
+    Boolean(vendor?.strengths?.length >= 3),
+    Boolean(vendor?.weaknesses?.length >= 2),
+    Boolean(vendor?.integrations?.length >= 2),
+    Boolean(vendor?.specs?.length >= 4),
+    productCount >= 2,
+    Boolean(vendor?.reviews_data?.length >= 1),
+    Boolean(vendor?.website),
+  ];
+  const score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  const missing = [
+    !checks[1] && "best-fit guidance",
+    !checks[2] && "watch-outs",
+    !checks[4] && "implementation risks",
+    productCount < 2 && "product listings",
+    !checks[8] && "practitioner notes",
+  ].filter(Boolean);
+  const level = score >= 85 ? "Research-ready" : score >= 65 ? "Enhanced" : "Basic";
+  const color = score >= 85 ? "#22c55e" : score >= 65 ? "#f59e0b" : "#94a3b8";
+  return { score, level, color, productCount, missing };
+}
+
+function estimateLeadQuality(lead) {
+  let score = 20;
+  if (lead.company) score += 15;
+  if (lead.email) score += 15;
+  if (lead.phone) score += 10;
+  if (lead.budget && !String(lead.budget).toLowerCase().includes("explor")) score += 15;
+  if (lead.timeline && !String(lead.timeline).includes("12+")) score += 10;
+  if (lead.description || lead.notes) score += 10;
+  if (lead.vendor || lead.product) score += 5;
+  return Math.min(score, 100);
+}
+
+function ProfileScoreBadge({ vendor }) {
+  const profile = getProfileScore(vendor);
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      fontSize: 11, fontWeight: 700, padding: "4px 9px", borderRadius: 999,
+      color: profile.color, background: `${profile.color}18`, border: `1px solid ${profile.color}33`
+    }}>
+      {profile.level} · {profile.score}%
+    </span>
+  );
+}
+
+function getSimilarVendors(vendor) {
+  return vendors.filter(v => v.id !== vendor.id && (v.category === vendor.category || v.industry.some(i => vendor.industry.includes(i)))).slice(0, 3);
+}
+
 // ─── COMPONENTS ───────────────────────────────────────────────────────────────
 function Stars({ rating }) {
   return (
@@ -168,17 +399,33 @@ function Stars({ rating }) {
 }
 
 function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
+  const profile = getProfileScore(vendor);
   return (
     <div
       style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}), boxShadow: selected ? "0 0 0 2px #f59e0b" : "none" }}
       onClick={onClick}
     >
-      {vendor.featured && <div style={S.featuredBadge}>FEATURED</div>}
-      <div style={{ ...S.logoCircle, background: vendor.color }}>{vendor.logo}</div>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+        <div style={{ ...S.logoCircle, background: vendor.color, marginBottom: 0 }}>{vendor.logo}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
+          {vendor.featured && <span style={{ fontSize: 10, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em" }}>FEATURED</span>}
+          <ProfileScoreBadge vendor={vendor} />
+        </div>
+      </div>
       <div style={S.cardName}>{vendor.name}</div>
       <div style={S.cardTagline}>{vendor.tagline}</div>
       <div style={S.tags}>
         {vendor.tags.slice(0, 3).map(t => <span key={t} style={S.tag}>{t}</span>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
+        <div style={{ background: "#0d1526", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Products</div>
+          <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700 }}>{profile.productCount || "Pending"}</div>
+        </div>
+        <div style={{ background: "#0d1526", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Fit</div>
+          <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{vendor.price_range || "Review"}</div>
+        </div>
       </div>
       <div style={S.cardFooter}>
         <Stars rating={vendor.rating} />
@@ -198,64 +445,98 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
 }
 
 function NavBar({ page, setPage }) {
+  const links = [
+    ["directory", "Directory"],
+    ["categories", "Categories"],
+    ["solution", "Find Solution"],
+    ["compare", "Compare"],
+    ["reviews", "Reviews"],
+    ["about", "About"],
+  ];
   return (
     <nav style={S.nav}>
       <div style={S.logo} onClick={() => setPage("home")}>
         OpEx<span style={S.logoAccent}>Scout</span>
       </div>
-      <div style={S.navLinks}>
-        {[["directory", "Directory"], ["compare", "Compare Tools"], ["about", "For Vendors"]].map(([p, label]) => (
+      <div style={{ ...S.navLinks, gap: 20 }}>
+        {links.map(([p, label]) => (
           <span key={p} style={{ ...S.navLink, color: page === p ? "#e8edf5" : "#64748b" }} onClick={() => setPage(p)}>{label}</span>
         ))}
       </div>
-      <button style={S.navCta} onClick={() => setPage("list")}>List Your Company</button>
+      <button style={S.navCta} onClick={() => setPage("list")}>Claim Listing</button>
     </nav>
   );
 }
 
 // ─── PAGES ───────────────────────────────────────────────────────────────────
-function HomePage({ setPage, setCategoryFilter }) {
+function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail }) {
   const catCounts = categories.map(c => ({ name: c, count: vendors.filter(v => v.category === c).length }));
-  const featured = vendors.filter(v => v.featured);
-
-  const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭"];
+  const featured = vendors.filter(v => v.featured).slice(0, 3);
+  const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭", "🚚", "📊", "👁️", "🧩"];
 
   return (
     <div>
       <div style={S.hero}>
-        <div style={S.heroEyebrow}>The Independent Resource for Automation Professionals</div>
-        <h1 style={S.heroH1}>Find the right automation<br />vendor for your operation</h1>
-        <p style={S.heroSub}>Search, compare, and connect with vendors across warehouse, DC, and manufacturing automation — built by practitioners, for practitioners.</p>
-        <div style={S.searchWrap}>
-          <input style={S.searchInput} placeholder="Search vendors, technologies, applications..." onKeyDown={e => { if (e.key === "Enter") setPage("directory"); }} />
-          <select style={S.searchSelect}>
-            <option>All categories</option>
-            {categories.map(c => <option key={c}>{c}</option>)}
-          </select>
-          <button style={S.searchBtn} onClick={() => setPage("directory")}>Search</button>
-        </div>
-        <div style={S.chips}>
-          {["AMR", "Depalletizing", "WMS", "Controls", "Manufacturing"].map(c => (
-            <div key={c} style={S.chip} onClick={() => { setCategoryFilter(c); setPage("directory"); }}>{c}</div>
-          ))}
+        <div style={{ maxWidth: 920, margin: "0 auto" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "8px 14px", marginBottom: 18, fontSize: 12, color: "#f8c56a", fontWeight: 600 }}>
+            Early-access buyer platform · profiles are expanding weekly
+          </div>
+          <div style={S.heroEyebrow}>Independent automation vendor intelligence</div>
+          <h1 style={S.heroH1}>Compare automation vendors like a buyer, not a booth visitor</h1>
+          <p style={S.heroSub}>OpEx Scout helps warehouse, manufacturing, and industrial teams research vendors, review products, compare fit, and submit qualified RFIs from one place.</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
+            <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find a solution</button>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse vendor directory</button>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("list")}>List your company</button>
+          </div>
+          <div style={S.searchWrap}>
+            <input style={S.searchInput} placeholder="Search vendors, products, categories, or use cases..." onKeyDown={e => { if (e.key === "Enter") setPage("directory"); }} />
+            <select style={S.searchSelect}>
+              <option>All categories</option>
+              {categories.map(c => <option key={c}>{c}</option>)}
+            </select>
+            <button style={S.searchBtn} onClick={() => setPage("directory")}>Search</button>
+          </div>
+          <div style={S.chips}>
+            {['AMR / Mobile Robots', 'Depalletizing & Palletizing', 'WMS Platforms', 'Conveyor & Sortation', 'Industrial Robotics'].map(c => (
+              <div key={c} style={S.chip} onClick={() => { setCategoryFilter(c); setPage("directory"); }}>{c}</div>
+            ))}
+          </div>
         </div>
       </div>
 
       <div style={S.statsBar}>
-        {[["20+", "Vendors Listed"], ["10", "Categories"], ["12", "Industries"], ["Free", "To Search"]].map(([n, l]) => (
+        {[[`${vendors.length}+`, "Vendors listed"], [`${categories.length}`, "Categories"], [`${industries.length}`, "Industries"], ["Live", "RFI routing"]].map(([n, l]) => (
           <div key={l} style={S.statItem}><div style={S.statN}>{n}</div><div style={S.statL}>{l}</div></div>
         ))}
       </div>
 
       <div style={S.section}>
+        <div style={S.sectionTitle}>How OpEx Scout helps buyers</div>
+        <div style={S.sectionSub}>Built to help engineering and operations teams screen vendors faster before engaging a sales cycle.</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+          {[
+            ["Browse by category", "Filter vendors by technology, industry, and use case."],
+            ["Review products", "See product pages, videos, specs, and practical fit notes."],
+            ["Generate a shortlist", "Use the solution wizard to build a buyer-ready shortlist."],
+          ].map(([title, desc]) => (
+            <div key={title} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>{title}</div>
+              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={S.section}>
         <div style={S.sectionTitle}>Browse by category</div>
-        <div style={{ ...S.sectionSub }}>From AMRs to WMS platforms, find vendors across every automation discipline</div>
+        <div style={{ ...S.sectionSub }}>Research the solutions most relevant to your operation.</div>
         <div style={S.catGrid}>
           {catCounts.map((c, i) => (
-            <div key={c.name} style={S.catCard} onClick={() => { setCategoryFilter(c.name); setPage("directory"); }}
+            <div key={c.name} style={S.catCard} onClick={() => { setCategoryPageCategory(c.name); setCategoryFilter(c.name); setPage("categories"); }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; e.currentTarget.style.background = "#131f35"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.background = "#0f1c30"; }}>
-              <div style={{ fontSize: 28 }}>{catIcons[i]}</div>
+              <div style={{ fontSize: 28 }}>{catIcons[i] || '⚙️'}</div>
               <div style={S.catName}>{c.name}</div>
               <div style={S.catCount}>{c.count} vendor{c.count !== 1 ? "s" : ""}</div>
             </div>
@@ -265,49 +546,48 @@ function HomePage({ setPage, setCategoryFilter }) {
 
       <div style={{ background: "#0d1526", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={S.section}>
-          <div style={S.sectionTitle}>Featured vendors</div>
-          <div style={S.sectionSub}>Verified profiles with full specs, reviews, and direct contact</div>
+          <div style={S.sectionTitle}>Featured vendor profiles</div>
+          <div style={S.sectionSub}>Profiles include buyer-fit notes, product pages, videos, and direct RFI routing.</div>
           <div style={S.grid}>
             {featured.map(v => (
-              <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => {}} compareCount={0} />
+              <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "home", "home")} compareCount={0} />
             ))}
-          </div>
-          <div style={{ textAlign: "center", marginTop: 28 }}>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "10px 28px" }} onClick={() => setPage("directory")}>View all vendors →</button>
           </div>
         </div>
       </div>
 
       <div style={S.section}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 28, alignItems: "start" }}>
           <div>
-            <div style={S.heroEyebrow}>For Vendors</div>
-            <div style={S.sectionTitle}>Reach the buyers who matter</div>
-            <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.8, marginBottom: 24 }}>
-              OpEx Scout's audience is operations engineers, IEs, and supply chain leaders actively evaluating automation investments. Get your product in front of the right people at the right time.
+            <div style={S.heroEyebrow}>For vendors</div>
+            <div style={S.sectionTitle}>Sponsor visibility and capture qualified buyer intent</div>
+            <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 18 }}>
+              Vendors can claim listings, enrich product pages, route RFIs, and participate in featured category placements. OpEx Scout is designed to help buyers research first — then convert that research into qualified introductions.
             </p>
-            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("list")}>List your company →</button>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("list")}>Claim your listing</button>
+              <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("vendors")}>Vendor program</button>
+            </div>
           </div>
-          <div style={S.pricingGrid}>
-            {[["Free", "Basic profile", "Basic listing"], ["$999/mo", "Featured listing", "Featured"], ["$1,999/mo", "Verified + leads", "Verified"]].map(([price, desc, tier], i) => (
-              <div key={tier} style={{ ...S.pricingCard, ...(i === 1 ? S.pricingCardFeatured : {}) }}>
-                <div style={S.pricingTier}>{tier}</div>
-                <div style={S.pricingPrice}>{price}</div>
-                <div style={S.pricingDesc}>{desc}</div>
+          <div style={{ display: "grid", gap: 12 }}>
+            {[
+              ["Free profile", "Basic company page, category listing, website link, and contact routing."],
+              ["Verified plan", "Enhanced profile, product pages, videos, case studies, and better conversion."],
+              ["Featured visibility", "Category placement, shortlist visibility, and higher-intent lead flow."],
+            ].map(([title, desc]) => (
+              <div key={title} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 18 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 6 }}>{title}</div>
+                <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{desc}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      <div style={{ background: "#0d1526", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px 32px", textAlign: "center", fontSize: 12, color: "#334155" }}>
-        © 2026 OpEx Scout · Built by practitioners, for practitioners · opexscout.com
-      </div>
     </div>
   );
 }
 
-function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, categoryFilter, setCategoryFilter }) {
+function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter }) {
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
@@ -326,7 +606,7 @@ function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, catego
     else setSelected(s => s.filter(x => x !== id));
   };
 
-  const openDetail = (v) => { setDetailVendor(v); setPage("detail"); };
+  const openDetailLocal = (v) => openDetail(v, "directory", "directory");
 
   return (
     <div>
@@ -376,13 +656,13 @@ function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, catego
         {view === "grid" ? (
           <div style={S.grid}>
             {filtered.map(v => (
-              <VendorCard key={v.id} vendor={v} selected={selected.includes(v.id)} onSelect={toggleSelect} onClick={() => openDetail(v)} compareCount={selected.length} />
+              <VendorCard key={v.id} vendor={v} selected={selected.includes(v.id)} onSelect={toggleSelect} onClick={() => openDetailLocal(v)} compareCount={selected.length} />
             ))}
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {filtered.map(v => (
-              <div key={v.id} style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} onClick={() => openDetail(v)}>
+              <div key={v.id} style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} onClick={() => openDetailLocal(v)}>
                 <div style={{ ...S.logoCircle, background: v.color, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
@@ -410,118 +690,177 @@ function DirectoryPage({ setPage, setDetailVendor, selected, setSelected, catego
 
 function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedProducts }) {
   const isSelected = selectedProducts?.find(sp => sp.product.id === product.id);
+  const gallery = getProductGallery(product);
+  const [activeImage, setActiveImage] = useState(gallery[0]);
+  const similar = (allProducts[vendor.slug] || []).filter(p => p.id !== product.id).slice(0, 3);
+  const [productLead, setProductLead] = useState({ name: "", company: "", email: "", budget: "Exploring", timeline: "3–6 months", notes: "" });
+  const [productLeadSent, setProductLeadSent] = useState(false);
+  const [productLeadLoading, setProductLeadLoading] = useState(false);
+
+  const submitProductLead = async () => {
+    if (!productLead.name || !productLead.company || !productLead.email) return;
+    setProductLeadLoading(true);
+    try {
+      const ok = await submitLeadForm(
+        { ...productLead, vendor: vendor.name, product: product.name },
+        { lead_type: "Product RFI", vendor_slug: vendor.slug, product_id: product.id, category: product.category, _subject: `OpEx Scout Product RFI — ${product.name} from ${productLead.company}` }
+      );
+      if (ok) setProductLeadSent(true);
+    } catch (e) { console.error(e); }
+    setProductLeadLoading(false);
+  };
+
   return (
     <div style={{ padding: "0 0 32px" }}>
       <button style={{ ...S.backBtn, marginBottom: 20 }} onClick={onBack}>← Back to products</button>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 16 }}>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 20, marginBottom: 20 }}>
         <div>
+          <div style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 10 }}>
+            <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            {gallery.slice(0, 4).map((img, idx) => (
+              <button key={img} onClick={() => setActiveImage(img)} style={{ padding: 0, borderRadius: 8, overflow: "hidden", border: activeImage === img ? "2px solid #f59e0b" : "1px solid rgba(255,255,255,0.08)", background: "#0d1526", cursor: "pointer" }}>
+                <img src={img} alt={`${product.name} media ${idx + 1}`} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+              </button>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, fontSize: 11, color: "#475569", lineHeight: 1.5 }}>
+            Media source: {product.imageSource || "Placeholder until official product media is added"}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+            <MediaBadge product={product} />
+            <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
+          </div>
           <div style={{ fontSize: 22, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px", marginBottom: 4 }}>{product.name}</div>
           <div style={{ fontSize: 13, color: "#475569", marginBottom: 12 }}>{product.tagline}</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ ...S.tag, background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)" }}>{product.category}</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
             {product.price_range && <PriceBadge tier={product.price_range} large={true} />}
+            {product.specSheetUrl && <span style={{ ...S.tag, color: "#22c55e" }}>Spec sheet linked</span>}
+            {product.catalogUrl && <span style={{ ...S.tag, color: "#22c55e" }}>Catalog linked</span>}
           </div>
           {product.price_notes && (
-            <div style={{ marginTop: 10, fontSize: 12, color: "#475569", background: "#0d1526", borderRadius: 8, padding: "8px 12px", border: "1px solid rgba(255,255,255,0.05)" }}>
-              💡 <strong style={{ color: "#64748b" }}>Pricing context:</strong> {product.price_notes}
+            <div style={{ marginBottom: 12, fontSize: 12, color: "#94a3b8", background: "#0d1526", borderRadius: 8, padding: "10px 12px", border: "1px solid rgba(255,255,255,0.05)", lineHeight: 1.6 }}>
+              <strong style={{ color: "#e8edf5" }}>Commercial note:</strong> {product.price_notes}
             </div>
           )}
-        </div>
-        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          {addProductToCompare && vendor && (
-            <button
-              onClick={() => !isSelected && addProductToCompare(product, vendor)}
-              style={{
-                padding: "9px 16px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
-                background: isSelected ? "rgba(245,158,11,0.15)" : "transparent",
-                color: isSelected ? "#f59e0b" : "#94a3b8", cursor: isSelected ? "default" : "pointer", fontWeight: isSelected ? 600 : 400
-              }}
-            >
-              {isSelected ? "✓ Added to compare" : "+ Add to compare"}
-            </button>
-          )}
-          <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px", textDecoration: "none", flexShrink: 0 }}>
-            View on vendor site →
-          </a>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            {addProductToCompare && vendor && (
+              <button onClick={() => !isSelected && addProductToCompare(product, vendor)} style={{ padding: "9px 16px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: isSelected ? "rgba(245,158,11,0.15)" : "transparent", color: isSelected ? "#f59e0b" : "#94a3b8", cursor: isSelected ? "default" : "pointer", fontWeight: isSelected ? 600 : 400 }}>
+                {isSelected ? "✓ Added to compare" : "+ Add to compare"}
+              </button>
+            )}
+            <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px", textDecoration: "none", flexShrink: 0 }}>Official product page →</a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {product.specSheetUrl && <a href={product.specSheetUrl} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", textAlign: "center", textDecoration: "none", fontSize: 12 }}>Spec sheet</a>}
+            {product.catalogUrl && <a href={product.catalogUrl} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", textAlign: "center", textDecoration: "none", fontSize: 12 }}>Catalog / brochure</a>}
+            {product.videoUrl && <a href={product.videoUrl} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", textAlign: "center", textDecoration: "none", fontSize: 12 }}>Demo video</a>}
+            {product.imageSourceUrl && <a href={product.imageSourceUrl} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", textAlign: "center", textDecoration: "none", fontSize: 12 }}>Image source</a>}
+          </div>
         </div>
       </div>
 
       {product.youtube_id && (
         <div style={{ marginBottom: 24, borderRadius: 12, overflow: "hidden", background: "#000", aspectRatio: "16/9", width: "100%" }}>
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${product.youtube_id}`}
-            title={product.name}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={{ display: "block" }}
-          />
+          <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${product.youtube_id}`} title={product.name} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ display: "block" }} />
         </div>
       )}
 
       {product.description && (
-        <div style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24, background: "#0d1526", borderRadius: 12, padding: 20, border: "1px solid rgba(255,255,255,0.06)" }}>
-          {product.description}
-        </div>
+        <div style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24, background: "#0d1526", borderRadius: 12, padding: 20, border: "1px solid rgba(255,255,255,0.06)" }}>{product.description}</div>
       )}
 
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Specifications</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginBottom: 20 }}>
-        {product.payload && product.payload !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Payload</div><div style={S.specVal}>{product.payload}</div></div>}
-        {product.reach && product.reach !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Reach</div><div style={S.specVal}>{product.reach}</div></div>}
-        {product.axes && <div style={S.specItem}><div style={S.specLabel}>Axes</div><div style={S.specVal}>{product.axes}</div></div>}
-        {product.repeatability && <div style={S.specItem}><div style={S.specLabel}>Repeatability</div><div style={S.specVal}>{product.repeatability}</div></div>}
-        {product.speed && <div style={S.specItem}><div style={S.specLabel}>Speed / Rate</div><div style={S.specVal}>{product.speed}</div></div>}
-        {product.throughput && <div style={S.specItem}><div style={S.specLabel}>Throughput</div><div style={S.specVal}>{product.throughput}</div></div>}
-        {product.navigation && <div style={S.specItem}><div style={S.specLabel}>Navigation</div><div style={S.specVal}>{product.navigation}</div></div>}
-        {product.battery && <div style={S.specItem}><div style={S.specLabel}>Battery</div><div style={S.specVal}>{product.battery}</div></div>}
-        {product.ip_rating && <div style={S.specItem}><div style={S.specLabel}>IP Rating</div><div style={S.specVal}>{product.ip_rating}</div></div>}
-        {product.weight && <div style={S.specItem}><div style={S.specLabel}>Robot weight</div><div style={S.specVal}>{product.weight}</div></div>}
-        {product.mounting && <div style={S.specItem}><div style={S.specLabel}>Mounting</div><div style={S.specVal}>{product.mounting}</div></div>}
-        {product.deployment && <div style={S.specItem}><div style={S.specLabel}>Deployment</div><div style={S.specVal}>{product.deployment}</div></div>}
-        {product.density && <div style={S.specItem}><div style={S.specLabel}>Storage density</div><div style={S.specVal}>{product.density}</div></div>}
-        {product.temp_range && <div style={S.specItem}><div style={S.specLabel}>Temp range</div><div style={S.specVal}>{product.temp_range}</div></div>}
-        {product.accuracy && <div style={S.specItem}><div style={S.specLabel}>Accuracy</div><div style={S.specVal}>{product.accuracy}</div></div>}
-        {product.memory && <div style={S.specItem}><div style={S.specLabel}>Memory</div><div style={S.specVal}>{product.memory}</div></div>}
-        {product.io_capacity && <div style={S.specItem}><div style={S.specLabel}>I/O capacity</div><div style={S.specVal}>{product.io_capacity}</div></div>}
-        {product.comms && <div style={S.specItem}><div style={S.specLabel}>Communications</div><div style={S.specVal}>{product.comms}</div></div>}
-      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Specifications</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 8, marginBottom: 20 }}>
+            {product.payload && product.payload !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Payload</div><div style={S.specVal}>{product.payload}</div></div>}
+            {product.reach && product.reach !== "N/A" && <div style={S.specItem}><div style={S.specLabel}>Reach</div><div style={S.specVal}>{product.reach}</div></div>}
+            {product.axes && <div style={S.specItem}><div style={S.specLabel}>Axes</div><div style={S.specVal}>{product.axes}</div></div>}
+            {product.repeatability && <div style={S.specItem}><div style={S.specLabel}>Repeatability</div><div style={S.specVal}>{product.repeatability}</div></div>}
+            {product.speed && <div style={S.specItem}><div style={S.specLabel}>Speed / Rate</div><div style={S.specVal}>{product.speed}</div></div>}
+            {product.throughput && <div style={S.specItem}><div style={S.specLabel}>Throughput</div><div style={S.specVal}>{product.throughput}</div></div>}
+            {product.navigation && <div style={S.specItem}><div style={S.specLabel}>Navigation</div><div style={S.specVal}>{product.navigation}</div></div>}
+            {product.battery && <div style={S.specItem}><div style={S.specLabel}>Battery</div><div style={S.specVal}>{product.battery}</div></div>}
+            {product.ip_rating && <div style={S.specItem}><div style={S.specLabel}>IP Rating</div><div style={S.specVal}>{product.ip_rating}</div></div>}
+            {product.weight && <div style={S.specItem}><div style={S.specLabel}>Robot weight</div><div style={S.specVal}>{product.weight}</div></div>}
+            {product.mounting && <div style={S.specItem}><div style={S.specLabel}>Mounting</div><div style={S.specVal}>{product.mounting}</div></div>}
+            {product.deployment && <div style={S.specItem}><div style={S.specLabel}>Deployment</div><div style={S.specVal}>{product.deployment}</div></div>}
+            {product.density && <div style={S.specItem}><div style={S.specLabel}>Storage density</div><div style={S.specVal}>{product.density}</div></div>}
+            {product.temp_range && <div style={S.specItem}><div style={S.specLabel}>Temp range</div><div style={S.specVal}>{product.temp_range}</div></div>}
+            {product.accuracy && <div style={S.specItem}><div style={S.specLabel}>Accuracy</div><div style={S.specVal}>{product.accuracy}</div></div>}
+            {product.memory && <div style={S.specItem}><div style={S.specLabel}>Memory</div><div style={S.specVal}>{product.memory}</div></div>}
+            {product.io_capacity && <div style={S.specItem}><div style={S.specLabel}>I/O capacity</div><div style={S.specVal}>{product.io_capacity}</div></div>}
+            {product.comms && <div style={S.specItem}><div style={S.specLabel}>Communications</div><div style={S.specVal}>{product.comms}</div></div>}
+          </div>
 
-      {product.highlights && (
-        <>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Key highlights</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-            {product.highlights.map(h => (
-              <div key={h} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#94a3b8" }}>
-                <span style={{ color: "#f59e0b", fontWeight: 700 }}>✓</span> {h}
+          {product.highlights && (
+            <>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Key highlights</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                {product.highlights.map(h => <div key={h} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#94a3b8" }}><span style={{ color: "#f59e0b", fontWeight: 700 }}>✓</span> {h}</div>)}
               </div>
-            ))}
-          </div>
-        </>
-      )}
+            </>
+          )}
 
-      {product.applications && (
-        <>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Applications</div>
-          <div style={{ ...S.tags, marginBottom: 20 }}>
-            {product.applications.map(a => <span key={a} style={S.tag}>{a}</span>)}
-          </div>
-        </>
-      )}
+          {product.applications && (
+            <>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Applications</div>
+              <div style={{ ...S.tags, marginBottom: 20 }}>{product.applications.map(a => <span key={a} style={S.tag}>{a}</span>)}</div>
+            </>
+          )}
+        </div>
 
-      {product.variants && product.variants.length > 1 && (
-        <>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Available variants</div>
-          <div style={S.tags}>
-            {product.variants.map(v => <span key={v} style={{ ...S.tag, color: "#94a3b8" }}>{v}</span>)}
+        <div>
+          <div style={S.sideCard}>
+            <div style={S.sideCardTitle}>Request product info</div>
+            {productLeadSent ? (
+              <div style={{ textAlign: "center", padding: "20px 0", color: "#f59e0b" }}><div style={{ fontSize: 28, marginBottom: 8 }}>✓</div><div style={{ fontSize: 14, fontWeight: 600 }}>Product inquiry submitted</div><div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>Captured with vendor, product, and category metadata.</div></div>
+            ) : (
+              <>
+                <input style={S.rfiInput} placeholder="Name *" value={productLead.name} onChange={e => setProductLead(d => ({ ...d, name: e.target.value }))} />
+                <input style={S.rfiInput} placeholder="Company *" value={productLead.company} onChange={e => setProductLead(d => ({ ...d, company: e.target.value }))} />
+                <input style={S.rfiInput} placeholder="Email *" type="email" value={productLead.email} onChange={e => setProductLead(d => ({ ...d, email: e.target.value }))} />
+                <select style={S.rfiInput} value={productLead.budget} onChange={e => setProductLead(d => ({ ...d, budget: e.target.value }))}><option>Exploring</option><option>Under $100k</option><option>$100k–$250k</option><option>$250k–$500k</option><option>$500k+</option></select>
+                <select style={S.rfiInput} value={productLead.timeline} onChange={e => setProductLead(d => ({ ...d, timeline: e.target.value }))}><option>0–3 months</option><option>3–6 months</option><option>6–12 months</option><option>12+ months</option></select>
+                <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} placeholder="Use case, facility type, current system, timeline..." value={productLead.notes} onChange={e => setProductLead(d => ({ ...d, notes: e.target.value }))} />
+                <button style={{ ...S.btnPrimary, opacity: productLeadLoading ? 0.7 : 1 }} onClick={submitProductLead} disabled={productLeadLoading}>{productLeadLoading ? "Submitting..." : "Request product info"}</button>
+              </>
+            )}
           </div>
-        </>
-      )}
+
+          <div style={{ ...S.sideCard, marginTop: 14 }}>
+            <div style={S.sideCardTitle}>Commercial fit snapshot</div>
+            <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.8 }}>
+              <div><strong style={{ color: "#94a3b8" }}>Vendor:</strong> {vendor.name}</div>
+              <div><strong style={{ color: "#94a3b8" }}>Commercial model:</strong> {inferCommercialModel(vendor)}</div>
+              <div><strong style={{ color: "#94a3b8" }}>Implementation level:</strong> {inferImplementationLevel(vendor)}</div>
+              <div><strong style={{ color: "#94a3b8" }}>Best fit:</strong> {vendor.best_for || vendor.ideal_operation || "Discuss with vendor"}</div>
+            </div>
+          </div>
+
+          {similar.length > 0 && (
+            <div style={{ ...S.sideCard, marginTop: 14 }}>
+              <div style={S.sideCardTitle}>More products from {vendor.name}</div>
+              {similar.map(s => (
+                <div key={s.id} style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10, marginTop: 10 }}>
+                  <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 600 }}>{s.name}</div>
+                  <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{s.category}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
 
 function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
   const vendorProducts = allProducts[slug] || [];
@@ -537,54 +876,41 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
     <div style={{ textAlign: "center", padding: "48px 0" }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>📦</div>
       <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8 }}>Product listings coming soon</div>
-      <div style={{ fontSize: 12, color: "#475569" }}>This vendor hasn't claimed their listing yet.</div>
+      <div style={{ fontSize: 12, color: "#475569" }}>This vendor has not expanded their product listing yet.</div>
     </div>
   );
 
   return (
     <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-        {cats.map(c => (
-          <div key={c} style={{ ...S.chip, ...(activeCat === c ? S.chipActive : {}), fontSize: 11, padding: "4px 12px" }} onClick={() => setActiveCat(c)}>{c}</div>
-        ))}
+        {cats.map(c => (<div key={c} style={{ ...S.chip, ...(activeCat === c ? S.chipActive : {}), fontSize: 11, padding: "4px 12px" }} onClick={() => setActiveCat(c)}>{c}</div>))}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
         {filtered.map(p => {
           const isSelected = selectedProducts?.find(sp => sp.product.id === p.id);
           return (
-            <div key={p.id} style={{ background: "#0d1526", borderRadius: 12, border: `1px solid ${isSelected ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.07)"}`, padding: 16, cursor: "pointer", transition: "border-color 0.15s" }}
-              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; }}
-              onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
-            >
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
-                <div style={{ flex: 1 }} onClick={() => setActiveProduct(p)}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5" }}>{p.name}</div>
-                    {p.youtube_id && <span style={{ fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>▶ VIDEO</span>}
+            <div key={p.id} style={{ background: "#0d1526", borderRadius: 14, border: `1px solid ${isSelected ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.07)"}`, overflow: "hidden", cursor: "pointer" }}>
+              <img src={getProductImage(p)} alt={p.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} onClick={() => setActiveProduct(p)} />
+              <div style={{ padding: 16 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ flex: 1 }} onClick={() => setActiveProduct(p)}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5" }}>{p.name}</div>
+                      <MediaBadge product={p} />{p.youtube_id && <span style={{ fontSize: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>▶ VIDEO</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5 }}>{p.tagline}</div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#475569" }}>{p.tagline}</div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); isSelected ? null : addProductToCompare(p, vendor); }}
-                    style={{
-                      padding: "4px 10px", fontSize: 11, borderRadius: 6, border: "none", cursor: isSelected ? "default" : "pointer",
-                      background: isSelected ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.06)",
-                      color: isSelected ? "#f59e0b" : "#64748b", fontWeight: isSelected ? 600 : 400
-                    }}
-                  >
+                  <button onClick={(e) => { e.stopPropagation(); isSelected ? null : addProductToCompare(p, vendor); }} style={{ padding: "6px 10px", fontSize: 11, borderRadius: 6, border: "none", cursor: isSelected ? "default" : "pointer", background: isSelected ? "rgba(245,158,11,0.15)" : "rgba(255,255,255,0.06)", color: isSelected ? "#f59e0b" : "#64748b", fontWeight: isSelected ? 600 : 400 }}>
                     {isSelected ? "✓ Added" : "+ Compare"}
                   </button>
-                  <span style={{ color: "#475569", fontSize: 16, cursor: "pointer" }} onClick={() => setActiveProduct(p)}>›</span>
                 </div>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }} onClick={() => setActiveProduct(p)}>
-                {p.price_range && <PriceBadge tier={p.price_range} />}
-                {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
-                {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
-                {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
-                {p.throughput && <span style={{ fontSize: 11, color: "#64748b" }}>Throughput: <strong style={{ color: "#94a3b8" }}>{p.throughput}</strong></span>}
-                {p.axes && <span style={{ fontSize: 11, color: "#64748b" }}>Axes: <strong style={{ color: "#94a3b8" }}>{p.axes}</strong></span>}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }} onClick={() => setActiveProduct(p)}>
+                  {p.price_range && <PriceBadge tier={p.price_range} />}
+                  {p.payload && p.payload !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Payload: <strong style={{ color: "#94a3b8" }}>{p.payload}</strong></span>}
+                  {p.reach && p.reach !== "N/A" && <span style={{ fontSize: 11, color: "#64748b" }}>Reach: <strong style={{ color: "#94a3b8" }}>{p.reach}</strong></span>}
+                  {p.speed && <span style={{ fontSize: 11, color: "#64748b" }}>Speed: <strong style={{ color: "#94a3b8" }}>{p.speed}</strong></span>}
+                  {p.axes && <span style={{ fontSize: 11, color: "#64748b" }}>Axes: <strong style={{ color: "#94a3b8" }}>{p.axes}</strong></span>}
+                </div>
               </div>
             </div>
           );
@@ -598,162 +924,161 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
   const [rfiLoading, setRfiLoading] = useState(false);
-  const [rfiData, setRfiData] = useState({ name: "", company: "", email: "", project: "New DC / greenfield build", description: "" });
-
-  const submitRfi = async () => {
-    if (!rfiData.name || !rfiData.email || !rfiData.company) return;
-    setRfiLoading(true);
-    try {
-      const res = await fetch("https://formspree.io/f/mgodkjpy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ ...rfiData, vendor: vendor.name, _subject: `OpEx Scout RFI — ${vendor.name} from ${rfiData.company}` }),
-      });
-      if (res.ok) setRfiSent(true);
-    } catch (e) { console.error(e); }
-    setRfiLoading(false);
-  };
-
+  const [rfiData, setRfiData] = useState({ name: "", company: "", email: "", phone: "", budget: "Exploring", timeline: "3–6 months", project: "New DC / greenfield build", description: "" });
   if (!vendor) return null;
-
   const isSelected = selected.includes(vendor.id);
   const toggleCompare = () => {
     if (isSelected) setSelected(s => s.filter(x => x !== vendor.id));
     else if (selected.length < 4) setSelected(s => [...s, vendor.id]);
   };
+  const playbook = getVendorPlaybook(vendor);
+  const vendorProducts = (allProducts[vendor.slug] || []).slice(0, 3);
+  const similarVendors = getSimilarVendors(vendor);
+
+  const submitRfi = async () => {
+    if (!rfiData.name || !rfiData.email || !rfiData.company) return;
+    setRfiLoading(true);
+    try {
+      const ok = await submitLeadForm(
+        { ...rfiData, vendor: vendor.name },
+        { lead_type: "Vendor RFI", vendor_slug: vendor.slug, category: vendor.category, _subject: `OpEx Scout RFI — ${vendor.name} from ${rfiData.company}` }
+      );
+      if (ok) setRfiSent(true);
+    } catch (e) { console.error(e); }
+    setRfiLoading(false);
+  };
 
   return (
     <div style={{ background: "#0b1220", minHeight: "100vh" }}>
       <div style={S.detailWrap}>
-        <button style={S.backBtn} onClick={() => setPage("directory")}><ArrowLeft /> Back to directory</button>
+        <button style={S.backBtn} onClick={() => setPage(detailBackPage || "directory")}><ArrowLeft /> Back to {detailBackLabel || "directory"}</button>
 
-        <div style={S.detailHeader}>
-          <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
-            <div style={{ ...S.logoCircle, background: vendor.color, width: 56, height: 56, fontSize: 16, marginBottom: 0 }}>{vendor.logo}</div>
-            <div>
-              <div style={S.detailName}>{vendor.name}</div>
-              <div style={S.detailSub}>{vendor.category} · {vendor.hq} · Founded {vendor.founded}</div>
-              <div style={S.tags}>{vendor.tags.map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
+        <div style={{ background: "linear-gradient(180deg, #111d31 0%, #0f1c30 100%)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24, marginBottom: 24 }}>
+          <div style={S.detailHeader}>
+            <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+              <div style={{ ...S.logoCircle, background: vendor.color, width: 64, height: 64, fontSize: 16, marginBottom: 0 }}>{vendor.logo}</div>
+              <div>
+                <div style={S.detailName}>{vendor.name}</div>
+                <div style={S.detailSub}>{vendor.category} · {vendor.hq} · Founded {vendor.founded}</div>
+                <div style={S.tags}>{vendor.tags.map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+                  <PriceBadge tier={vendor.price_range} large={true} />
+                  <span style={{ ...S.tag, color: "#94a3b8" }}>Commercial model: {inferCommercialModel(vendor)}</span>
+                  <span style={{ ...S.tag, color: "#94a3b8" }}>Implementation: {inferImplementationLevel(vendor)}</span>
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+              <button style={{ ...S.btnSecondary, width: "auto", padding: "9px 18px" }} onClick={toggleCompare}>{isSelected ? "✓ Added" : "+ Compare"}</button>
+              <a href={`https://${vendor.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", padding: "9px 18px", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Visit site</a>
+              <button style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px" }} onClick={() => document.getElementById("rfi-form")?.scrollIntoView({ behavior: "smooth" })}>Request Info</button>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "9px 18px" }} onClick={toggleCompare}>
-              {isSelected ? "✓ Added" : "+ Compare"}
-            </button>
-            <button style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px" }} onClick={() => document.getElementById("rfi-form")?.scrollIntoView({ behavior: "smooth" })}>
-              Request Info
-            </button>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            {[['Installs', vendor.installs], ['Employees', vendor.employees], ['Rating', `${vendor.rating}/5`], ['Primary fit', vendor.ideal_operation || vendor.best_for || 'Research in progress']].map(([l, n]) => (
+              <div key={l} style={{ background: "#0d1526", borderRadius: 10, padding: 12, border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ fontSize: 11, color: "#475569", marginBottom: 5 }}>{l}</div>
+                <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700, lineHeight: 1.4 }}>{n}</div>
+              </div>
+            ))}
           </div>
         </div>
 
         <div style={S.detailBody}>
           <div style={S.detailMain}>
             <div style={S.tabs}>
-              {[["overview", "Overview"], ["products", "Products"], ["specs", "Specs & Capabilities"], ["reviews", "Reviews"], ["cases", "Case Studies"]].map(([t, label]) => (
+              {[['overview', 'Overview'], ['products', 'Products'], ['specs', 'Specs & Capabilities'], ['reviews', 'Practitioner notes'], ['cases', 'Case Studies']].map(([t, label]) => (
                 <div key={t} style={{ ...S.tab, ...(tab === t ? S.tabActive : {}) }} onClick={() => setTab(t)}>{label}</div>
               ))}
             </div>
             <div style={S.tabContent}>
-              {tab === "products" && <ProductsTab slug={vendor.slug} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
-              {tab === "overview" && (
+              {tab === 'products' && <ProductsTab slug={vendor.slug} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
+              {tab === 'overview' && (
                 <>
-                  <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24 }}>{vendor.desc}</p>
-                  <div style={S.metricRow}>
-                    {[["Founded", vendor.founded], ["Installs", vendor.installs], ["Employees", vendor.employees], ["Rating", `${vendor.rating}/5`]].map(([l, n]) => (
-                      <div key={l} style={S.metric}><div style={S.metricN}>{n}</div><div style={S.metricL}>{l}</div></div>
-                    ))}
+                  <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8, marginBottom: 24 }}>{vendor.desc}</p>
+                  {vendorProducts.length > 0 && (
+                    <div style={{ marginBottom: 24 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Featured products</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                        {vendorProducts.map(p => (
+                          <div key={p.id} onClick={() => setTab('products')} style={{ background: '#0d1526', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}>
+                            <img src={getProductImage(p)} alt={p.name} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block' }} />
+                            <div style={{ padding: 12 }}>
+                              <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 700, marginBottom: 4 }}>{p.name}</div>
+                              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>{p.category}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+                    <div style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 10, padding: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>✓ Best fit</div>
+                      <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{vendor.best_for || vendor.ideal_operation || 'Buyer-fit profile being expanded.'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 10, padding: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Watch-outs</div>
+                      <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{vendor.not_for || 'Validate implementation assumptions, support coverage, and integration ownership during evaluation.'}</div>
+                    </div>
                   </div>
-
-                  {(vendor.best_for || vendor.not_for) && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
-                      {vendor.best_for && (
-                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 10, padding: 14 }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>✓ Best for</div>
-                          <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{vendor.best_for}</div>
-                        </div>
-                      )}
-                      {vendor.not_for && (
-                        <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: 14 }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>✗ Not ideal for</div>
-                          <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{vendor.not_for}</div>
-                        </div>
-                      )}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+                    <div style={{ background: '#0d1526', borderRadius: 10, padding: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Commercial snapshot</div>
+                      <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>
+                        <div><strong style={{ color: '#e8edf5' }}>Commercial model:</strong> {playbook.commercial}</div>
+                        <div><strong style={{ color: '#e8edf5' }}>Typical deployment:</strong> {playbook.deployment}</div>
+                        <div><strong style={{ color: '#e8edf5' }}>ROI pattern:</strong> {playbook.roi}</div>
+                      </div>
                     </div>
-                  )}
-
+                    <div style={{ background: '#0d1526', borderRadius: 10, padding: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Buyer questions</div>
+                      {playbook.questions.map((q, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}><span style={{ color: '#f59e0b' }}>•</span>{q}</div>
+                      ))}
+                    </div>
+                  </div>
                   {vendor.strengths && vendor.weaknesses && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
-                      <div style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Strengths</div>
-                        {vendor.strengths.map((s, i) => (
-                          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
-                            <span style={{ color: "#22c55e", flexShrink: 0, marginTop: 1 }}>+</span>{s}
-                          </div>
-                        ))}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+                      <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Strengths</div>
+                        {vendor.strengths.map((s, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#22c55e', flexShrink: 0, marginTop: 1 }}>+</span>{s}</div>))}
                       </div>
-                      <div style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Weaknesses</div>
-                        {vendor.weaknesses.map((w, i) => (
-                          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
-                            <span style={{ color: "#ef4444", flexShrink: 0, marginTop: 1 }}>−</span>{w}
-                          </div>
-                        ))}
+                      <div style={{ background: '#0d1526', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Watch-outs</div>
+                        {vendor.weaknesses.map((w, i) => (<div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 12, color: '#64748b', lineHeight: 1.5 }}><span style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }}>−</span>{w}</div>))}
                       </div>
                     </div>
                   )}
-
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Industries Served</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Industries served</div>
                   <div style={{ ...S.tags, marginBottom: 20 }}>{vendor.industry.map(i => <span key={i} style={S.tag}>{i}</span>)}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>WMS / System Integrations</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Integrations</div>
                   <div style={S.tags}>{vendor.integrations.map(i => <span key={i} style={S.tag}>{i}</span>)}</div>
                 </>
               )}
-              {tab === "specs" && (
+              {tab === 'specs' && (
                 <>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16 }}>Technical Specifications</div>
-                  <div style={S.specGrid}>
-                    {vendor.specs.map(s => (
-                      <div key={s.l} style={S.specItem}>
-                        <div style={S.specLabel}>{s.l}</div>
-                        <div style={S.specVal}>{s.v}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Technical specifications</div>
+                  <div style={S.specGrid}>{vendor.specs.map(s => (<div key={s.l} style={S.specItem}><div style={S.specLabel}>{s.l}</div><div style={S.specVal}>{s.v}</div></div>))}</div>
                 </>
               )}
-              {tab === "reviews" && (
+              {tab === 'reviews' && (
                 <>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                    <div style={{ fontSize: 40, fontWeight: 800, color: "#f59e0b" }}>{vendor.rating.toFixed(1)}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                    <div style={{ fontSize: 40, fontWeight: 800, color: '#f59e0b' }}>{vendor.rating.toFixed(1)}</div>
                     <div>
                       <Stars rating={vendor.rating} />
-                      <div style={{ fontSize: 12, color: "#475569", marginTop: 4 }}>{vendor.reviews} verified reviews</div>
+                      <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>Practitioner notes and early review intake</div>
                     </div>
                   </div>
-                  {vendor.reviews_data.map((r, i) => (
-                    <div key={i} style={S.review}>
-                      <div style={S.reviewHead}>
-                        <span style={S.reviewAuthor}>{r.author}</span>
-                        <span style={S.reviewRating}><StarIcon /> {r.rating.toFixed(1)}</span>
-                      </div>
-                      <div style={S.reviewText}>{r.text}</div>
-                    </div>
-                  ))}
+                  <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>These notes are provided as early practitioner input or public-source observations until formally verified. Use them as a starting point, not a substitute for qualification.</div>
+                  {vendor.reviews_data.map((r, i) => (<div key={i} style={S.review}><div style={S.reviewHead}><span style={S.reviewAuthor}>{r.author}</span><span style={S.reviewRating}><StarIcon /> {r.rating.toFixed(1)}</span></div><div style={S.reviewText}>{r.text}</div></div>))}
                 </>
               )}
-              {tab === "cases" && (
+              {tab === 'cases' && (
                 <>
-                  {[
-                    { title: "Fortune 500 Retailer — RDC Automation", badge: "Verified", body: `Deployed ${vendor.name} solution across 4 DCs in a brownfield environment. Achieved target throughput with 99%+ uptime over 18 months. Integration with existing WMS completed within 8 weeks of go-live.` },
-                    { title: "Regional 3PL — Fulfillment Operation", badge: "", body: `Replaced manual processes with ${vendor.name} technology. Labor productivity improvement tracked to 28% in the first operating year. Payback period trending ahead of business case projections.` },
-                  ].map((c, i) => (
-                    <div key={i} style={{ ...S.review, borderLeft: i === 0 ? "3px solid #f59e0b" : "none", borderRadius: i === 0 ? "0 10px 10px 0" : 10 }}>
-                      <div style={S.reviewHead}>
-                        <span style={S.reviewAuthor}>{c.title}</span>
-                        {c.badge && <span style={{ ...S.featuredBadge, position: "static" }}>{c.badge}</span>}
-                      </div>
-                      <div style={S.reviewText}>{c.body}</div>
-                    </div>
+                  {[{ title: 'Reference format — brownfield DC deployment', badge: 'Format', body: `Use this section to summarize customer use cases, throughput context, timeline, and implementation outcomes for ${vendor.name}.` }, { title: 'Reference format — operations improvement summary', badge: '', body: `Add public case-study snapshots that explain the application, the scope, and the operational results in plain language.` }].map((c, i) => (
+                    <div key={i} style={{ ...S.review, borderLeft: i === 0 ? '3px solid #f59e0b' : 'none', borderRadius: i === 0 ? '0 10px 10px 0' : 10 }}><div style={S.reviewHead}><span style={S.reviewAuthor}>{c.title}</span>{c.badge && <span style={{ ...S.featuredBadge, position: 'static' }}>Example format</span>}</div><div style={S.reviewText}>{c.body}</div></div>
                   ))}
                 </>
               )}
@@ -762,20 +1087,56 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
 
           <div style={S.detailSide}>
             <div style={S.sideCard}>
-              <div style={S.sideCardTitle}>Contact</div>
-              <div style={S.contactRow}><GlobeIcon /><span style={{ color: "#f59e0b" }}>{vendor.website}</span></div>
+              <div style={S.sideCardTitle}>Company snapshot</div>
+              <div style={S.contactRow}><GlobeIcon /><span style={{ color: '#f59e0b' }}>{vendor.website}</span></div>
               <div style={S.contactRow}><PhoneIcon />{vendor.phone}</div>
               <div style={S.contactRow}><BuildingIcon />{vendor.hq}</div>
+              <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.7, marginTop: 8 }}>Use the RFI form to route a structured inquiry. Listing quality and routing can be upgraded through the vendor program.</div>
             </div>
+
+            <div style={S.sideCard}>
+              <div style={S.sideCardTitle}>Profile quality</div>
+              {(() => {
+                const profile = getProfileScore(vendor);
+                return (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                      <ProfileScoreBadge vendor={vendor} />
+                      <span style={{ fontSize: 12, color: "#64748b" }}>{profile.productCount} product{profile.productCount === 1 ? "" : "s"}</span>
+                    </div>
+                    <div style={{ height: 8, borderRadius: 99, background: "#0b1220", overflow: "hidden", marginBottom: 10 }}>
+                      <div style={{ height: "100%", width: `${profile.score}%`, background: profile.color }} />
+                    </div>
+                    <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.7 }}>
+                      {profile.missing.length ? `Next profile upgrades: ${profile.missing.join(", ")}.` : "This profile has the core buyer-research fields needed for evaluation."}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {similarVendors.length > 0 && (
+              <div style={S.sideCard}>
+                <div style={S.sideCardTitle}>Similar vendors</div>
+                {similarVendors.map(v => (
+                  <div key={v.id} onClick={() => { setPage('detail'); window.scrollTo(0,0); }} style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 10, cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ ...S.logoCircle, background: v.color, width: 26, height: 26, fontSize: 10, marginBottom: 0 }}>{v.logo}</div>
+                      <div>
+                        <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 600 }}>{v.name}</div>
+                        <div style={{ fontSize: 11, color: '#64748b' }}>{v.category}</div>
+                      </div>
+                    </div>
+                    <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: '6px 10px' }} onClick={(e) => { e.stopPropagation(); setPage('detail'); }}>'View in directory'</button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div style={{ ...S.sideCard }} id="rfi-form">
               <div style={S.sideCardTitle}>Submit RFI to {vendor.name}</div>
               {rfiSent ? (
-                <div style={{ textAlign: "center", padding: "20px 0", color: "#f59e0b" }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>RFI Submitted</div>
-                  <div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>Expect a response within 1–2 business days</div>
-                </div>
+                <div style={{ textAlign: 'center', padding: '20px 0', color: '#f59e0b' }}><div style={{ fontSize: 28, marginBottom: 8 }}>✓</div><div style={{ fontSize: 14, fontWeight: 600 }}>RFI submitted</div><div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>Formspree and lead log captured this inquiry.</div></div>
               ) : (
                 <>
                   <label style={S.rfiLabel}>Name *</label>
@@ -784,20 +1145,17 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                   <input style={S.rfiInput} placeholder="Acme Logistics" value={rfiData.company} onChange={e => setRfiData(d => ({ ...d, company: e.target.value }))} />
                   <label style={S.rfiLabel}>Email *</label>
                   <input style={S.rfiInput} placeholder="jane@acme.com" type="email" value={rfiData.email} onChange={e => setRfiData(d => ({ ...d, email: e.target.value }))} />
+                  <label style={S.rfiLabel}>Phone</label>
+                  <input style={S.rfiInput} placeholder="Optional" value={rfiData.phone} onChange={e => setRfiData(d => ({ ...d, phone: e.target.value }))} />
+                  <label style={S.rfiLabel}>Budget range</label>
+                  <select style={S.rfiInput} value={rfiData.budget} onChange={e => setRfiData(d => ({ ...d, budget: e.target.value }))}><option>Exploring</option><option>Under $100k</option><option>$100k–$250k</option><option>$250k–$500k</option><option>$500k+</option></select>
+                  <label style={S.rfiLabel}>Timeline</label>
+                  <select style={S.rfiInput} value={rfiData.timeline} onChange={e => setRfiData(d => ({ ...d, timeline: e.target.value }))}><option>0–3 months</option><option>3–6 months</option><option>6–12 months</option><option>12+ months</option></select>
                   <label style={S.rfiLabel}>Project type</label>
-                  <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}>
-                    <option>New DC / greenfield build</option>
-                    <option>Brownfield retrofit</option>
-                    <option>Capacity expansion</option>
-                    <option>Vendor replacement</option>
-                    <option>Feasibility study</option>
-                    <option>Manufacturing automation</option>
-                  </select>
+                  <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}><option>New DC / greenfield build</option><option>Brownfield retrofit</option><option>Capacity expansion</option><option>Vendor replacement</option><option>Feasibility study</option><option>Manufacturing automation</option></select>
                   <label style={S.rfiLabel}>Brief description</label>
-                  <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} placeholder="Describe your application, throughput needs, timeline..." value={rfiData.description} onChange={e => setRfiData(d => ({ ...d, description: e.target.value }))} />
-                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>
-                    {rfiLoading ? "Submitting..." : "Submit RFI"}
-                  </button>
+                  <textarea style={{ ...S.rfiInput, minHeight: 90, resize: 'vertical' }} placeholder="Describe your application, throughput needs, systems, and goals..." value={rfiData.description} onChange={e => setRfiData(d => ({ ...d, description: e.target.value }))} />
+                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>{rfiLoading ? 'Submitting...' : 'Submit RFI'}</button>
                 </>
               )}
             </div>
@@ -808,7 +1166,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
   );
 }
 
-function ComparePage({ selected, setPage, setDetailVendor }) {
+function ComparePage({ selected, setPage, openDetail }) {
   const sel = vendors.filter(v => selected.includes(v.id));
   if (sel.length < 2) return (
     <div style={{ textAlign: "center", padding: "80px 32px", color: "#475569" }}>
@@ -842,7 +1200,7 @@ function ComparePage({ selected, setPage, setDetailVendor }) {
             <tr>
               <th style={S.compareTh}>Attribute</th>
               {sel.map(v => (
-                <th key={v.id} style={{ ...S.compareTh, cursor: "pointer" }} onClick={() => { setDetailVendor(v); setPage("detail"); }}>
+                <th key={v.id} style={{ ...S.compareTh, cursor: "pointer" }} onClick={() => { openDetail(v, "compare", "compare"); }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 10, marginBottom: 0 }}>{v.logo}</div>
                     {v.name}
@@ -910,7 +1268,7 @@ function ComparePage({ selected, setPage, setDetailVendor }) {
               <td style={S.compareTd} />
               {sel.map(v => (
                 <td key={v.id} style={S.compareTd}>
-                  <button style={{ ...S.btnPrimary, fontSize: 12, padding: "7px 14px" }} onClick={() => { setDetailVendor(v); setPage("detail"); }}>View full profile</button>
+                  <button style={{ ...S.btnPrimary, fontSize: 12, padding: "7px 14px" }} onClick={() => { openDetail(v, "compare", "compare"); }}>View full profile</button>
                 </td>
               ))}
             </tr>
@@ -921,23 +1279,312 @@ function ComparePage({ selected, setPage, setDetailVendor }) {
   );
 }
 
-function ListPage({ setPage }) {
-  const [submitted, setSubmitted] = useState(false);
+function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageCategory, setCategoryPageCategory, addProductToCompare, selectedProducts }) {
+  const activeCategory = categoryPageCategory || categories[0];
+  const categoryVendors = vendors.filter(v => v.category === activeCategory || v.tags.some(t => t.toLowerCase().includes(activeCategory.toLowerCase().split(" ")[0])));
+  const allProductRows = Object.entries(allProducts).flatMap(([slug, items]) => {
+    const vendor = vendors.find(v => v.slug === slug);
+    return (items || []).map(product => ({ product, vendor })).filter(row => row.vendor);
+  });
+  const categoryProducts = allProductRows.filter(({ product, vendor }) => {
+    const text = [product.category, product.name, product.tagline, ...(product.applications || []), vendor.category, ...(vendor.tags || [])].join(" ").toLowerCase();
+    return text.includes(activeCategory.toLowerCase().split(" ")[0]) || vendor.category === activeCategory;
+  }).slice(0, 8);
+
+  const categoryCopy = {
+    "AMR / Mobile Robots": "Autonomous mobile robots for goods-to-person, person-to-goods, cart movement, pallet movement, and warehouse transport workflows.",
+    "Depalletizing & Palletizing": "Robotic palletizing and depalletizing systems for case handling, mixed pallets, layer picking, and end-of-line automation.",
+    "Conveyor & Sortation": "Conveyor, sortation, accumulation, merge, and controls solutions for high-throughput distribution operations.",
+    "Dock Automation": "Dock and trailer automation for loading, unloading, yard flow, and labor-heavy inbound/outbound workflows.",
+    "WMS Platforms": "Warehouse management and execution platforms that coordinate inventory, labor, tasks, automation, and order flow.",
+    "Controls & Sensing": "PLC, controls, sensing, scanning, dimensioning, and industrial automation infrastructure.",
+    "Industrial Robotics": "Industrial robots and cobots for palletizing, picking, welding, machine tending, packaging, and material handling.",
+    "Manufacturing Automation": "Automation systems for manufacturing throughput, quality, machine tending, inspection, packaging, and line balancing.",
+  };
+
+  return (
+    <div style={S.detailWrap}>
+      <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Automation Categories</div>
+      <div style={S.detailName}>Research vendors by application</div>
+      <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, maxWidth: 760, marginBottom: 28 }}>
+        Use these category pages as buyer guides. Each page groups vendors, products, fit notes, and evaluation criteria around a specific automation problem.
+      </p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 24 }}>
+        <div style={S.sideCard}>
+          <div style={S.sideCardTitle}>Categories</div>
+          {categories.map(c => (
+            <div key={c} style={{ ...S.filterItem, color: activeCategory === c ? "#f59e0b" : "#64748b", background: activeCategory === c ? "rgba(245,158,11,0.08)" : "transparent" }} onClick={() => setCategoryPageCategory(c)}>
+              <span>{c}</span>
+              <span style={{ marginLeft: "auto", fontSize: 11, color: "#475569" }}>{vendors.filter(v => v.category === c).length}</span>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 20, alignItems: "flex-start" }}>
+              <div>
+                <div style={S.sectionTitle}>{activeCategory}</div>
+                <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 18 }}>{categoryCopy[activeCategory] || "Vendor and product research for this automation category."}</p>
+                <div style={S.tags}>{["Vendor shortlist", "Product specs", "Buyer questions", "RFI-ready"].map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
+              </div>
+              <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={() => { setCategoryFilter(activeCategory); setPage("directory"); }}>Open directory</button>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+            <div style={S.sideCard}>
+              <div style={S.sideCardTitle}>How to evaluate</div>
+              {["What process constraint are you solving?", "What system integration is required?", "Can it fit brownfield layout and traffic constraints?", "What support model exists after go-live?", "What metric proves ROI: labor, throughput, accuracy, safety, or uptime?"].map(x => (
+                <div key={x} style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6, marginBottom: 9 }}><span style={{ color: "#f59e0b" }}>• </span>{x}</div>
+              ))}
+            </div>
+            <div style={S.sideCard}>
+              <div style={S.sideCardTitle}>Common buyer questions</div>
+              {["What does implementation require from IT/controls?", "What does a failed install usually look like?", "Who owns maintenance and uptime response?", "Can the system scale without major layout changes?", "What data is needed before a vendor can quote accurately?"].map(x => (
+                <div key={x} style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6, marginBottom: 9 }}><span style={{ color: "#f59e0b" }}>• </span>{x}</div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={S.sideCardTitle}>Vendors in this category</div>
+            {categoryVendors.length ? (
+              <div style={S.grid}>{categoryVendors.map(v => <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "categories", "category")} compareCount={0} />)}</div>
+            ) : <div style={{ fontSize: 13, color: "#475569" }}>No vendors listed yet. Use the directory to browse adjacent categories.</div>}
+          </div>
+
+          <div style={S.sideCard}>
+            <div style={S.sideCardTitle}>Related products</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
+              {categoryProducts.map(({ product, vendor }) => {
+                const selected = selectedProducts.some(x => x.product.id === product.id);
+                return (
+                  <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                      <div style={{ ...S.logoCircle, background: vendor.color, width: 28, height: 28, fontSize: 9, marginBottom: 0 }}>{vendor.logo}</div>
+                      <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{vendor.name}</div>
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 5 }}>{product.name}</div>
+                    <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5, minHeight: 36 }}>{product.tagline || product.category}</div>
+                    <button style={{ ...S.btnSecondary, marginTop: 12, fontSize: 12, padding: "8px 10px", color: selected ? "#22c55e" : "#94a3b8" }} onClick={() => addProductToCompare(product, vendor)}>{selected ? "✓ Added to compare" : "+ Compare product"}</button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToCompare, selectedProducts }) {
+  const [form, setForm] = useState({ useCase: "AMR / mobile robots", facility: "Warehouse & DC", environment: "Brownfield retrofit", budget: "$200k–$500k", timeline: "3–6 months", systems: "", notes: "", name: "", company: "", email: "" });
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const useCases = [
+    { label: "AMR / mobile robots", terms: ["amr", "goods-to-person", "mobile", "cart", "pallet"], categories: ["AMR / Mobile Robots", "AGV Systems"] },
+    { label: "Robotic palletizing / depalletizing", terms: ["pallet", "depallet", "robot"], categories: ["Depalletizing & Palletizing", "Industrial Robotics"] },
+    { label: "Conveyor / sortation", terms: ["conveyor", "sortation", "wcs"], categories: ["Conveyor & Sortation"] },
+    { label: "Dock or trailer automation", terms: ["dock", "trailer", "loading", "unloading"], categories: ["Dock Automation"] },
+    { label: "WMS / WES / WCS", terms: ["wms", "wes", "wcs", "software"], categories: ["WMS Platforms"] },
+    { label: "Machine vision / AI inspection", terms: ["vision", "ai", "inspection", "camera"], categories: ["Vision & AI", "Controls & Sensing"] },
+    { label: "Manufacturing automation", terms: ["manufacturing", "robot", "cobot", "controls"], categories: ["Manufacturing Automation", "Industrial Robotics"] },
+    { label: "AS/RS / automated storage", terms: ["as/rs", "storage", "shuttle", "autostore"], categories: ["AS/RS & Storage"] },
+  ];
+  const selectedUse = useCases.find(u => u.label === form.useCase) || useCases[0];
+  const scoreVendor = (v) => {
+    const text = [v.name, v.category, v.tagline, v.desc, ...(v.tags || []), ...(v.apps || []), ...(v.industry || [])].join(" ").toLowerCase();
+    let score = 0;
+    if (selectedUse.categories.includes(v.category)) score += 5;
+    if ((v.industry || []).includes(form.facility)) score += 3;
+    selectedUse.terms.forEach(t => { if (text.includes(t)) score += 2; });
+    if (form.environment.toLowerCase().includes("brownfield") && text.includes("brownfield")) score += 1;
+    return score;
+  };
+  const vendorMatches = vendors.map(v => ({ v, score: scoreVendor(v) })).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 6).map(x => x.v);
+  const productMatches = Object.entries(allProducts).flatMap(([slug, items]) => {
+    const vendor = vendors.find(v => v.slug === slug);
+    return (items || []).map(product => ({ product, vendor })).filter(row => row.vendor);
+  }).map(row => {
+    const text = [row.product.name, row.product.tagline, row.product.category, ...(row.product.applications || []), row.vendor.name, row.vendor.category].join(" ").toLowerCase();
+    let score = 0;
+    selectedUse.terms.forEach(t => { if (text.includes(t)) score += 2; });
+    if (selectedUse.categories.includes(row.vendor.category)) score += 2;
+    if ((row.vendor.industry || []).includes(form.facility)) score += 1;
+    return { ...row, score };
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 8);
+
+  const submit = async () => {
+    if (!form.name || !form.company || !form.email) return;
+    setLoading(true);
+    try {
+      const ok = await submitLeadForm(form, { lead_type: "Shortlist Request", _subject: `OpEx Scout Shortlist Request — ${form.company}` });
+      if (ok) setSent(true);
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
+
+  return (
+    <div style={S.detailWrap}>
+      <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Find a Solution</div>
+      <div style={S.detailName}>Build a vendor shortlist for your operation</div>
+      <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, maxWidth: 760, marginBottom: 28 }}>Answer a few practical questions and OpEx Scout will surface matching categories, vendors, and products. This is the lead-gen engine of the site.</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 24 }}>
+        <div style={S.sideCard}>
+          <div style={S.sideCardTitle}>Operation details</div>
+          <label style={S.rfiLabel}>Problem / use case</label>
+          <select style={S.rfiInput} value={form.useCase} onChange={e => setForm(f => ({ ...f, useCase: e.target.value }))}>{useCases.map(u => <option key={u.label}>{u.label}</option>)}</select>
+          <label style={S.rfiLabel}>Facility type</label>
+          <select style={S.rfiInput} value={form.facility} onChange={e => setForm(f => ({ ...f, facility: e.target.value }))}>{industries.map(i => <option key={i}>{i}</option>)}</select>
+          <label style={S.rfiLabel}>Project type</label>
+          <select style={S.rfiInput} value={form.environment} onChange={e => setForm(f => ({ ...f, environment: e.target.value }))}>{["Brownfield retrofit", "Greenfield / new build", "Capacity expansion", "Vendor replacement", "Feasibility study"].map(x => <option key={x}>{x}</option>)}</select>
+          <label style={S.rfiLabel}>Budget range</label>
+          <select style={S.rfiInput} value={form.budget} onChange={e => setForm(f => ({ ...f, budget: e.target.value }))}>{["Under $50k", "$50k–$200k", "$200k–$500k", "$500k–$1M", "$1M+", "Unknown"].map(x => <option key={x}>{x}</option>)}</select>
+          <label style={S.rfiLabel}>Timeline</label>
+          <select style={S.rfiInput} value={form.timeline} onChange={e => setForm(f => ({ ...f, timeline: e.target.value }))}>{["0–3 months", "3–6 months", "6–12 months", "12+ months", "Researching only"].map(x => <option key={x}>{x}</option>)}</select>
+          <label style={S.rfiLabel}>Current WMS / ERP / controls</label>
+          <input style={S.rfiInput} value={form.systems} onChange={e => setForm(f => ({ ...f, systems: e.target.value }))} placeholder="Manhattan, SAP, Oracle, Rockwell..." />
+          <label style={S.rfiLabel}>Notes</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Volume, labor issue, layout constraint, throughput target..." />
+        </div>
+
+        <div>
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={S.sideCardTitle}>Recommended categories</div>
+            <div style={S.tags}>{selectedUse.categories.map(c => <span key={c} style={{ ...S.tag, color: "#f59e0b" }}>{c}</span>)}</div>
+          </div>
+
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={S.sideCardTitle}>Vendor shortlist</div>
+            <div style={S.grid}>{vendorMatches.map(v => <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "solution", "solution results")} compareCount={0} />)}</div>
+          </div>
+
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={S.sideCardTitle}>Product shortlist</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
+              {productMatches.map(({ product, vendor }) => {
+                const selected = selectedProducts.some(x => x.product.id === product.id);
+                return (
+                  <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 14 }}>
+                    <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 700, marginBottom: 6 }}>{vendor.name}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 5 }}>{product.name}</div>
+                    <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5 }}>{product.tagline || product.category}</div>
+                    <button style={{ ...S.btnSecondary, marginTop: 12, fontSize: 12, padding: "8px 10px", color: selected ? "#22c55e" : "#94a3b8" }} onClick={() => addProductToCompare(product, vendor)}>{selected ? "✓ Added" : "+ Compare product"}</button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={S.sideCard}>
+            <div style={S.sideCardTitle}>Request this shortlist</div>
+            {sent ? (
+              <div style={{ textAlign: "center", padding: 24, color: "#f59e0b" }}>✓ Shortlist request submitted. You should receive it through Formspree.</div>
+            ) : (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                  <input style={S.rfiInput} placeholder="Name *" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                  <input style={S.rfiInput} placeholder="Company *" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
+                  <input style={S.rfiInput} placeholder="Email *" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                </div>
+                <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>{loading ? "Submitting..." : "Send me this vendor shortlist"}</button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReviewPage({ setPage }) {
+  const [form, setForm] = useState({ vendor: vendors[0]?.name || "", product: "", role: "", facility: "Warehouse & DC", rating: "4", implementation: "", support: "", notes: "", name: "", email: "", anonymous: "Yes" });
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const submit = async () => {
+    if (!form.vendor || !form.notes) return;
+    setLoading(true);
+    try {
+      const ok = await submitLeadForm(form, { lead_type: "Review Submission", _subject: `OpEx Scout Review Submission — ${form.vendor}` });
+      if (ok) setSent(true);
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
   return (
     <div style={S.listWrap}>
       <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
-      <div style={S.heroEyebrow}>For Vendors</div>
-      <div style={S.listTitle}>List your company on OpEx Scout</div>
-      <p style={S.listSub}>Get your product in front of IEs, operations engineers, and supply chain leaders actively evaluating automation solutions. Our audience makes capital investment decisions — not interns doing research.</p>
+      <div style={S.heroEyebrow}>Submit a Review</div>
+      <div style={S.listTitle}>Share a practitioner review</div>
+      <p style={S.listSub}>Help operations teams understand what vendor implementation really looks like. Reviews are reviewed before publishing and can be anonymous on the public site.</p>
+      {sent ? (
+        <div style={{ textAlign: "center", padding: "40px 0", color: "#f59e0b" }}><div style={{ fontSize: 40, marginBottom: 12 }}>✓</div><div style={{ fontSize: 18, fontWeight: 700 }}>Review submitted</div><div style={{ fontSize: 13, color: "#475569", marginTop: 8 }}>It will be reviewed before appearing publicly.</div></div>
+      ) : (
+        <>
+          <label style={S.rfiLabel}>Vendor *</label>
+          <select style={S.rfiInput} value={form.vendor} onChange={e => setForm(f => ({ ...f, vendor: e.target.value }))}>{vendors.map(v => <option key={v.id}>{v.name}</option>)}</select>
+          <label style={S.rfiLabel}>Product used</label>
+          <input style={S.rfiInput} value={form.product} onChange={e => setForm(f => ({ ...f, product: e.target.value }))} placeholder="LocusBot, FANUC M-410iC, Manhattan Active..." />
+          <label style={S.rfiLabel}>Your role / perspective</label>
+          <input style={S.rfiInput} value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} placeholder="IE, DC Manager, Controls Engineer, Ops Director..." />
+          <label style={S.rfiLabel}>Facility type</label>
+          <select style={S.rfiInput} value={form.facility} onChange={e => setForm(f => ({ ...f, facility: e.target.value }))}>{industries.map(i => <option key={i}>{i}</option>)}</select>
+          <label style={S.rfiLabel}>Overall rating</label>
+          <select style={S.rfiInput} value={form.rating} onChange={e => setForm(f => ({ ...f, rating: e.target.value }))}>{["5", "4", "3", "2", "1"].map(x => <option key={x}>{x}</option>)}</select>
+          <label style={S.rfiLabel}>Implementation difficulty</label>
+          <input style={S.rfiInput} value={form.implementation} onChange={e => setForm(f => ({ ...f, implementation: e.target.value }))} placeholder="Easy, moderate, difficult, explain why..." />
+          <label style={S.rfiLabel}>Support quality</label>
+          <input style={S.rfiInput} value={form.support} onChange={e => setForm(f => ({ ...f, support: e.target.value }))} placeholder="Response time, escalation, parts/service, vendor support..." />
+          <label style={S.rfiLabel}>What should buyers know? *</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 120, resize: "vertical" }} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="What went well? What was painful? What would you ask before buying again?" />
+          <label style={S.rfiLabel}>Public display preference</label>
+          <select style={S.rfiInput} value={form.anonymous} onChange={e => setForm(f => ({ ...f, anonymous: e.target.value }))}><option>Yes</option><option>No</option></select>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <input style={S.rfiInput} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Name optional" />
+            <input style={S.rfiInput} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email optional" type="email" />
+          </div>
+          <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>{loading ? "Submitting..." : "Submit review"}</button>
+        </>
+      )}
+    </div>
+  );
+}
+
+
+function ListPage({ setPage }) {
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ company: "", category: categories[0], industries: "", website: "", email: "", contact: "", tier: "Free — basic profile", products: "", productImages: "", specSheets: "", videos: "", catalogs: "", notes: "" });
+  const submit = async () => {
+    if (!form.company || !form.website || !form.email) return;
+    setLoading(true);
+    try {
+      const ok = await submitLeadForm(form, { lead_type: "Vendor Claim", _subject: `OpEx Scout Listing Claim — ${form.company}` });
+      if (ok) setSubmitted(true);
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
+  return (
+    <div style={S.listWrap}>
+      <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>For vendors</div>
+      <div style={S.listTitle}>Claim or upgrade your company profile</div>
+      <p style={S.listSub}>OpEx Scout helps automation vendors get discovered by operations, engineering, and supply chain teams who are actively researching solutions. Start with a free listing, then move into richer product pages, better placement, and qualified lead routing.</p>
 
       <div style={S.pricingGrid}>
         {[
-          { tier: "Free", price: "Free", desc: "Basic vendor profile, directory listing, contact info", featured: false },
-          { tier: "Featured", price: "$999/mo", desc: "Priority placement, enhanced profile, case studies, video", featured: true },
-          { tier: "Verified", price: "$1,999/mo", desc: "All featured benefits + qualified RFI lead gen", featured: false },
+          { tier: "Free", price: "Free", desc: "Basic company profile, category placement, website link, and contact routing." },
+          { tier: "Verified", price: "$149/mo", desc: "Enhanced profile, product pages, videos, case studies, and a verified badge." , featured: true},
+          { tier: "Featured", price: "$399/mo", desc: "Priority placement, shortlist visibility, and stronger lead capture support." },
         ].map(p => (
           <div key={p.tier} style={{ ...S.pricingCard, ...(p.featured ? S.pricingCardFeatured : {}) }}>
-            {p.featured && <div style={{ fontSize: 10, color: "#f59e0b", fontWeight: 700, marginBottom: 6 }}>MOST POPULAR</div>}
+            {p.featured && <div style={{ fontSize: 10, color: "#f59e0b", fontWeight: 700, marginBottom: 6 }}>MOST PRACTICAL START</div>}
             <div style={S.pricingTier}>{p.tier}</div>
             <div style={S.pricingPrice}>{p.price}</div>
             <div style={S.pricingDesc}>{p.desc}</div>
@@ -945,37 +1592,54 @@ function ListPage({ setPage }) {
         ))}
       </div>
 
-      {submitted ? (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "#f59e0b" }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Request received</div>
-          <div style={{ fontSize: 13, color: "#475569" }}>We'll be in touch within 1–2 business days to get you listed.</div>
+      <div style={{ ...S.sideCard, marginBottom: 24 }}>
+        <div style={S.sideCardTitle}>What verified and featured listings include</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {['Expanded vendor profile', 'Product gallery and photos', 'Demo videos', 'Category placement', 'Case-study section', 'Qualified RFI routing', 'Lead metadata', 'Claimed listing badge'].map(x => <div key={x} style={{ fontSize: 13, color: '#64748b' }}><span style={{ color: '#f59e0b' }}>✓ </span>{x}</div>)}
         </div>
+      </div>
+
+      {submitted ? (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#f59e0b' }}><div style={{ fontSize: 40, marginBottom: 12 }}>✓</div><div style={{ fontSize: 18, fontWeight: 700 }}>Listing request submitted</div><div style={{ fontSize: 13, color: '#475569', marginTop: 8 }}>We captured your request and routing details.</div></div>
       ) : (
         <>
-          <label style={S.rfiLabel}>Company name *</label>
-          <input style={S.rfiInput} placeholder="Acme Robotics" />
+          <label style={S.rfiLabel}>Company *</label>
+          <input style={S.rfiInput} value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} placeholder="Company name" />
           <label style={S.rfiLabel}>Primary category *</label>
-          <select style={S.rfiInput}>
-            {categories.map(c => <option key={c}>{c}</option>)}
-          </select>
+          <select style={S.rfiInput} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>{categories.map(c => <option key={c}>{c}</option>)}</select>
           <label style={S.rfiLabel}>Industries served</label>
-          <select multiple style={{ ...S.rfiInput, minHeight: 80 }}>
-            {industries.map(i => <option key={i}>{i}</option>)}
-          </select>
-          <label style={S.rfiLabel}>Website *</label>
-          <input style={S.rfiInput} placeholder="https://acmerobotics.com" />
-          <label style={S.rfiLabel}>Contact email *</label>
-          <input style={S.rfiInput} placeholder="sales@acmerobotics.com" type="email" />
-          <label style={S.rfiLabel}>Listing tier</label>
-          <select style={S.rfiInput}>
-            <option>Free — basic profile</option>
-            <option>Featured — $999/month</option>
-            <option>Verified — $1,999/month</option>
-          </select>
-          <label style={S.rfiLabel}>Tell us about your product</label>
-          <textarea style={{ ...S.rfiInput, minHeight: 100, resize: "vertical" }} placeholder="What does your product do? Who is the ideal customer? Key differentiators vs. competition..." />
-          <button style={S.btnPrimary} onClick={() => setSubmitted(true)}>Submit listing request</button>
+          <input style={S.rfiInput} value={form.industries} onChange={e => setForm(f => ({ ...f, industries: e.target.value }))} placeholder="Warehouse & DC, Manufacturing, Food & Beverage..." />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={S.rfiLabel}>Website *</label>
+              <input style={S.rfiInput} value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} placeholder="https://company.com" />
+            </div>
+            <div>
+              <label style={S.rfiLabel}>Contact email *</label>
+              <input style={S.rfiInput} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="name@company.com" type="email" />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={S.rfiLabel}>Primary contact</label>
+              <input style={S.rfiInput} value={form.contact} onChange={e => setForm(f => ({ ...f, contact: e.target.value }))} placeholder="Name / title" />
+            </div>
+            <div>
+              <label style={S.rfiLabel}>Interested plan</label>
+              <select style={S.rfiInput} value={form.tier} onChange={e => setForm(f => ({ ...f, tier: e.target.value }))}><option>Free — basic profile</option><option>Verified — enhanced profile</option><option>Featured — sponsored placement</option></select>
+            </div>
+          </div>
+          <label style={S.rfiLabel}>Products to include</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 90, resize: 'vertical' }} value={form.products} onChange={e => setForm(f => ({ ...f, products: e.target.value }))} placeholder="List key products, model names, or product families" />
+          <label style={S.rfiLabel}>Product image URLs</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 80, resize: 'vertical' }} value={form.productImages} onChange={e => setForm(f => ({ ...f, productImages: e.target.value }))} placeholder="Paste official product image, gallery, or media kit URLs" />
+          <label style={S.rfiLabel}>Spec sheet / catalog URLs</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 80, resize: 'vertical' }} value={form.specSheets} onChange={e => setForm(f => ({ ...f, specSheets: e.target.value }))} placeholder="Paste spec sheets, catalogs, brochures, PDFs, or product literature URLs" />
+          <label style={S.rfiLabel}>Demo video URLs</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 70, resize: 'vertical' }} value={form.videos} onChange={e => setForm(f => ({ ...f, videos: e.target.value }))} placeholder="Paste YouTube, Vimeo, or official demo video links" />
+          <label style={S.rfiLabel}>Additional notes</label>
+          <textarea style={{ ...S.rfiInput, minHeight: 90, resize: 'vertical' }} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Anything else you want included in the profile or lead-routing setup" />
+          <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>{loading ? 'Submitting...' : 'Submit listing request'}</button>
         </>
       )}
     </div>
@@ -984,24 +1648,216 @@ function ListPage({ setPage }) {
 
 function AboutPage({ setPage }) {
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 28px" }}>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 28px" }}>
       <div style={S.heroEyebrow}>About</div>
-      <div style={S.listTitle}>Built by practitioners, for practitioners</div>
+      <div style={S.listTitle}>Automation research without the trade show fluff</div>
       <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 20 }}>
-        OpEx Scout is the independent resource for warehouse, DC, and manufacturing automation professionals. We aggregate vendor information, real user reviews, and technical specs so operations engineers and supply chain leaders can make better capital decisions.
+        OpEx Scout helps warehouse, distribution, and manufacturing teams find automation vendors by application, facility type, product capability, and implementation fit. The goal is simple: make vendor discovery more useful than a static exhibitor directory.
       </p>
-      <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 32 }}>
-        Built by an Industrial Engineer with hands-on experience implementing AMRs, depalletizers, and controls systems across brownfield distribution environments. We speak the language because we've lived it.
+      <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 28 }}>
+        The site is built from an operations-first perspective. Instead of only listing what a vendor sells, OpEx Scout focuses on where the technology fits, what questions buyers should ask, what systems need to integrate, and what implementation risks matter in real facilities.
       </p>
-      <div style={{ display: "flex", gap: 12 }}>
-        <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("list")}>List your company</button>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 30 }}>
+        {[
+          ["For buyers", "Shortlist vendors, compare products, and route RFIs from one place."],
+          ["For vendors", "Claim listings, add product data, and reach buyers actively researching automation."],
+          ["For practitioners", "Submit reviews and implementation notes that help others avoid bad decisions."],
+        ].map(([h,b]) => (
+          <div key={h} style={S.sideCard}><div style={S.sideCardTitle}>{h}</div><div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{b}</div></div>
+        ))}
+      </div>
+      <div style={{ ...S.sideCard, marginBottom: 28 }}>
+        <div style={S.sideCardTitle}>Data transparency</div>
+        <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8, margin: 0 }}>
+          Early vendor profiles combine publicly available company/product information, vendor marketing materials, and OpEx Scout research notes. Practitioner reviews are labeled as notes until verified. Vendors can claim listings to correct, expand, or add product data.
+        </p>
+      </div>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find a solution</button>
         <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("directory")}>Browse directory</button>
+        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("list")}>Claim listing</button>
+        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("reviews")}>Submit review</button>
+      </div>
+    </div>
+  );
+}
+
+
+function VendorsPage({ setPage }) {
+  return (
+    <div style={S.listWrap}>
+      <button style={S.backBtn} onClick={() => setPage('home')}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Vendor program</div>
+      <div style={S.listTitle}>How OpEx Scout helps automation vendors generate demand</div>
+      <p style={S.listSub}>OpEx Scout is built around buyer research. Vendors can use the platform to improve discovery, enrich product pages, and capture structured RFIs from operations teams actively evaluating automation.</p>
+      <div style={{ display: 'grid', gap: 14 }}>
+        {[
+          ['Free listing', 'Basic profile, category placement, website link, and contact routing.'],
+          ['Verified listing', 'Enhanced profile with product pages, photos, videos, case studies, and stronger conversion paths.'],
+          ['Featured placement', 'Priority visibility in category pages, shortlist surfacing, and premium profile presentation.'],
+          ['Lead routing', 'Structured RFIs with lead metadata, source information, and vendor-specific routing.'],
+        ].map(([title, desc]) => (
+          <div key={title} style={S.sideCard}><div style={S.sideCardTitle}>{title}</div><div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>{desc}</div></div>
+        ))}
+      </div>
+      <button style={{ ...S.navCta, fontFamily: 'inherit', marginTop: 20 }} onClick={() => setPage('list')}>Claim or upgrade listing</button>
+    </div>
+  );
+}
+
+function LeadOpsPage({ setPage }) {
+  const [leads, setLeads] = useState(readLeadLog());
+  const refresh = () => setLeads(readLeadLog());
+  const exportCsv = () => {
+    const rows = readLeadLog();
+    if (!rows.length) return;
+    const keys = Array.from(new Set(rows.flatMap(r => Object.keys(r))));
+    const csv = [keys.join(','), ...rows.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'opexscout-leads.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const total = leads.length;
+  const rfis = leads.filter(l => l.lead_type === 'Vendor RFI').length;
+  const shortlists = leads.filter(l => l.lead_type === 'Shortlist Request').length;
+  const reviews = leads.filter(l => l.lead_type === 'Review Submission').length;
+  return (
+    <div style={S.listWrap}>
+      <button style={S.backBtn} onClick={() => setPage('home')}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Lead operations</div>
+      <div style={S.listTitle}>Lead tracking snapshot</div>
+      <p style={S.listSub}>This lightweight lead log captures structured submissions from this browser for testing. Formspree remains the primary delivery path until a full backend CRM is added.</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 18 }}>
+        {[["Total submissions", total], ["Vendor RFIs", rfis], ["Shortlist requests", shortlists], ["Review submissions", reviews]].map(([l, n]) => <div key={l} style={S.metric}><div style={S.metricN}>{n}</div><div style={S.metricL}>{l}</div></div>)}
+      </div>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
+        <button style={{ ...S.btnSecondary, width: 'auto' }} onClick={refresh}>Refresh</button>
+        <button style={{ ...S.navCta, fontFamily: 'inherit' }} onClick={exportCsv}>Export CSV</button>
+      </div>
+      <div style={S.sideCard}>
+        <div style={S.sideCardTitle}>Recent submissions</div>
+        {leads.length === 0 ? <div style={{ fontSize: 13, color: '#64748b' }}>No local submissions captured yet.</div> : leads.slice(0, 20).map(item => (
+          <div key={item.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 700 }}>{item.lead_type || 'Submission'}</div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{item.company || item.vendor || 'Unknown company'} · {item.email || 'No email'}</div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{item.vendor || item.company || ''} {item.product ? `· ${item.product}` : ''}</div>
+              </div>
+              <div style={{ fontSize: 11, color: '#475569', textAlign: 'right' }}>{new Date(item.timestamp).toLocaleString()}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContactPage({ setPage }) {
+  return (
+    <div style={S.listWrap}>
+      <button style={S.backBtn} onClick={() => setPage('home')}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Contact</div>
+      <div style={S.listTitle}>Get in touch</div>
+      <p style={S.listSub}>Use the forms throughout the site for vendor RFIs, listing requests, and review submissions. For general inquiries, create a domain inbox such as info@opexscout.com or vendors@opexscout.com.</p>
+      <div style={S.sideCard}>
+        <div style={S.sideCardTitle}>Recommended inboxes</div>
+        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>info@opexscout.com<br/>vendors@opexscout.com<br/>reviews@opexscout.com</div>
+      </div>
+    </div>
+  );
+}
+
+function LegalPage({ setPage, type }) {
+  const map = {
+    privacy: { title: 'Privacy Policy', body: 'OpEx Scout collects form-submission data for routing requests, responding to inquiries, and improving the platform. During the MVP stage, submissions may be delivered through third-party tools such as Formspree and stored in a lightweight lead log for testing.' },
+    terms: { title: 'Terms of Use', body: 'Vendor profiles, product details, and practitioner notes are provided for informational purposes only. Buyers should validate all technical, commercial, and operational claims directly with the vendor before making a purchasing decision.' },
+  };
+  const content = map[type] || map.privacy;
+  return (
+    <div style={S.listWrap}>
+      <button style={S.backBtn} onClick={() => setPage('home')}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Legal</div>
+      <div style={S.listTitle}>{content.title}</div>
+      <div style={S.sideCard}><div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.9 }}>{content.body}</div></div>
+    </div>
+  );
+}
+
+function SiteFooter({ setPage }) {
+  return (
+    <div style={{ background: '#0d1526', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 32px', marginTop: 36 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#e8edf5' }}>OpEx<span style={{ color: '#f59e0b' }}>Scout</span></div>
+          <div style={{ fontSize: 12, color: '#475569', marginTop: 8, maxWidth: 420 }}>Automation vendor intelligence for warehouse, manufacturing, and industrial teams.</div>
+        </div>
+        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 12, color: '#94a3b8' }}>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('contact')}>Contact</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('vendors')}>Vendor program</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('lead-ops')}>Lead ops</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('media-ops')}>Media ops</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('privacy')}>Privacy</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('terms')}>Terms</span>
+        </div>
       </div>
     </div>
   );
 }
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
+function MediaOpsPage({ setPage }) {
+  const all = Object.entries(allProducts).flatMap(([slug, items]) => {
+    const vendor = vendors.find(v => v.slug === slug);
+    return items.map(product => ({ product, vendor }));
+  });
+  const missing = all.filter(({ product }) => getMediaStatus(product).label !== "Media complete");
+  const complete = all.length - missing.length;
+  return (
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 28px" }}>
+      <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>Media operations</div>
+      <div style={S.listTitle}>Product media tracker</div>
+      <p style={S.listSub}>Use this page to see which product profiles still need official images, catalogs, spec sheets, or vendor-submitted media. This is the practical checklist for making OpEx Scout look production-grade.</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+        {[["Products", all.length], ["Media complete", complete], ["Needs work", missing.length], ["With video", all.filter(x => x.product.youtube_id).length]].map(([l, n]) => (
+          <div key={l} style={S.metric}><div style={S.metricN}>{n}</div><div style={S.metricL}>{l}</div></div>
+        ))}
+      </div>
+      <div style={S.sideCard}>
+        <div style={S.sideCardTitle}>Priority media queue</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
+          {missing.slice(0, 60).map(({ product, vendor }) => (
+            <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, overflow: "hidden" }}>
+              <img src={getProductImage(product)} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+              <div style={{ padding: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700 }}>{product.name}</div>
+                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}>{vendor?.name || "Unknown vendor"} · {product.category}</div>
+                  </div>
+                  <MediaBadge product={product} />
+                </div>
+                <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
+                  {!product.image && !product.gallery?.length && <div>• Add official image/gallery</div>}
+                  {!product.specSheetUrl && !product.catalogUrl && <div>• Add spec sheet or catalog URL</div>}
+                  {!product.imageSourceUrl && <div>• Add media/source attribution link</div>}
+                </div>
+                <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, display: "block", textAlign: "center", textDecoration: "none", fontSize: 12, marginTop: 12 }}>Open official page</a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function ProductCompareBar({ selectedProducts, removeProduct, onCompare, onClear }) {
   return (
     <div style={{
@@ -1037,7 +1893,7 @@ function ProductCompareBar({ selectedProducts, removeProduct, onCompare, onClear
   );
 }
 
-function ProductComparePage({ selectedProducts, setPage, removeProduct, setDetailVendor }) {
+function ProductComparePage({ selectedProducts, setPage, removeProduct, openDetail }) {
   if (selectedProducts.length < 2) return (
     <div style={{ textAlign: "center", padding: "80px 32px", color: "#475569" }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
@@ -1207,36 +2063,70 @@ function ProductComparePage({ selectedProducts, setPage, removeProduct, setDetai
 }
 
 export default function App() {
-  const [page, setPage] = useState("home");
+  const [page, rawSetPage] = useState("home");
   const [detailVendor, setDetailVendor] = useState(null);
+  const [detailBack, setDetailBack] = useState({ page: "directory", label: "directory" });
   const [selected, setSelected] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([]); // [{product, vendorName, vendorSlug, vendorColor, vendorLogo}]
+  const [categoryPageCategory, setCategoryPageCategory] = useState(categories[0]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Navigate with scroll-to-top and browser history
+  const navigate = (nextPage) => {
+    rawSetPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "auto" });
+    window.history.pushState({ page: nextPage }, "", `#${nextPage}`);
+  };
+
+  // Browser back/forward button support
+  useEffect(() => {
+    window.history.replaceState({ page: "home" }, "", "#home");
+    const onPop = (e) => {
+      rawSetPage(e.state?.page || "home");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const addProductToCompare = (product, vendor) => {
     if (selectedProducts.length >= 4) return;
     if (selectedProducts.find(p => p.product.id === product.id)) return;
     setSelectedProducts(prev => [...prev, { product, vendorName: vendor.name, vendorSlug: vendor.slug, vendorColor: vendor.color, vendorLogo: vendor.logo }]);
   };
+  const removeProductFromCompare = (productId) => setSelectedProducts(prev => prev.filter(p => p.product.id !== productId));
 
-  const removeProductFromCompare = (productId) => {
-    setSelectedProducts(prev => prev.filter(p => p.product.id !== productId));
+  // Open vendor detail with back context
+  const openDetail = (vendor, fromPage, fromLabel) => {
+    setDetailVendor(vendor);
+    setDetailBack({ page: fromPage || "directory", label: fromLabel || "directory" });
+    navigate("detail");
   };
 
   return (
     <div style={S.app}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      <NavBar page={page} setPage={setPage} />
-      {page === "home" && <HomePage setPage={setPage} setCategoryFilter={setCategoryFilter} />}
-      {page === "directory" && <DirectoryPage setPage={setPage} setDetailVendor={setDetailVendor} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
-      {page === "detail" && <DetailPage vendor={detailVendor} setPage={setPage} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
-      {page === "compare" && <ComparePage selected={selected} setPage={setPage} setDetailVendor={setDetailVendor} />}
-      {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={setPage} removeProduct={removeProductFromCompare} setDetailVendor={setDetailVendor} />}
-      {page === "list" && <ListPage setPage={setPage} />}
-      {page === "about" && <AboutPage setPage={setPage} />}
+      <NavBar page={page} setPage={navigate} />
+      {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} />}
+      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
+      {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
+      {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
+      {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} />}
+      {page === "compare" && <ComparePage selected={selected} setPage={navigate} openDetail={openDetail} />}
+      {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={navigate} removeProduct={removeProductFromCompare} openDetail={openDetail} />}
+      {page === "list" && <ListPage setPage={navigate} />}
+      {page === "vendors" && <VendorsPage setPage={navigate} />}
+      {page === "about" && <AboutPage setPage={navigate} />}
+      {page === "reviews" && <ReviewPage setPage={navigate} />}
+      {page === "lead-ops" && <LeadOpsPage setPage={navigate} />}
+      {page === "media-ops" && <MediaOpsPage setPage={navigate} />}
+      {page === "contact" && <ContactPage setPage={navigate} />}
+      {page === "privacy" && <LegalPage setPage={navigate} type="privacy" />}
+      {page === "terms" && <LegalPage setPage={navigate} type="terms" />}
       {selectedProducts.length > 0 && page !== "product-compare" && (
-        <ProductCompareBar selectedProducts={selectedProducts} removeProduct={removeProductFromCompare} onCompare={() => setPage("product-compare")} onClear={() => setSelectedProducts([])} />
+        <ProductCompareBar selectedProducts={selectedProducts} removeProduct={removeProductFromCompare} onCompare={() => navigate("product-compare")} onClear={() => setSelectedProducts([])} />
       )}
+      <SiteFooter setPage={navigate} />
     </div>
   );
 }
