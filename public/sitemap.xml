@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://opexscout.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://opexscout.com/#directory</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://opexscout.com/#categories</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://opexscout.com/#solution</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://opexscout.com/#vendor/geekplus</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/fanuc</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/slip-robotics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/boston-dynamics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/locus-robotics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/honeywell-intelligrated</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/blue-yonder</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/dematic</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/manhattan-associates</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/zebra-technologies</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/rockwell-automation</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/universal-robots</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/autostore</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/exotec</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/cognex</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://opexscout.com/#vendor/keyence</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+</urlset>

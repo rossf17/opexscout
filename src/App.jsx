@@ -966,7 +966,7 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
   );
 }
 
-function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts, detailBackPage = "directory", detailBackLabel = "directory" }) {
+function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts, detailBackPage = "directory", detailBackLabel = "directory", openDetail }) {
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
   const [rfiLoading, setRfiLoading] = useState(false);
@@ -1165,7 +1165,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
               <div style={S.sideCard}>
                 <div style={S.sideCardTitle}>Similar vendors</div>
                 {similarVendors.map(v => (
-                  <div key={v.id} onClick={() => { setPage('detail'); window.scrollTo(0,0); }} style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 10, cursor: 'pointer' }}>
+                  <div key={v.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 10 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ ...S.logoCircle, background: v.color, width: 26, height: 26, fontSize: 10, marginBottom: 0 }}>{v.logo}</div>
                       <div>
@@ -1173,7 +1173,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                         <div style={{ fontSize: 11, color: '#64748b' }}>{v.category}</div>
                       </div>
                     </div>
-                    <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: '6px 10px' }} onClick={(e) => { e.stopPropagation(); setPage('detail'); }}>'View in directory'</button>
+                    <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: '6px 10px' }} onClick={(e) => { e.stopPropagation(); openDetail(v, 'detail', vendor.name); }}>View profile</button>
                   </div>
                 ))}
               </div>
@@ -1428,48 +1428,115 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
 }
 
 function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToCompare, selectedProducts }) {
-  const [form, setForm] = useState({ useCase: "AMR / mobile robots", facility: "Warehouse & DC", environment: "Brownfield retrofit", budget: "$200k–$500k", timeline: "3–6 months", systems: "", notes: "", name: "", company: "", email: "" });
+  const [form, setForm] = useState({
+    useCase: "AMR / mobile robots",
+    facility: "Warehouse & DC",
+    environment: "Brownfield retrofit",
+    budget: "$200k–$500k",
+    timeline: "3–6 months",
+    throughput: "",
+    sqft: "",
+    systems: "",
+    notes: "",
+    name: "",
+    company: "",
+    email: "",
+  });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const useCases = [
-    { label: "AMR / mobile robots", terms: ["amr", "goods-to-person", "mobile", "cart", "pallet"], categories: ["AMR / Mobile Robots", "AGV Systems"] },
-    { label: "Robotic palletizing / depalletizing", terms: ["pallet", "depallet", "robot"], categories: ["Depalletizing & Palletizing", "Industrial Robotics"] },
-    { label: "Conveyor / sortation", terms: ["conveyor", "sortation", "wcs"], categories: ["Conveyor & Sortation"] },
-    { label: "Dock or trailer automation", terms: ["dock", "trailer", "loading", "unloading"], categories: ["Dock Automation"] },
-    { label: "WMS / WES / WCS", terms: ["wms", "wes", "wcs", "software"], categories: ["WMS Platforms"] },
-    { label: "Machine vision / AI inspection", terms: ["vision", "ai", "inspection", "camera"], categories: ["Vision & AI", "Controls & Sensing"] },
-    { label: "Manufacturing automation", terms: ["manufacturing", "robot", "cobot", "controls"], categories: ["Manufacturing Automation", "Industrial Robotics"] },
-    { label: "AS/RS / automated storage", terms: ["as/rs", "storage", "shuttle", "autostore"], categories: ["AS/RS & Storage"] },
+    { label: "AMR / mobile robots", terms: ["amr", "goods-to-person", "mobile", "cart", "pallet", "autonomous"], categories: ["AMR / Mobile Robots", "AGV Systems"], budgetMin: 1 },
+    { label: "Robotic palletizing / depalletizing", terms: ["pallet", "depallet", "case handling", "robot arm", "end of line"], categories: ["Depalletizing & Palletizing", "Industrial Robotics"], budgetMin: 2 },
+    { label: "Conveyor / sortation", terms: ["conveyor", "sortation", "sort", "wcs", "accumulation"], categories: ["Conveyor & Sortation"], budgetMin: 3 },
+    { label: "Dock / trailer automation", terms: ["dock", "trailer", "loading", "unloading", "slip"], categories: ["Dock Automation"], budgetMin: 2 },
+    { label: "WMS / WES / WCS software", terms: ["wms", "wes", "wcs", "warehouse management", "software"], categories: ["WMS Platforms", "Labor Management"], budgetMin: 1 },
+    { label: "Machine vision / AI inspection", terms: ["vision", "ai", "inspection", "camera", "barcode", "sensing"], categories: ["Vision & AI", "Controls & Sensing"], budgetMin: 1 },
+    { label: "Manufacturing automation / cobots", terms: ["manufacturing", "cobot", "collaborative", "cnc", "welding", "machine tending"], categories: ["Manufacturing Automation", "Industrial Robotics"], budgetMin: 1 },
+    { label: "AS/RS / automated storage", terms: ["as/rs", "storage", "shuttle", "autostore", "vertical lift", "vlm", "high density"], categories: ["AS/RS & Storage"], budgetMin: 3 },
+    { label: "Labor management / LMS", terms: ["labor", "lms", "productivity", "standards", "engineered", "voice"], categories: ["Labor Management"], budgetMin: 1 },
+    { label: "Simulation / digital twin", terms: ["simulation", "digital twin", "flexsim", "emulate", "model"], categories: ["Simulation & Digital Twin"], budgetMin: 1 },
   ];
+
+  const budgetTiers = {
+    "Under $50k": 1, "$50k–$200k": 2, "$200k–$500k": 3, "$500k–$1M": 4, "$1M+": 5, "Unknown": 3,
+  };
+
+  const priceTiers = { "$": 1, "$$": 2, "$$$": 3, "$$$$": 4 };
+
   const selectedUse = useCases.find(u => u.label === form.useCase) || useCases[0];
+  const budgetTier = budgetTiers[form.budget] || 3;
+
   const scoreVendor = (v) => {
-    const text = [v.name, v.category, v.tagline, v.desc, ...(v.tags || []), ...(v.apps || []), ...(v.industry || [])].join(" ").toLowerCase();
+    const text = [v.name, v.category, v.tagline, v.desc, ...(v.tags || []), ...(v.industry || []), v.best_for || ""].join(" ").toLowerCase();
     let score = 0;
-    if (selectedUse.categories.includes(v.category)) score += 5;
-    if ((v.industry || []).includes(form.facility)) score += 3;
+
+    // Category match — strongest signal
+    if (selectedUse.categories.includes(v.category)) score += 8;
+
+    // Industry match
+    if ((v.industry || []).includes(form.facility)) score += 4;
+
+    // Keyword match in description/tags
     selectedUse.terms.forEach(t => { if (text.includes(t)) score += 2; });
-    if (form.environment.toLowerCase().includes("brownfield") && text.includes("brownfield")) score += 1;
+
+    // Brownfield bonus
+    if (form.environment.toLowerCase().includes("brownfield")) {
+      const specText = (v.specs || []).map(s => s.v).join(" ").toLowerCase();
+      if (text.includes("brownfield") || specText.includes("yes")) score += 3;
+    }
+
+    // Budget fit — penalize vendors that are clearly too expensive or too cheap
+    const vTier = priceTiers[v.price_range] || 3;
+    const diff = Math.abs(vTier - budgetTier);
+    if (diff === 0) score += 3;
+    else if (diff === 1) score += 1;
+    else if (diff >= 2) score -= 2;
+
+    // Featured vendors get slight boost
+    if (v.featured) score += 1;
+
     return score;
   };
-  const vendorMatches = vendors.map(v => ({ v, score: scoreVendor(v) })).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 6).map(x => x.v);
+
+  const vendorMatches = vendors
+    .map(v => ({ v, score: scoreVendor(v) }))
+    .filter(x => x.score > 3)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map(x => x.v);
+
   const productMatches = Object.entries(allProducts).flatMap(([slug, items]) => {
     const vendor = vendors.find(v => v.slug === slug);
-    return (items || []).map(product => ({ product, vendor })).filter(row => row.vendor);
+    return (items || []).map(product => ({ product, vendor })).filter(r => r.vendor);
   }).map(row => {
     const text = [row.product.name, row.product.tagline, row.product.category, ...(row.product.applications || []), row.vendor.name, row.vendor.category].join(" ").toLowerCase();
     let score = 0;
     selectedUse.terms.forEach(t => { if (text.includes(t)) score += 2; });
-    if (selectedUse.categories.includes(row.vendor.category)) score += 2;
-    if ((row.vendor.industry || []).includes(form.facility)) score += 1;
+    if (selectedUse.categories.includes(row.vendor.category)) score += 3;
+    if ((row.vendor.industry || []).includes(form.facility)) score += 2;
+    // Budget fit on product price
+    const pTier = priceTiers[row.product.price_range] || 3;
+    if (Math.abs(pTier - budgetTier) === 0) score += 2;
+    else if (Math.abs(pTier - budgetTier) >= 2) score -= 1;
     return { ...row, score };
-  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 8);
+  }).filter(x => x.score > 2).sort((a, b) => b.score - a.score).slice(0, 6);
+
+  // Why these vendors — generate explanation text
+  const getMatchReason = (v) => {
+    const reasons = [];
+    if (selectedUse.categories.includes(v.category)) reasons.push(`Primary category match (${v.category})`);
+    if ((v.industry || []).includes(form.facility)) reasons.push(`Serves ${form.facility}`);
+    if (form.environment.includes("brownfield") && v.best_for?.toLowerCase().includes("brownfield")) reasons.push("Brownfield experience noted");
+    if (v.price_range === form.budget?.split("–")[0]?.trim()) reasons.push("Price range aligns");
+    return reasons.slice(0, 2).join(" · ") || "Category and keyword match";
+  };
 
   const submit = async () => {
     if (!form.name || !form.company || !form.email) return;
     setLoading(true);
     try {
-      const ok = await submitLeadForm(form, { lead_type: "Shortlist Request", _subject: `OpEx Scout Shortlist Request — ${form.company}` });
+      const ok = await submitLeadForm(form, { lead_type: "Shortlist Request", matched_vendors: vendorMatches.map(v => v.name).join(", "), _subject: `OpEx Scout Shortlist — ${form.company}` });
       if (ok) setSent(true);
     } catch (e) { console.error(e); }
     setLoading(false);
@@ -1480,67 +1547,127 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
       <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
       <div style={S.heroEyebrow}>Find a Solution</div>
       <div style={S.detailName}>Build a vendor shortlist for your operation</div>
-      <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, maxWidth: 760, marginBottom: 28 }}>Answer a few practical questions and OpEx Scout will surface matching categories, vendors, and products. This is the lead-gen engine of the site.</p>
+      <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, maxWidth: 760, marginBottom: 28 }}>Tell us about your operation and we'll match vendors and products by use case, industry, budget, and fit. Results update instantly as you change your answers.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 24 }}>
-        <div style={S.sideCard}>
-          <div style={S.sideCardTitle}>Operation details</div>
-          <label style={S.rfiLabel}>Problem / use case</label>
-          <select style={S.rfiInput} value={form.useCase} onChange={e => setForm(f => ({ ...f, useCase: e.target.value }))}>{useCases.map(u => <option key={u.label}>{u.label}</option>)}</select>
-          <label style={S.rfiLabel}>Facility type</label>
-          <select style={S.rfiInput} value={form.facility} onChange={e => setForm(f => ({ ...f, facility: e.target.value }))}>{industries.map(i => <option key={i}>{i}</option>)}</select>
-          <label style={S.rfiLabel}>Project type</label>
-          <select style={S.rfiInput} value={form.environment} onChange={e => setForm(f => ({ ...f, environment: e.target.value }))}>{["Brownfield retrofit", "Greenfield / new build", "Capacity expansion", "Vendor replacement", "Feasibility study"].map(x => <option key={x}>{x}</option>)}</select>
-          <label style={S.rfiLabel}>Budget range</label>
-          <select style={S.rfiInput} value={form.budget} onChange={e => setForm(f => ({ ...f, budget: e.target.value }))}>{["Under $50k", "$50k–$200k", "$200k–$500k", "$500k–$1M", "$1M+", "Unknown"].map(x => <option key={x}>{x}</option>)}</select>
-          <label style={S.rfiLabel}>Timeline</label>
-          <select style={S.rfiInput} value={form.timeline} onChange={e => setForm(f => ({ ...f, timeline: e.target.value }))}>{["0–3 months", "3–6 months", "6–12 months", "12+ months", "Researching only"].map(x => <option key={x}>{x}</option>)}</select>
-          <label style={S.rfiLabel}>Current WMS / ERP / controls</label>
-          <input style={S.rfiInput} value={form.systems} onChange={e => setForm(f => ({ ...f, systems: e.target.value }))} placeholder="Manhattan, SAP, Oracle, Rockwell..." />
-          <label style={S.rfiLabel}>Notes</label>
-          <textarea style={{ ...S.rfiInput, minHeight: 80, resize: "vertical" }} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Volume, labor issue, layout constraint, throughput target..." />
+      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 24 }}>
+        <div>
+          <div style={S.sideCard}>
+            <div style={S.sideCardTitle}>Your operation</div>
+            <label style={S.rfiLabel}>Primary use case *</label>
+            <select style={S.rfiInput} value={form.useCase} onChange={e => setForm(f => ({ ...f, useCase: e.target.value }))}>{useCases.map(u => <option key={u.label}>{u.label}</option>)}</select>
+            <label style={S.rfiLabel}>Facility type</label>
+            <select style={S.rfiInput} value={form.facility} onChange={e => setForm(f => ({ ...f, facility: e.target.value }))}>{industries.map(i => <option key={i}>{i}</option>)}</select>
+            <label style={S.rfiLabel}>Project type</label>
+            <select style={S.rfiInput} value={form.environment} onChange={e => setForm(f => ({ ...f, environment: e.target.value }))}>{["Brownfield retrofit", "Greenfield / new build", "Capacity expansion", "Vendor replacement", "Feasibility study"].map(x => <option key={x}>{x}</option>)}</select>
+            <label style={S.rfiLabel}>Budget range</label>
+            <select style={S.rfiInput} value={form.budget} onChange={e => setForm(f => ({ ...f, budget: e.target.value }))}>{["Under $50k", "$50k–$200k", "$200k–$500k", "$500k–$1M", "$1M+", "Unknown"].map(x => <option key={x}>{x}</option>)}</select>
+            <label style={S.rfiLabel}>Timeline</label>
+            <select style={S.rfiInput} value={form.timeline} onChange={e => setForm(f => ({ ...f, timeline: e.target.value }))}>{["0–3 months", "3–6 months", "6–12 months", "12+ months", "Researching only"].map(x => <option key={x}>{x}</option>)}</select>
+            <label style={S.rfiLabel}>Throughput target (optional)</label>
+            <input style={S.rfiInput} value={form.throughput} onChange={e => setForm(f => ({ ...f, throughput: e.target.value }))} placeholder="e.g. 500 cases/hr, 1,000 orders/day" />
+            <label style={S.rfiLabel}>Facility size (optional)</label>
+            <input style={S.rfiInput} value={form.sqft} onChange={e => setForm(f => ({ ...f, sqft: e.target.value }))} placeholder="e.g. 250,000 sqft" />
+            <label style={S.rfiLabel}>Current WMS / ERP / controls</label>
+            <input style={S.rfiInput} value={form.systems} onChange={e => setForm(f => ({ ...f, systems: e.target.value }))} placeholder="Manhattan, SAP, Oracle, Rockwell..." />
+            <label style={S.rfiLabel}>Notes</label>
+            <textarea style={{ ...S.rfiInput, minHeight: 72, resize: "vertical" }} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Labor issue, layout constraint, key goal..." />
+          </div>
         </div>
 
         <div>
-          <div style={{ ...S.sideCard, marginBottom: 16 }}>
-            <div style={S.sideCardTitle}>Recommended categories</div>
-            <div style={S.tags}>{selectedUse.categories.map(c => <span key={c} style={{ ...S.tag, color: "#f59e0b" }}>{c}</span>)}</div>
-          </div>
-
-          <div style={{ ...S.sideCard, marginBottom: 16 }}>
-            <div style={S.sideCardTitle}>Vendor shortlist</div>
-            <div style={S.grid}>{vendorMatches.map(v => <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "solution", "solution results")} compareCount={0} />)}</div>
-          </div>
-
-          <div style={{ ...S.sideCard, marginBottom: 16 }}>
-            <div style={S.sideCardTitle}>Product shortlist</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
-              {productMatches.map(({ product, vendor }) => {
-                const selected = selectedProducts.some(x => x.product.id === product.id);
-                return (
-                  <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 14 }}>
-                    <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 700, marginBottom: 6 }}>{vendor.name}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 5 }}>{product.name}</div>
-                    <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5 }}>{product.tagline || product.category}</div>
-                    <button style={{ ...S.btnSecondary, marginTop: 12, fontSize: 12, padding: "8px 10px", color: selected ? "#22c55e" : "#94a3b8" }} onClick={() => addProductToCompare(product, vendor)}>{selected ? "✓ Added" : "+ Compare product"}</button>
-                  </div>
-                );
-              })}
+          {/* Match summary */}
+          <div style={{ ...S.sideCard, marginBottom: 16, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 6 }}>
+                  {vendorMatches.length} vendors · {productMatches.length} products matched
+                </div>
+                <div style={{ fontSize: 12, color: "#64748b" }}>
+                  Based on: {form.useCase} · {form.facility} · {form.environment} · {form.budget}
+                </div>
+              </div>
+              <div style={S.tags}>{selectedUse.categories.map(c => <span key={c} style={{ ...S.tag, color: "#f59e0b", borderColor: "rgba(245,158,11,0.2)" }}>{c}</span>)}</div>
             </div>
           </div>
 
+          {/* Vendor shortlist */}
+          <div style={{ ...S.sideCard, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={S.sideCardTitle}>Vendor shortlist</div>
+              <span style={{ fontSize: 11, color: "#475569" }}>Ranked by fit score</span>
+            </div>
+            {vendorMatches.length === 0 ? (
+              <div style={{ fontSize: 13, color: "#475569", padding: "16px 0" }}>No strong matches for this combination — try adjusting budget or use case.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {vendorMatches.map((v, i) => (
+                  <div key={v.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
+                    onClick={() => openDetail(v, "solution", "solution results")}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", width: 20, flexShrink: 0 }}>#{i + 1}</div>
+                    <div style={{ ...S.logoCircle, background: v.color, width: 36, height: 36, fontSize: 11, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5" }}>{v.name}</span>
+                        <PriceBadge tier={v.price_range} />
+                      </div>
+                      <div style={{ fontSize: 11, color: "#475569" }}>{getMatchReason(v)}</div>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#f59e0b" }}>View →</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Product shortlist */}
+          {productMatches.length > 0 && (
+            <div style={{ ...S.sideCard, marginBottom: 16 }}>
+              <div style={S.sideCardTitle}>Matched products</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+                {productMatches.map(({ product, vendor }) => {
+                  const isSelected = selectedProducts.some(x => x.product.id === product.id);
+                  return (
+                    <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 14 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                        <div style={{ ...S.logoCircle, background: vendor.color, width: 22, height: 22, fontSize: 8, marginBottom: 0 }}>{vendor.logo}</div>
+                        <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 700 }}>{vendor.name}</span>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5", marginBottom: 4 }}>{product.name}</div>
+                      <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.5, marginBottom: 8 }}>{product.category}</div>
+                      {product.price_range && <PriceBadge tier={product.price_range} />}
+                      <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: "6px 10px", color: isSelected ? "#22c55e" : "#94a3b8", display: "block", width: "100%", textAlign: "center" }}
+                        onClick={() => addProductToCompare(product, vendor)}>
+                        {isSelected ? "✓ Added to compare" : "+ Compare product"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Lead capture */}
           <div style={S.sideCard}>
-            <div style={S.sideCardTitle}>Request this shortlist</div>
+            <div style={S.sideCardTitle}>Get this shortlist emailed to you</div>
+            <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12, lineHeight: 1.6 }}>
+              We'll send you the matched vendors, fit notes, and suggested next steps for your evaluation.
+            </div>
             {sent ? (
-              <div style={{ textAlign: "center", padding: 24, color: "#f59e0b" }}>✓ Shortlist request submitted. You should receive it through Formspree.</div>
+              <div style={{ textAlign: "center", padding: 20, color: "#f59e0b" }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
+                <div style={{ fontWeight: 700 }}>Shortlist sent</div>
+                <div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>Check your inbox — matched vendors: {vendorMatches.map(v => v.name).join(", ")}</div>
+              </div>
             ) : (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-                  <input style={S.rfiInput} placeholder="Name *" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                  <input style={S.rfiInput} placeholder="Company *" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
-                  <input style={S.rfiInput} placeholder="Email *" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 8 }}>
+                  <input style={{ ...S.rfiInput, marginBottom: 0 }} placeholder="Name *" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                  <input style={{ ...S.rfiInput, marginBottom: 0 }} placeholder="Company *" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
+                  <input style={{ ...S.rfiInput, marginBottom: 0 }} placeholder="Email *" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
                 </div>
-                <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>{loading ? "Submitting..." : "Send me this vendor shortlist"}</button>
+                <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>
+                  {loading ? "Sending..." : `Send shortlist (${vendorMatches.length} vendors matched)`}
+                </button>
               </>
             )}
           </div>
@@ -2115,18 +2242,38 @@ export default function App() {
   const [categoryPageCategory, setCategoryPageCategory] = useState(categories[0]);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
+  const pageTitles = {
+    home: "OpEx Scout — Automation Vendor Intelligence",
+    directory: "Vendor Directory — OpEx Scout",
+    categories: "Browse by Category — OpEx Scout",
+    solution: "Find a Solution — OpEx Scout",
+    compare: "Compare Vendors — OpEx Scout",
+    "product-compare": "Compare Products — OpEx Scout",
+    reviews: "Submit a Review — OpEx Scout",
+    list: "List Your Company — OpEx Scout",
+    about: "About — OpEx Scout",
+  };
+
   // Navigate with scroll-to-top and browser history
   const navigate = (nextPage) => {
     rawSetPage(nextPage);
     window.scrollTo({ top: 0, behavior: "auto" });
     window.history.pushState({ page: nextPage }, "", `#${nextPage}`);
+    document.title = pageTitles[nextPage] || "OpEx Scout";
   };
 
   // Browser back/forward button support
   useEffect(() => {
     window.history.replaceState({ page: "home" }, "", "#home");
     const onPop = (e) => {
-      rawSetPage(e.state?.page || "home");
+      const state = e.state || {};
+      const nextPage = state.page || "home";
+      // If going back to a vendor detail, restore the vendor
+      if (nextPage === "detail" && state.slug) {
+        const v = vendors.find(x => x.slug === state.slug);
+        if (v) setDetailVendor(v);
+      }
+      rawSetPage(nextPage);
       window.scrollTo({ top: 0, behavior: "auto" });
     };
     window.addEventListener("popstate", onPop);
@@ -2140,11 +2287,14 @@ export default function App() {
   };
   const removeProductFromCompare = (productId) => setSelectedProducts(prev => prev.filter(p => p.product.id !== productId));
 
-  // Open vendor detail with back context
+  // Open vendor detail with back context + slug URL
   const openDetail = (vendor, fromPage, fromLabel) => {
     setDetailVendor(vendor);
     setDetailBack({ page: fromPage || "directory", label: fromLabel || "directory" });
-    navigate("detail");
+    rawSetPage("detail");
+    window.scrollTo({ top: 0, behavior: "auto" });
+    window.history.pushState({ page: "detail", slug: vendor.slug }, "", `#vendor/${vendor.slug}`);
+    document.title = `${vendor.name} — OpEx Scout`;
   };
 
   return (
@@ -2155,7 +2305,7 @@ export default function App() {
       {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
       {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
-      {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} />}
+      {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} openDetail={openDetail} />}
       {page === "compare" && <ComparePage selected={selected} setPage={navigate} openDetail={openDetail} />}
       {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={navigate} removeProduct={removeProductFromCompare} openDetail={openDetail} />}
       {page === "list" && <ListPage setPage={navigate} />}
