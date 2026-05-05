@@ -174,6 +174,21 @@ function getProductImage(product) {
   return makePlaceholderDataUri(product?.name || "Product");
 }
 
+// Reusable image component with automatic fallback to placeholder
+function ProductImg({ product, style, onClick }) {
+  const placeholder = makePlaceholderDataUri(product?.name || "Product");
+  const src = getProductImage(product);
+  return (
+    <img
+      src={src}
+      alt={product?.name || "Product"}
+      style={style}
+      onClick={onClick}
+      onError={e => { e.target.onerror = null; e.target.src = placeholder; }}
+    />
+  );
+}
+
 function getProductGallery(product) {
   const items = [];
   if (product?.image) items.push(product.image);
@@ -717,12 +732,12 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
       <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 20, marginBottom: 20 }}>
         <div>
           <div style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 10 }}>
-            <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+            <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name); }} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
             {gallery.slice(0, 4).map((img, idx) => (
               <button key={img} onClick={() => setActiveImage(img)} style={{ padding: 0, borderRadius: 8, overflow: "hidden", border: activeImage === img ? "2px solid #f59e0b" : "1px solid rgba(255,255,255,0.08)", background: "#0d1526", cursor: "pointer" }}>
-                <img src={img} alt={`${product.name} media ${idx + 1}`} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+                <img src={img} alt={`${product.name} media ${idx + 1}`} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name); }} />
               </button>
             ))}
           </div>
@@ -765,9 +780,23 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
         </div>
       </div>
 
-      {product.youtube_id && (
-        <div style={{ marginBottom: 24, borderRadius: 12, overflow: "hidden", background: "#000", aspectRatio: "16/9", width: "100%" }}>
-          <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${product.youtube_id}`} title={product.name} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ display: "block" }} />
+      {(product.youtube_id || product.videoUrl) && (
+        <div style={{ marginBottom: 24, background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 20, display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 12, background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: 22 }}>▶</span>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 4 }}>Demo video available</div>
+            <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>Watch the official product demo on YouTube. Opens in a new tab.</div>
+          </div>
+          <a
+            href={product.videoUrl || `https://www.youtube.com/watch?v=${product.youtube_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ ...S.btnPrimary, width: "auto", padding: "10px 20px", textDecoration: "none", flexShrink: 0 }}
+          >
+            Watch demo →
+          </a>
         </div>
       )}
 
@@ -890,7 +919,7 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
           const isSelected = selectedProducts?.find(sp => sp.product.id === p.id);
           return (
             <div key={p.id} style={{ background: "#0d1526", borderRadius: 14, border: `1px solid ${isSelected ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.07)"}`, overflow: "hidden", cursor: "pointer" }}>
-              <img src={getProductImage(p)} alt={p.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} onClick={() => setActiveProduct(p)} />
+              <ProductImg product={p} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onClick={() => setActiveProduct(p)} />
               <div style={{ padding: 16 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
                   <div style={{ flex: 1 }} onClick={() => setActiveProduct(p)}>
@@ -1002,7 +1031,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                         {vendorProducts.map(p => (
                           <div key={p.id} onClick={() => setTab('products')} style={{ background: '#0d1526', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}>
-                            <img src={getProductImage(p)} alt={p.name} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block' }} />
+                            <ProductImg product={p} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'contain', display: 'block' }} />
                             <div style={{ padding: 12 }}>
                               <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 700, marginBottom: 4 }}>{p.name}</div>
                               <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>{p.category}</div>
@@ -1833,7 +1862,7 @@ function MediaOpsPage({ setPage }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
           {missing.slice(0, 60).map(({ product, vendor }) => (
             <div key={product.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, overflow: "hidden" }}>
-              <img src={getProductImage(product)} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />
+              <ProductImg product={product} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} />
               <div style={{ padding: 14 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
                   <div>
@@ -2034,10 +2063,8 @@ function ProductComparePage({ selectedProducts, setPage, removeProduct, openDeta
                 <td style={{ ...S.compareTd, fontWeight: 600, color: "#475569", fontSize: 12, background: "#0d1526", verticalAlign: "top", paddingTop: 20 }}>Product video</td>
                 {selectedProducts.map(({ product: p }, i) => (
                   <td key={i} style={{ ...S.compareTd, background: "#0f1c30", padding: 12 }}>
-                    {p.youtube_id ? (
-                      <div style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "16/9" }}>
-                        <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${p.youtube_id}`} title={p.name} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ display: "block" }} />
-                      </div>
+                    {(p.youtube_id || p.videoUrl) ? (
+                      <a href={p.videoUrl || `https://www.youtube.com/watch?v=${p.youtube_id}`} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, display: "block", textAlign: "center", textDecoration: "none", fontSize: 12 }}>▶ Watch demo</a>
                     ) : <span style={{ fontSize: 12, color: "#334155" }}>No video available</span>}
                   </td>
                 ))}
