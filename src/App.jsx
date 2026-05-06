@@ -45,31 +45,42 @@ function PriceBadge({ tier, large = false }) {
   );
 }
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
+// ─── RESPONSIVE HOOK ─────────────────────────────────────────────────────────
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
+
 const S = {
   // Layout
   app: { fontFamily: "'DM Sans', system-ui, sans-serif", minHeight: "100vh", background: "#0b1220", color: "#e8edf5" },
   // Nav
-  nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 60, background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)", position: "sticky", top: 0, zIndex: 100 },
+  nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 60, background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)", position: "sticky", top: 0, zIndex: 100 },
   logo: { fontSize: 18, fontWeight: 700, letterSpacing: "-0.3px", cursor: "pointer" },
   logoAccent: { color: "#f59e0b" },
   navLinks: { display: "flex", gap: 28, fontSize: 13, color: "#94a3b8" },
   navLink: { cursor: "pointer", transition: "color 0.15s" },
   navCta: { padding: "8px 18px", background: "#f59e0b", color: "#0b1220", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" },
   // Hero
-  hero: { padding: "72px 32px 56px", textAlign: "center", background: "linear-gradient(180deg, #0d1a35 0%, #0b1220 100%)", borderBottom: "1px solid rgba(255,255,255,0.06)" },
-  heroEyebrow: { fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", color: "#f59e0b", textTransform: "uppercase", marginBottom: 16 },
-  heroH1: { fontSize: 48, fontWeight: 800, letterSpacing: "-1px", lineHeight: 1.1, marginBottom: 16, background: "linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
-  heroSub: { fontSize: 17, color: "#64748b", maxWidth: 520, margin: "0 auto 36px", lineHeight: 1.7 },
-  searchWrap: { maxWidth: 620, margin: "0 auto 20px", display: "flex", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, overflow: "hidden" },
-  searchInput: { flex: 1, background: "transparent", border: "none", padding: "14px 18px", fontSize: 14, color: "#e8edf5", outline: "none" },
-  searchSelect: { background: "#1a2a45", border: "none", borderLeft: "1px solid rgba(255,255,255,0.08)", padding: "0 14px", fontSize: 13, color: "#94a3b8", outline: "none", cursor: "pointer" },
-  searchBtn: { padding: "0 24px", background: "#f59e0b", border: "none", color: "#0b1220", fontWeight: 700, fontSize: 13, cursor: "pointer" },
+  hero: { padding: "48px 20px 40px", textAlign: "center", background: "linear-gradient(180deg, #0d1a35 0%, #0b1220 100%)", borderBottom: "1px solid rgba(255,255,255,0.06)" },
+  heroEyebrow: { fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", color: "#f59e0b", textTransform: "uppercase", marginBottom: 14 },
+  heroH1: { fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 800, letterSpacing: "-1px", lineHeight: 1.1, marginBottom: 16, background: "linear-gradient(135deg, #e8edf5 0%, #94a3b8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
+  heroSub: { fontSize: 15, color: "#64748b", maxWidth: 520, margin: "0 auto 28px", lineHeight: 1.7 },
+  searchWrap: { maxWidth: 620, margin: "0 auto 16px", display: "flex", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, overflow: "hidden" },
+  searchInput: { flex: 1, background: "transparent", border: "none", padding: "13px 16px", fontSize: 14, color: "#e8edf5", outline: "none", minWidth: 0 },
+  searchSelect: { background: "#1a2a45", border: "none", borderLeft: "1px solid rgba(255,255,255,0.08)", padding: "0 10px", fontSize: 12, color: "#94a3b8", outline: "none", cursor: "pointer" },
+  searchBtn: { padding: "0 18px", background: "#f59e0b", border: "none", color: "#0b1220", fontWeight: 700, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap" },
   chips: { display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" },
   chip: { padding: "6px 14px", borderRadius: 20, fontSize: 12, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", color: "#94a3b8", background: "transparent", transition: "all 0.15s" },
   chipActive: { background: "#f59e0b", color: "#0b1220", border: "1px solid #f59e0b", fontWeight: 600 },
   // Stats bar
-  statsBar: { display: "flex", justifyContent: "center", gap: 48, padding: "20px 32px", background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)" },
+  statsBar: { display: "flex", justifyContent: "center", gap: 24, padding: "16px", background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)", flexWrap: "wrap" },
   statItem: { textAlign: "center" },
   statN: { fontSize: 22, fontWeight: 700, color: "#f59e0b" },
   statL: { fontSize: 12, color: "#475569", marginTop: 2 },
@@ -82,7 +93,7 @@ const S = {
   contentHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
   resultCount: { fontSize: 13, color: "#475569" },
   // Vendor cards
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 },
   card: { background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20, cursor: "pointer", transition: "all 0.18s", position: "relative" },
   cardFeatured: { borderColor: "rgba(245,158,11,0.35)" },
   cardSelected: { borderColor: "#f59e0b", borderWidth: 2 },
@@ -101,18 +112,18 @@ const S = {
   compareBtn: { padding: "7px 18px", background: "#f59e0b", color: "#0b1220", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" },
   compareBtnDisabled: { background: "#1e2d45", color: "#475569", cursor: "not-allowed" },
   // Detail page
-  detailWrap: { maxWidth: 1100, margin: "0 auto", padding: "32px 28px" },
-  backBtn: { display: "inline-flex", alignItems: "center", gap: 6, color: "#f59e0b", fontSize: 13, cursor: "pointer", marginBottom: 28, background: "none", border: "none", fontFamily: "inherit" },
-  detailHeader: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, gap: 20 },
-  detailName: { fontSize: 32, fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 6, color: "#e8edf5" },
-  detailSub: { fontSize: 14, color: "#475569", marginBottom: 14 },
-  detailBody: { display: "grid", gridTemplateColumns: "1fr 300px", gap: 28 },
+  detailWrap: { maxWidth: 1100, margin: "0 auto", padding: "24px 16px" },
+  backBtn: { display: "inline-flex", alignItems: "center", gap: 6, color: "#f59e0b", fontSize: 13, cursor: "pointer", marginBottom: 20, background: "none", border: "none", fontFamily: "inherit" },
+  detailHeader: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" },
+  detailName: { fontSize: 26, fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 6, color: "#e8edf5" },
+  detailSub: { fontSize: 13, color: "#475569", marginBottom: 14 },
+  detailBody: { display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 },
   detailMain: { background: "#0f1c30", borderRadius: 14, border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" },
   detailSide: { display: "flex", flexDirection: "column", gap: 16 },
-  tabs: { display: "flex", borderBottom: "1px solid rgba(255,255,255,0.07)" },
-  tab: { padding: "14px 20px", fontSize: 13, cursor: "pointer", color: "#475569", borderBottom: "2px solid transparent", transition: "all 0.15s" },
+  tabs: { display: "flex", borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto" },
+  tab: { padding: "12px 16px", fontSize: 12, cursor: "pointer", color: "#475569", borderBottom: "2px solid transparent", transition: "all 0.15s", whiteSpace: "nowrap" },
   tabActive: { color: "#f59e0b", borderBottomColor: "#f59e0b", fontWeight: 600 },
-  tabContent: { padding: 24 },
+  tabContent: { padding: 20 },
   specGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
   specItem: { background: "#0d1526", borderRadius: 8, padding: "10px 14px" },
   specLabel: { fontSize: 11, color: "#475569", marginBottom: 4 },
@@ -143,11 +154,11 @@ const S = {
   catCard: { background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "20px 16px", cursor: "pointer", transition: "all 0.15s", textAlign: "center" },
   catName: { fontSize: 13, fontWeight: 600, color: "#94a3b8", marginTop: 10 },
   catCount: { fontSize: 12, color: "#475569", marginTop: 4 },
-  section: { maxWidth: 1100, margin: "0 auto", padding: "56px 32px" },
+  section: { maxWidth: 1100, margin: "0 auto", padding: "40px 16px" },
   sectionTitle: { fontSize: 24, fontWeight: 800, letterSpacing: "-0.3px", marginBottom: 8, color: "#e8edf5" },
   sectionSub: { fontSize: 14, color: "#475569", marginBottom: 32 },
   // List vendor page
-  listWrap: { maxWidth: 680, margin: "0 auto", padding: "48px 28px" },
+  listWrap: { maxWidth: 680, margin: "0 auto", padding: "32px 16px" },
   listTitle: { fontSize: 28, fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 8, color: "#e8edf5" },
   listSub: { fontSize: 14, color: "#475569", marginBottom: 32, lineHeight: 1.7 },
   pricingGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 32 },
@@ -505,6 +516,8 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
 }
 
 function NavBar({ page, setPage }) {
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
   const links = [
     ["directory", "Directory"],
     ["categories", "Categories"],
@@ -515,21 +528,44 @@ function NavBar({ page, setPage }) {
   ];
   return (
     <nav style={S.nav}>
-      <div style={S.logo} onClick={() => setPage("home")}>
+      <div style={S.logo} onClick={() => { setPage("home"); setMenuOpen(false); }}>
         OpEx<span style={S.logoAccent}>Scout</span>
       </div>
-      <div style={{ ...S.navLinks, gap: 20 }}>
-        {links.map(([p, label]) => (
-          <span key={p} style={{ ...S.navLink, color: page === p ? "#e8edf5" : "#64748b" }} onClick={() => setPage(p)}>{label}</span>
-        ))}
+      {!isMobile && (
+        <div style={{ ...S.navLinks, gap: 20 }}>
+          {links.map(([p, label]) => (
+            <span key={p} style={{ ...S.navLink, color: page === p ? "#e8edf5" : "#64748b" }} onClick={() => setPage(p)}>{label}</span>
+          ))}
+        </div>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {!isMobile && <button style={S.navCta} onClick={() => setPage("list")}>Claim Listing</button>}
+        {isMobile && (
+          <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 12px", color: "#94a3b8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>
+            {menuOpen ? "✕" : "☰"}
+          </button>
+        )}
       </div>
-      <button style={S.navCta} onClick={() => setPage("list")}>Claim Listing</button>
+      {isMobile && menuOpen && (
+        <div style={{ position: "absolute", top: 60, left: 0, right: 0, background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.08)", zIndex: 200, padding: "12px 0" }}>
+          {links.map(([p, label]) => (
+            <div key={p} style={{ padding: "14px 24px", fontSize: 15, color: page === p ? "#f59e0b" : "#94a3b8", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)", fontWeight: page === p ? 600 : 400 }}
+              onClick={() => { setPage(p); setMenuOpen(false); }}>
+              {label}
+            </div>
+          ))}
+          <div style={{ padding: "14px 24px" }}>
+            <button style={{ ...S.navCta, width: "100%", fontFamily: "inherit" }} onClick={() => { setPage("list"); setMenuOpen(false); }}>Claim Listing</button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
 
 // ─── PAGES ───────────────────────────────────────────────────────────────────
 function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch }) {
+  const isMobile = useIsMobile();
   const catCounts = categories.map(c => ({ name: c, count: vendors.filter(v => v.category === c).length }));
   const featured = vendors.filter(v => v.featured).slice(0, 3);
   const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭", "🚚", "📊", "👁️", "🧩"];
@@ -544,9 +580,9 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
           <div style={S.heroEyebrow}>Independent automation vendor intelligence</div>
           <h1 style={S.heroH1}>Compare automation vendors like a buyer, not a booth visitor</h1>
           <p style={S.heroSub}>OpEx Scout helps warehouse, manufacturing, and industrial teams research vendors, review products, compare fit, and submit qualified RFIs from one place.</p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20, flexWrap: "wrap", padding: "0 16px" }}>
             <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find a solution</button>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse vendor directory</button>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse directory</button>
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("list")}>List your company</button>
           </div>
           <div style={S.searchWrap}>
@@ -588,7 +624,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
       <div style={S.section}>
         <div style={S.sectionTitle}>How OpEx Scout helps buyers</div>
         <div style={S.sectionSub}>Built to help engineering and operations teams screen vendors faster before engaging a sales cycle.</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 14 }}>
           {[
             ["Browse by category", "Filter vendors by technology, industry, and use case."],
             ["Review products", "See product pages, videos, specs, and practical fit notes."],
@@ -631,7 +667,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
       </div>
 
       <div style={S.section}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 28, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.1fr 0.9fr", gap: 28, alignItems: "start" }}>
           <div>
             <div style={S.heroEyebrow}>For vendors</div>
             <div style={S.sectionTitle}>Sponsor visibility and capture qualified buyer intent</div>
@@ -715,7 +751,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
         <div style={{ height: 16 }} />
       </div>
 
-      <div style={{ padding: "20px 28px", maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+      <div style={{ padding: "16px", maxWidth: 1400, margin: "0 auto", width: "100%" }}>
         {selected.length > 0 && (
           <div style={S.compareBar}>
             <span style={{ color: "#94a3b8" }}><strong style={{ color: "#e8edf5" }}>{selected.length}</strong> vendor{selected.length > 1 ? "s" : ""} selected for comparison</span>
@@ -771,6 +807,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
 }
 
 function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedProducts }) {
+  const isMobile = useIsMobile();
   const isSelected = selectedProducts?.find(sp => sp.product.id === product.id);
   const gallery = getProductGallery(product);
   const [activeImage, setActiveImage] = useState(gallery[0]);
@@ -796,7 +833,7 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
     <div style={{ padding: "0 0 32px" }}>
       <button style={{ ...S.backBtn, marginBottom: 20 }} onClick={onBack}>← Back to products</button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 20, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.05fr 0.95fr", gap: 20, marginBottom: 20 }}>
         <div>
           <div style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 10 }}>
             <img src={activeImage} alt={product.name} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} onError={e => { e.target.onerror = null; e.target.src = makePlaceholderDataUri(product.name, vendor?.color, product.category); }} />
@@ -871,7 +908,7 @@ function ProductDetail({ product, onBack, addProductToCompare, vendor, selectedP
         <div style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 24, background: "#0d1526", borderRadius: 12, padding: 20, border: "1px solid rgba(255,255,255,0.06)" }}>{product.description}</div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 20 }}>
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Specifications</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 8, marginBottom: 20 }}>
@@ -1017,6 +1054,7 @@ function ProductsTab({ slug, addProductToCompare, selectedProducts }) {
 }
 
 function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompare, selectedProducts, detailBackPage = "directory", detailBackLabel = "directory", openDetail }) {
+  const isMobile = useIsMobile();
   const [tab, setTab] = useState("overview");
   const [rfiSent, setRfiSent] = useState(false);
   const [rfiLoading, setRfiLoading] = useState(false);
@@ -1050,7 +1088,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
         <button style={S.backBtn} onClick={() => setPage(detailBackPage || "directory")}><ArrowLeft /> Back to {detailBackLabel || "directory"}</button>
 
         <div style={{ background: "linear-gradient(180deg, #111d31 0%, #0f1c30 100%)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 24, marginBottom: 24 }}>
-          <div style={S.detailHeader}>
+          <div style={{ ...S.detailHeader, flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
               <div style={{ ...S.logoCircle, background: vendor.color, width: 64, height: 64, fontSize: 16, marginBottom: 0 }}>{vendor.logo}</div>
               <div>
@@ -1065,13 +1103,13 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                 <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>Pricing tiers are estimates based on industry research. Get exact pricing from {vendor.name}.</div>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 10, flexShrink: 0, flexWrap: "wrap" }}>
               <button style={{ ...S.btnSecondary, width: "auto", padding: "9px 18px" }} onClick={toggleCompare}>{isSelected ? "✓ Added" : "+ Compare"}</button>
               <a href={`https://${vendor.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...S.btnSecondary, width: "auto", padding: "9px 18px", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Visit site</a>
               <button style={{ ...S.btnPrimary, width: "auto", padding: "9px 18px" }} onClick={() => document.getElementById("rfi-form")?.scrollIntoView({ behavior: "smooth" })}>Request Info</button>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10 }}>
             {[['Installs', vendor.installs], ['Employees', vendor.employees], ['HQ', vendor.hq], ['Primary fit', vendor.ideal_operation || vendor.best_for || 'Research in progress']].map(([l, n]) => (
               <div key={l} style={{ background: "#0d1526", borderRadius: 10, padding: 12, border: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ fontSize: 11, color: "#475569", marginBottom: 5 }}>{l}</div>
@@ -1081,7 +1119,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
           </div>
         </div>
 
-        <div style={S.detailBody}>
+        <div style={{ ...S.detailBody, gridTemplateColumns: isMobile ? "1fr" : "1fr 300px" }}>
           <div style={S.detailMain}>
             <div style={S.tabs}>
               {[['overview', 'Overview'], ['products', 'Products'], ['specs', 'Specs & Capabilities'], ['reviews', 'Practitioner notes'], ['cases', 'Case Studies']].map(([t, label]) => (
@@ -1391,6 +1429,7 @@ function ComparePage({ selected, setPage, openDetail }) {
 }
 
 function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageCategory, setCategoryPageCategory, addProductToCompare, selectedProducts }) {
+  const isMobile = useIsMobile();
   const activeCategory = categoryPageCategory || categories[0];
   const categoryVendors = vendors.filter(v => v.category === activeCategory || v.tags.some(t => t.toLowerCase().includes(activeCategory.toLowerCase().split(" ")[0])));
   const allProductRows = Object.entries(allProducts).flatMap(([slug, items]) => {
@@ -1422,7 +1461,7 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
         Use these category pages as buyer guides. Each page groups vendors, products, fit notes, and evaluation criteria around a specific automation problem.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "260px 1fr", gap: 20 }}>
         <div style={S.sideCard}>
           <div style={S.sideCardTitle}>Categories</div>
           {categories.map(c => (
@@ -1493,6 +1532,7 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
 }
 
 function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToCompare, selectedProducts }) {
+  const isMobile = useIsMobile();
   const [form, setForm] = useState({
     useCase: "AMR / mobile robots",
     facility: "Warehouse & DC",
@@ -1624,7 +1664,7 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
       <div style={S.detailName}>Build a vendor shortlist for your operation</div>
       <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, maxWidth: 760, marginBottom: 28 }}>Tell us about your operation and we'll match vendors and products by use case, industry, budget, and fit. Results update instantly as you change your answers.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "340px 1fr", gap: 20 }}>
         <div>
           <div style={S.sideCard}>
             <div style={S.sideCardTitle}>Your operation</div>
