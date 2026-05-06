@@ -172,6 +172,57 @@ const S = {
 
 const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
 const LEAD_LOG_KEY = "opexscout_local_lead_log";
+const SHORTLISTS_KEY = "opexscout_shortlists";
+
+// ─── SHORTLIST STORAGE ────────────────────────────────────────────────────────
+function genId() {
+  return Math.random().toString(36).slice(2, 9);
+}
+
+function readShortlists() {
+  try { return JSON.parse(localStorage.getItem(SHORTLISTS_KEY) || "[]"); } catch { return []; }
+}
+
+function writeShortlists(lists) {
+  try { localStorage.setItem(SHORTLISTS_KEY, JSON.stringify(lists)); } catch {}
+}
+
+function saveShortlist(name, vendorIds, productIds, notes = "") {
+  const lists = readShortlists();
+  const id = genId();
+  const entry = {
+    id,
+    name: name || "My Shortlist",
+    vendorIds,
+    productIds,
+    notes,
+    created: new Date().toISOString(),
+    updated: new Date().toISOString(),
+  };
+  lists.unshift(entry);
+  writeShortlists(lists.slice(0, 50));
+  return id;
+}
+
+function updateShortlist(id, patch) {
+  const lists = readShortlists();
+  const idx = lists.findIndex(l => l.id === id);
+  if (idx === -1) return;
+  lists[idx] = { ...lists[idx], ...patch, updated: new Date().toISOString() };
+  writeShortlists(lists);
+}
+
+function deleteShortlist(id) {
+  writeShortlists(readShortlists().filter(l => l.id !== id));
+}
+
+function getShortlistById(id) {
+  return readShortlists().find(l => l.id === id) || null;
+}
+
+function shortlistShareUrl(id) {
+  return `${window.location.origin}${window.location.pathname}#shortlist/${id}`;
+}
 
 function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "", vendorLogo = "") {
   const text = String(label || "Product").slice(0, 36);
@@ -523,8 +574,8 @@ function NavBar({ page, setPage }) {
     ["categories", "Categories"],
     ["solution", "Find Solution"],
     ["compare", "Compare"],
+    ["shortlists", "My Shortlists"],
     ["reviews", "Reviews"],
-    ["about", "About"],
   ];
   return (
     <nav style={S.nav}>
@@ -1318,11 +1369,34 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
 
 function ComparePage({ selected, setPage, openDetail }) {
   const sel = vendors.filter(v => selected.includes(v.id));
+  const [saved, setSaved] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [listName, setListName] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleSave = () => {
+    const name = listName || `${sel.map(v => v.name).join(" vs ")}`;
+    const id = saveShortlist(name, selected, [], "");
+    const url = shortlistShareUrl(id);
+    setShareUrl(url);
+    setSaved(true);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   if (sel.length < 2) return (
     <div style={{ textAlign: "center", padding: "80px 32px", color: "#475569" }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
       <div style={{ fontSize: 16, marginBottom: 8, color: "#94a3b8" }}>Select at least 2 vendors to compare</div>
-      <button style={{ ...S.btnSecondary, width: "auto", marginTop: 16 }} onClick={() => setPage("directory")}>Go to directory</button>
+      <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16 }}>
+        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("directory")}>Browse directory</button>
+        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("shortlists")}>My shortlists</button>
+      </div>
     </div>
   );
 
@@ -1332,7 +1406,7 @@ function ComparePage({ selected, setPage, openDetail }) {
     { label: "Founded", fn: v => v.founded },
     { label: "Installations", fn: v => v.installs },
     { label: "Employees", fn: v => v.employees },
-    { label: "Price range", fn: v => v.price_range || "N/A" },
+    { label: "Price range", fn: v => v.price_range || "—" },
     { label: "Industries", fn: v => v.industry.slice(0, 3).join(", ") },
     { label: "Integrations", fn: v => v.integrations.slice(0, 3).join(", ") },
   ];
@@ -1340,8 +1414,44 @@ function ComparePage({ selected, setPage, openDetail }) {
   return (
     <div style={S.compareWrap}>
       <button style={S.backBtn} onClick={() => setPage("directory")}><ArrowLeft /> Back to directory</button>
-      <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: "#e8edf5" }}>Vendor comparison</div>
-      <div style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>Side-by-side view · {sel.length} vendors selected</div>
+
+      {/* Header with save/share */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4, color: "#e8edf5" }}>Vendor comparison</div>
+          <div style={{ fontSize: 13, color: "#475569" }}>{sel.length} vendors · Click any vendor to view full profile</div>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          {!saved ? (
+            <>
+              <input
+                style={{ ...S.rfiInput, marginBottom: 0, width: 200, padding: "8px 12px" }}
+                placeholder="Name this shortlist..."
+                value={listName}
+                onChange={e => setListName(e.target.value)}
+              />
+              <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={handleSave}>
+                💾 Save & share
+              </button>
+            </>
+          ) : (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 10, padding: "8px 14px" }}>
+              <span style={{ fontSize: 12, color: "#22c55e", fontWeight: 600 }}>✓ Saved</span>
+              <input
+                readOnly
+                value={shareUrl}
+                style={{ ...S.rfiInput, marginBottom: 0, width: 260, padding: "6px 10px", fontSize: 11, background: "#0d1526" }}
+              />
+              <button style={{ ...S.navCta, fontFamily: "inherit", padding: "6px 14px", fontSize: 12 }} onClick={handleCopy}>
+                {copied ? "Copied!" : "Copy link"}
+              </button>
+              <button style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12 }} onClick={() => setPage("shortlists")}>
+                My lists
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div style={{ overflowX: "auto" }}>
         <table style={S.compareTable}>
@@ -1973,6 +2083,209 @@ function AboutPage({ setPage }) {
   );
 }
 
+function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedProducts, openDetail }) {
+  const isMobile = useIsMobile();
+  const [lists, setLists] = useState(readShortlists());
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [copied, setCopied] = useState(null);
+  const [newName, setNewName] = useState("");
+  const [newNotes, setNewNotes] = useState("");
+
+  const refresh = () => setLists(readShortlists());
+
+  const handleDelete = (id) => {
+    deleteShortlist(id);
+    refresh();
+  };
+
+  const handleSaveEdit = (id) => {
+    updateShortlist(id, { name: editName, notes: editNotes });
+    setEditingId(null);
+    refresh();
+  };
+
+  const handleCopy = (id) => {
+    navigator.clipboard.writeText(shortlistShareUrl(id)).then(() => {
+      setCopied(id);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  };
+
+  const handleLoad = (list) => {
+    // Load vendor IDs into compare state
+    setSelected(list.vendorIds || []);
+    setPage("compare");
+  };
+
+  const handleCreate = () => {
+    if (!newName.trim()) return;
+    const vendorIds = selectedProducts.map(p => p.vendorSlug)
+      .filter((s, i, a) => a.indexOf(s) === i)
+      .map(slug => vendors.find(v => v.slug === slug)?.id)
+      .filter(Boolean);
+    saveShortlist(newName, vendorIds, selectedProducts.map(p => p.product.id), newNotes);
+    setNewName("");
+    setNewNotes("");
+    refresh();
+  };
+
+  return (
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: isMobile ? "24px 16px" : "40px 28px" }}>
+      <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
+      <div style={S.heroEyebrow}>My Shortlists</div>
+      <div style={S.listTitle}>Saved vendor and product shortlists</div>
+      <p style={{ fontSize: 14, color: "#64748b", marginBottom: 28, lineHeight: 1.7 }}>
+        Save and share vendor shortlists with your team. Each shortlist has a unique link you can paste into Slack, email, or a project doc. Anyone with the link can view the vendors you've selected.
+      </p>
+
+      {/* Create new shortlist */}
+      <div style={{ ...S.sideCard, marginBottom: 24, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginBottom: 12 }}>
+          {selectedProducts.length > 0 ? `Save current selection (${selectedProducts.length} products)` : "Create a new shortlist"}
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input
+            style={{ ...S.rfiInput, marginBottom: 0, flex: 1, minWidth: 160 }}
+            placeholder="Shortlist name (e.g. AMR options Q3 2026)"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleCreate()}
+          />
+          <input
+            style={{ ...S.rfiInput, marginBottom: 0, flex: 2, minWidth: 200 }}
+            placeholder="Notes (optional)"
+            value={newNotes}
+            onChange={e => setNewNotes(e.target.value)}
+          />
+          <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={handleCreate}>
+            + Save shortlist
+          </button>
+        </div>
+        {selectedProducts.length > 0 && (
+          <div style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {selectedProducts.map(p => (
+              <span key={p.product.id} style={{ ...S.tag, color: "#f59e0b" }}>{p.product.name}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Saved lists */}
+      {lists.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "48px 0", color: "#475569" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
+          <div style={{ fontSize: 15, color: "#64748b", marginBottom: 8 }}>No shortlists saved yet</div>
+          <div style={{ fontSize: 13, color: "#475569" }}>
+            Select vendors in the directory or compare page, then save them here to build a shareable shortlist.
+          </div>
+          <button style={{ ...S.btnSecondary, width: "auto", marginTop: 20 }} onClick={() => setPage("directory")}>
+            Browse vendors
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {lists.map(list => {
+            const listVendors = vendors.filter(v => (list.vendorIds || []).includes(v.id));
+            const isEditing = editingId === list.id;
+            return (
+              <div key={list.id} style={{ ...S.sideCard, padding: 0, overflow: "hidden" }}>
+                {/* Header */}
+                <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        style={{ ...S.rfiInput, marginBottom: 6, fontSize: 15, fontWeight: 700 }}
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                      />
+                    ) : (
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 4 }}>{list.name}</div>
+                    )}
+                    <div style={{ fontSize: 11, color: "#475569" }}>
+                      Created {new Date(list.created).toLocaleDateString()} · {listVendors.length} vendor{listVendors.length !== 1 ? "s" : ""}
+                      {(list.productIds || []).length > 0 && ` · ${list.productIds.length} product${list.productIds.length !== 1 ? "s" : ""}`}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                    {isEditing ? (
+                      <>
+                        <button style={{ ...S.navCta, fontFamily: "inherit", padding: "6px 12px", fontSize: 12 }} onClick={() => handleSaveEdit(list.id)}>Save</button>
+                        <button style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12 }} onClick={() => setEditingId(null)}>Cancel</button>
+                      </>
+                    ) : (
+                      <>
+                        <button style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12 }}
+                          onClick={() => { setEditingId(list.id); setEditName(list.name); setEditNotes(list.notes || ""); }}>
+                          Edit
+                        </button>
+                        <button
+                          style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12, color: copied === list.id ? "#22c55e" : "#94a3b8", borderColor: copied === list.id ? "rgba(34,197,94,0.3)" : undefined }}
+                          onClick={() => handleCopy(list.id)}>
+                          {copied === list.id ? "✓ Copied" : "Share link"}
+                        </button>
+                        {listVendors.length >= 2 && (
+                          <button style={{ ...S.navCta, fontFamily: "inherit", padding: "6px 12px", fontSize: 12 }} onClick={() => handleLoad(list)}>
+                            Compare
+                          </button>
+                        )}
+                        <button style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12, color: "#ef4444", borderColor: "rgba(239,68,68,0.2)" }}
+                          onClick={() => handleDelete(list.id)}>
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                {isEditing ? (
+                  <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <textarea
+                      style={{ ...S.rfiInput, marginBottom: 0, minHeight: 60, resize: "vertical" }}
+                      placeholder="Add notes about this shortlist..."
+                      value={editNotes}
+                      onChange={e => setEditNotes(e.target.value)}
+                    />
+                  </div>
+                ) : list.notes ? (
+                  <div style={{ padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>{list.notes}</div>
+                ) : null}
+
+                {/* Share URL */}
+                <div style={{ padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 11, color: "#475569", flexShrink: 0 }}>Share:</span>
+                  <code style={{ fontSize: 11, color: "#64748b", background: "#0d1526", padding: "3px 8px", borderRadius: 4, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {shortlistShareUrl(list.id)}
+                  </code>
+                </div>
+
+                {/* Vendors in list */}
+                {listVendors.length > 0 && (
+                  <div style={{ padding: "14px 20px" }}>
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      {listVendors.map(v => (
+                        <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 8, background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "6px 12px", cursor: "pointer" }}
+                          onClick={() => openDetail(v, "shortlists", "shortlists")}>
+                          <div style={{ ...S.logoCircle, background: v.color, width: 22, height: 22, fontSize: 8, marginBottom: 0 }}>{v.logo}</div>
+                          <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>{v.name}</span>
+                          <span style={{ fontSize: 10, color: "#475569" }}>→</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MethodologyPage({ setPage }) {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 28px" }}>
@@ -2203,6 +2516,7 @@ function SiteFooter({ setPage }) {
           <div style={{ fontSize: 12, color: '#475569', marginTop: 8, maxWidth: 420 }}>Automation vendor intelligence for warehouse, manufacturing, and industrial teams.</div>
         </div>
         <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 12, color: '#94a3b8' }}>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('shortlists')}>My Shortlists</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('methodology')}>Methodology</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('contact')}>Contact</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('vendors')}>Vendor program</span>
@@ -2485,6 +2799,7 @@ export default function App() {
     compare: "Compare Vendors — OpEx Scout",
     "product-compare": "Compare Products — OpEx Scout",
     reviews: "Submit a Review — OpEx Scout",
+    shortlists: "My Shortlists — OpEx Scout",
     list: "List Your Company — OpEx Scout",
     about: "About — OpEx Scout",
     methodology: "Methodology — OpEx Scout",
@@ -2498,13 +2813,30 @@ export default function App() {
     document.title = pageTitles[nextPage] || "OpEx Scout";
   };
 
-  // Browser back/forward button support
+  // Browser back/forward button support + shortlist URL detection
   useEffect(() => {
-    window.history.replaceState({ page: "home" }, "", "#home");
+    // Check if URL is a shared shortlist link
+    const hash = window.location.hash;
+    const shortlistMatch = hash.match(/^#shortlist\/([a-z0-9]+)$/);
+    if (shortlistMatch) {
+      const id = shortlistMatch[1];
+      const list = getShortlistById(id);
+      if (list) {
+        setSelected(list.vendorIds || []);
+        rawSetPage("compare");
+        window.history.replaceState({ page: "compare" }, "", hash);
+      } else {
+        // Shared list not found in this browser — show shortlists page with message
+        rawSetPage("shortlists");
+        window.history.replaceState({ page: "shortlists" }, "", "#shortlists");
+      }
+    } else {
+      window.history.replaceState({ page: "home" }, "", "#home");
+    }
+
     const onPop = (e) => {
       const state = e.state || {};
       const nextPage = state.page || "home";
-      // If going back to a vendor detail, restore the vendor
       if (nextPage === "detail" && state.slug) {
         const v = vendors.find(x => x.slug === state.slug);
         if (v) setDetailVendor(v);
@@ -2545,6 +2877,7 @@ export default function App() {
       {page === "compare" && <ComparePage selected={selected} setPage={navigate} openDetail={openDetail} />}
       {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={navigate} removeProduct={removeProductFromCompare} openDetail={openDetail} />}
       {page === "list" && <ListPage setPage={navigate} />}
+      {page === "shortlists" && <ShortlistsPage setPage={navigate} setSelected={setSelected} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} openDetail={openDetail} />}
       {page === "vendors" && <VendorsPage setPage={navigate} />}
       {page === "methodology" && <MethodologyPage setPage={navigate} />}
       {page === "about" && <AboutPage setPage={navigate} />}
