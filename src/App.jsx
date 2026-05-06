@@ -483,12 +483,12 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
           <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700 }}>{profile.productCount || "Pending"}</div>
         </div>
         <div style={{ background: "#0d1526", borderRadius: 8, padding: "8px 10px" }}>
-          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Fit</div>
-          <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{vendor.price_range || "Review"}</div>
+          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Price range</div>
+          <div style={{ fontSize: 12, color: vendor.price_range ? "#94a3b8" : "#334155", fontWeight: 700 }}>{vendor.price_range || "—"}</div>
         </div>
       </div>
       <div style={S.cardFooter}>
-        <Stars rating={vendor.rating} />
+        <span style={{ fontSize: 12, color: "#475569" }}>{vendor.category}</span>
         <label style={S.compareCheck} onClick={e => e.stopPropagation()}>
           <input
             type="checkbox"
@@ -529,7 +529,7 @@ function NavBar({ page, setPage }) {
 }
 
 // ─── PAGES ───────────────────────────────────────────────────────────────────
-function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail }) {
+function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch }) {
   const catCounts = categories.map(c => ({ name: c, count: vendors.filter(v => v.category === c).length }));
   const featured = vendors.filter(v => v.featured).slice(0, 3);
   const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭", "🚚", "📊", "👁️", "🧩"];
@@ -550,12 +550,26 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("list")}>List your company</button>
           </div>
           <div style={S.searchWrap}>
-            <input style={S.searchInput} placeholder="Search vendors, products, categories, or use cases..." onKeyDown={e => { if (e.key === "Enter") setPage("directory"); }} />
+            <input
+              style={S.searchInput}
+              placeholder="Search vendors, products, categories, or use cases..."
+              id="hero-search"
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  setInitialSearch(e.target.value);
+                  setPage("directory");
+                }
+              }}
+            />
             <select style={S.searchSelect}>
               <option>All categories</option>
               {categories.map(c => <option key={c}>{c}</option>)}
             </select>
-            <button style={S.searchBtn} onClick={() => setPage("directory")}>Search</button>
+            <button style={S.searchBtn} onClick={() => {
+              const val = document.getElementById("hero-search")?.value || "";
+              setInitialSearch(val);
+              setPage("directory");
+            }}>Search</button>
           </div>
           <div style={S.chips}>
             {['AMR / Mobile Robots', 'Depalletizing & Palletizing', 'WMS Platforms', 'Conveyor & Sortation', 'Industrial Robotics'].map(c => (
@@ -647,11 +661,19 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
   );
 }
 
-function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter }) {
-  const [search, setSearch] = useState("");
+function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter, initialSearch, setInitialSearch }) {
+  const [search, setSearch] = useState(initialSearch || "");
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
   const [view, setView] = useState("grid");
+
+  // Consume initialSearch once on mount
+  useEffect(() => {
+    if (initialSearch) {
+      setSearch(initialSearch);
+      setInitialSearch("");
+    }
+  }, []);
 
   const filtered = useMemo(() => vendors.filter(v => {
     const q = search.toLowerCase();
@@ -731,7 +753,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
                   </div>
                   <div style={{ fontSize: 12, color: "#475569" }}>{v.category} · {v.hq}</div>
                 </div>
-                <Stars rating={v.rating} />
+                <div style={{ fontSize: 12, color: "#475569" }}>{v.category} · {v.hq}</div>
                 <div style={S.tags}>
                   {v.tags.slice(0, 2).map(t => <span key={t} style={S.tag}>{t}</span>)}
                 </div>
@@ -1050,7 +1072,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            {[['Installs', vendor.installs], ['Employees', vendor.employees], ['Rating', `${vendor.rating}/5`], ['Primary fit', vendor.ideal_operation || vendor.best_for || 'Research in progress']].map(([l, n]) => (
+            {[['Installs', vendor.installs], ['Employees', vendor.employees], ['HQ', vendor.hq], ['Primary fit', vendor.ideal_operation || vendor.best_for || 'Research in progress']].map(([l, n]) => (
               <div key={l} style={{ background: "#0d1526", borderRadius: 10, padding: 12, border: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ fontSize: 11, color: "#475569", marginBottom: 5 }}>{l}</div>
                 <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700, lineHeight: 1.4 }}>{n}</div>
@@ -1272,7 +1294,6 @@ function ComparePage({ selected, setPage, openDetail }) {
     { label: "Founded", fn: v => v.founded },
     { label: "Installations", fn: v => v.installs },
     { label: "Employees", fn: v => v.employees },
-    { label: "Rating", fn: v => `${v.rating}/5 (${v.reviews} reviews)` },
     { label: "Price range", fn: v => v.price_range || "N/A" },
     { label: "Industries", fn: v => v.industry.slice(0, 3).join(", ") },
     { label: "Integrations", fn: v => v.integrations.slice(0, 3).join(", ") },
@@ -2083,6 +2104,56 @@ function LegalPage({ setPage, type }) {
   );
 }
 
+function EmailCapture() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    if (!email || !email.includes("@")) return;
+    setLoading(true);
+    try {
+      await submitLeadForm({ email }, { lead_type: "Email Signup", _subject: `OpEx Scout Email Signup — ${email}` });
+      setSent(true);
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ background: "linear-gradient(135deg, #0d1a35 0%, #0f1c30 100%)", borderTop: "1px solid rgba(245,158,11,0.15)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "36px 32px" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Stay current</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px", marginBottom: 8 }}>New vendor profiles, weekly</div>
+        <div style={{ fontSize: 14, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+          We add new vendor profiles, product specs, and practitioner notes every week. Get the update in your inbox.
+        </div>
+        {sent ? (
+          <div style={{ fontSize: 15, color: "#22c55e", fontWeight: 600 }}>✓ You're on the list. We'll send updates as profiles expand.</div>
+        ) : (
+          <div style={{ display: "flex", gap: 0, maxWidth: 440, margin: "0 auto", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden" }}>
+            <input
+              style={{ flex: 1, background: "transparent", border: "none", padding: "13px 16px", fontSize: 14, color: "#e8edf5", outline: "none" }}
+              placeholder="your@email.com"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && submit()}
+            />
+            <button
+              style={{ padding: "0 22px", background: "#f59e0b", border: "none", color: "#0b1220", fontWeight: 700, fontSize: 13, cursor: loading ? "wait" : "pointer", whiteSpace: "nowrap" }}
+              onClick={submit}
+              disabled={loading}
+            >
+              {loading ? "..." : "Get updates"}
+            </button>
+          </div>
+        )}
+        <div style={{ fontSize: 11, color: "#334155", marginTop: 10 }}>No spam. Unsubscribe anytime.</div>
+      </div>
+    </div>
+  );
+}
+
 function SiteFooter({ setPage }) {
   return (
     <div style={{ background: '#0d1526', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 32px', marginTop: 36 }}>
@@ -2364,6 +2435,7 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [categoryPageCategory, setCategoryPageCategory] = useState(categories[0]);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [initialSearch, setInitialSearch] = useState("");
 
   const pageTitles = {
     home: "OpEx Scout — Automation Vendor Intelligence",
@@ -2425,8 +2497,8 @@ export default function App() {
     <div style={S.app}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <NavBar page={page} setPage={navigate} />
-      {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} />}
-      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
+      {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} setInitialSearch={setInitialSearch} />}
+      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} />}
       {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} openDetail={openDetail} />}
@@ -2445,6 +2517,7 @@ export default function App() {
       {selectedProducts.length > 0 && page !== "product-compare" && (
         <ProductCompareBar selectedProducts={selectedProducts} removeProduct={removeProductFromCompare} onCompare={() => navigate("product-compare")} onClear={() => setSelectedProducts([])} />
       )}
+      <EmailCapture />
       <SiteFooter setPage={navigate} />
     </div>
   );
