@@ -1297,5 +1297,306 @@ export const products = {
       description: "Jungheinrich's ETV automated narrow aisle truck operates autonomously in very narrow aisle (VNA) racking environments where conventional forklifts would require human operators. The robot navigates precisely within aisles as narrow as 1.5m, storing and retrieving pallets at heights up to 13 meters with millimeter precision. Lithium-ion power enables continuous multi-shift operation without battery changes. Integration with SAP EWM provides complete inventory management visibility. The ETV is particularly popular in cold chain environments where automating the human-in-freezer workflow is both a safety imperative and a productivity improvement.",
     },
   ],
+
+  // BLUE YONDER
+  "blue-yonder": [
+    {
+      id: "by-luminate-wm",
+      name: "Luminate Warehouse Management",
+      tagline: "AI-powered cloud WMS for omnichannel distribution",
+      category: "WMS",
+      deployment: "6–18 months",
+      price_range: "$$$$",
+      price_notes: "Enterprise SaaS pricing. Typically $500k–$2M+ annually depending on volume, modules, and site count. Implementation cost often equals or exceeds first-year software.",
+      highlights: ["AI-driven labor and slotting optimization", "Native omnichannel fulfillment (store, DC, ship-from-store)", "Proven at top-10 global retailers", "Real-time inventory visibility across network"],
+      applications: ["Omnichannel retail DC", "E-commerce fulfillment", "3PL", "Grocery distribution"],
+      variants: ["Luminate WM", "Luminate Labor", "Luminate Inventory"],
+      description: "Blue Yonder's Luminate WMS is the platform of choice for large omnichannel retailers and consumer goods companies managing complex, multi-channel distribution. The AI layer optimizes slotting, labor assignments, and wave planning in real time — going beyond traditional WMS rule-based logic. The platform handles the full omnichannel complexity that simpler WMS platforms struggle with: ship-from-store, BOPIS, same-day, returns, and store replenishment from the same DC. Blue Yonder's acquisition by Panasonic has strengthened its hardware and IoT integration roadmap.",
+      url: "https://blueyonder.com/solutions/warehouse-management",
+      specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Integration", v: "SAP, Oracle, Manhattan" }, { l: "Industries", v: "Retail, 3PL, CPG, Grocery" }, { l: "Modules", v: "WM, Labor, Inventory, Slotting" }],
+    },
+  ],
+
+  // MANHATTAN ASSOCIATES
+  "manhattan-associates": [
+    {
+      id: "ma-active-wm",
+      name: "Manhattan Active WM",
+      tagline: "Cloud-native WMS with continuous updates and no upgrade cycles",
+      category: "WMS",
+      deployment: "6–18 months",
+      price_range: "$$$$",
+      price_notes: "Among the most expensive WMS platforms available. Enterprise SaaS — typically $750k–$3M+ annually. Implementation services often add 1–2× the annual software cost.",
+      highlights: ["Truly cloud-native — updates deploy like an app, no version upgrades", "Strongest automation integration in the WMS category", "Microservices architecture scales to highest-volume DCs", "Industry benchmark for large retail and 3PL operations"],
+      applications: ["Large retail DC", "High-volume e-commerce", "3PL multi-client", "Omnichannel fulfillment"],
+      variants: ["Manhattan Active WM", "Manhattan Active Labor", "Manhattan Active Slotting"],
+      description: "Manhattan Active WM is widely considered the most capable WMS platform for large, complex distribution operations. Its cloud-native architecture means the platform updates continuously — customers always run the latest version without painful upgrade projects. The automation integration layer is the deepest in the industry, with pre-built connectors for AMRs, conveyor/sortation, goods-to-person, and voice systems. The platform excels in environments where process complexity, automation density, and throughput volume are all high simultaneously. Its primary limitation is cost — both software and implementation — which puts it out of reach for most mid-market operations.",
+      url: "https://www.manhattanassociates.com/solutions/warehouse-management",
+      specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Architecture", v: "Cloud-native microservices" }, { l: "Industries", v: "Retail, 3PL, Wholesale, Manufacturing" }, { l: "Automation", v: "AMR, AS/RS, Conveyor, Voice, RFID" }],
+    },
+  ],
+
+  // ZEBRA TECHNOLOGIES
+  "zebra-technologies": [
+    {
+      id: "zebra-tc-series",
+      name: "TC Series Mobile Computers",
+      tagline: "Rugged touch computers for warehouse scanning and workflows",
+      category: "Scanning & Mobility",
+      price_range: "$$",
+      price_notes: "Per device. TC52/TC57 range $1,500–$2,500 per unit. Volume pricing standard. Enterprise license (Zebra DNA) additional.",
+      highlights: ["Android-based with Zebra's enterprise-grade layer", "All-shift battery life without swap", "Integrated barcode scanner rated for 250k+ scans/day", "Drop-rated to 1.8m on concrete"],
+      applications: ["Receiving and putaway", "Pick/pack/ship", "Cycle counting", "Yard management"],
+      variants: ["TC52ax", "TC57x", "TC72", "TC77"],
+      description: "Zebra's TC Series is the dominant mobile computer in warehouse operations. The combination of enterprise Android, purpose-built barcode scanning hardware, and Zebra's DNA software layer provides reliability and manageability that consumer devices cannot match in 24/7 DC environments. The TC52 and TC57 cover most warehouse workflows. The TC72/TC77 provide larger screens for supervisors and more complex workflows. Battery hot-swap or all-shift charging covers most shift configurations without workflow interruption.",
+      url: "https://www.zebra.com/us/en/products/mobile-computers/handheld/tc5x-series-touch-computer.html",
+      specs: [{ l: "OS", v: "Android 13 enterprise" }, { l: "Battery", v: "All-shift (10-14hr)" }, { l: "Drop rating", v: "1.8m to concrete" }, { l: "Scanner", v: "SE4710 1D/2D imager" }],
+    },
+    {
+      id: "zebra-zt-printers",
+      name: "ZT Series Industrial Printers",
+      tagline: "Industrial label printers for high-volume DC labeling",
+      category: "Print & Apply",
+      price_range: "$",
+      price_notes: "Per printer. ZT400/ZT600 series $800–$2,500 per unit depending on model and options.",
+      highlights: ["Industry standard for DC label printing", "Link-OS enables remote management across printer fleet", "Supports ZPL — universal label format", "Modular design for field repair"],
+      applications: ["Shipping label print", "Receiving labels", "License plate printing", "Compliance labeling"],
+      variants: ["ZT411", "ZT421", "ZT610", "ZT620"],
+      description: "The Zebra ZT Series is the de facto standard for industrial label printing in distribution centers. Link-OS enables centralized fleet management — firmware updates, configuration changes, and alerts across hundreds of printers from one console. ZPL language support ensures compatibility with virtually every WMS on the market. The modular field-replaceable components reduce downtime and maintenance cost.",
+      url: "https://www.zebra.com/us/en/products/printers/industrial.html",
+      specs: [{ l: "Print speed", v: "Up to 14 in/sec" }, { l: "Resolution", v: "203, 300, 600 dpi" }, { l: "Language", v: "ZPL/ZPL II" }, { l: "Connectivity", v: "Ethernet, WiFi, Bluetooth" }],
+    },
+  ],
+
+  // AUTOSTORE
+  "autostore": [
+    {
+      id: "autostore-system",
+      name: "AutoStore Grid System",
+      tagline: "Cubic storage automation with bin-carrying robots on an aluminum grid",
+      category: "AS/RS",
+      price_range: "$$$$",
+      price_notes: "Full system pricing — typically $3M–$30M+ depending on grid size, robot count, and throughput. Sold through integrator partners (Dematic, Swisslog, Bastian, etc.). Robot count drives throughput — plan for 1 robot per 40–60 bins accessed per hour.",
+      highlights: ["Highest storage density of any goods-to-person system", "99.7%+ uptime — robots reroute around failed units", "Scalable — add robots or expand grid without stopping operations", "Over 1,100 live systems worldwide"],
+      applications: ["E-commerce fulfillment", "Pharmacy DC", "Grocery e-commerce", "Parts distribution"],
+      variants: ["R5 Robot", "R5+ Robot", "B5 Black Line", "FusionPort workstation", "ConveyorPort workstation"],
+      description: "AutoStore is the dominant goods-to-person AS/RS technology globally, with over 1,100 installations across retail, grocery, pharmacy, and industrial applications. The aluminum grid stores bins stacked floor-to-ceiling, and R5 robots drive on top to retrieve bins and deliver them to ergonomic workstations. The system's key advantage is density — AutoStore can store 4-6× more SKUs per square foot than conventional shelving. The system has near-perfect uptime because robots autonomously route around any failed unit. It scales incrementally — add robots for more throughput, or expand the grid for more storage, without shutting down. Sold exclusively through certified integration partners.",
+      url: "https://www.autostoresystem.com",
+      specs: [{ l: "Bin dimensions", v: "449×649mm (std)" }, { l: "Bin capacity", v: "30kg" }, { l: "Grid height", v: "Up to 8m (24 bins)" }, { l: "Robot speed", v: "3.1 m/s" }, { l: "Uptime", v: ">99.7%" }],
+    },
+  ],
+
+  // 6 RIVER SYSTEMS
+  "6-river-systems": [
+    {
+      id: "6rs-chuck",
+      name: "Chuck",
+      tagline: "Collaborative mobile robot for unit-pick fulfillment",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "RaaS subscription model. Per-robot monthly fee or per-pick pricing. Contact for fleet pricing — typically deployed in fleets of 20–100+ robots.",
+      highlights: ["Guides pickers through optimized pick paths", "Reduces picker travel by up to 50%", "Zero infrastructure — works in existing layout", "Acquired by Ocado — strong software roadmap"],
+      applications: ["Unit pick fulfillment", "E-commerce", "3PL", "Retail DC"],
+      variants: ["Chuck (standard)", "Chuck (multi-level)"],
+      description: "Chuck is a collaborative robot that works alongside human pickers rather than replacing them. Instead of goods-to-person, Chuck brings the task to the picker — displaying what to pick and where, then following the picker through optimized routes. The model works well in operations where re-slotting for goods-to-person is impractical but labor efficiency still needs improvement. Acquired by Ocado Group, which brings significant software and optimization capability to the roadmap.",
+      url: "https://6river.com/chuck",
+      specs: [{ l: "Navigation", v: "Autonomous SLAM" }, { l: "Payload", v: "136 kg" }, { l: "Battery", v: "Auto-charging" }, { l: "Integration", v: "WMS-agnostic" }],
+    },
+  ],
+
+  // MiR ROBOTICS
+  "mir-robotics": [
+    {
+      id: "mir250",
+      name: "MiR250",
+      tagline: "Compact autonomous mobile robot for internal logistics",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot. MiR250 typically $30k–$50k per unit. Top modules (shelves, conveyors, pallet lifts) additional. Fleet management software included.",
+      highlights: ["Smallest footprint in MiR lineup — fits in tight facilities", "Natural feature SLAM navigation — no infrastructure", "MiR Fleet manages up to 100 robots from one interface", "IP52 rated for light industrial environments"],
+      applications: ["Internal transport", "Line feeding", "Cart transport", "Hospital logistics"],
+      variants: ["MiR250 base", "MiR250 Shelf", "MiR250 Hook"],
+      description: "The MiR250 is the workhorse of the MiR AMR lineup for facilities where space is constrained and payloads are in the 250kg range. SLAM navigation means zero floor infrastructure changes — the robot learns the facility map and navigates dynamically around obstacles, people, and traffic. The MiR Fleet software manages multi-robot coordination with no additional per-robot licensing. MiR's acquisition by Teradyne gives it financial stability and integration potential with the broader Teradyne automation portfolio.",
+      url: "https://www.mobile-industrial-robots.com/solutions/robots/mir250",
+      specs: [{ l: "Payload", v: "250 kg" }, { l: "Speed", v: "2.0 m/s" }, { l: "Navigation", v: "SLAM laser + camera" }, { l: "Battery", v: "8hr operation" }, { l: "Safety", v: "ISO 3691-4 certified" }],
+    },
+    {
+      id: "mir600",
+      name: "MiR600",
+      tagline: "Heavy-payload AMR for pallet and heavy material transport",
+      category: "AMR / Mobile Robots",
+      price_range: "$$$",
+      price_notes: "Per robot. Significantly higher than MiR250 due to payload class. Pallet fork top module additional.",
+      highlights: ["600kg payload — handles full pallets", "Pallet fork top module enables autonomous pallet pickup", "Operates alongside MiR250 fleet under same MiR Fleet software", "Brownfield-ready — no facility modifications required"],
+      applications: ["Pallet transport", "End-of-line automation", "Raw material delivery", "Manufacturing line feeding"],
+      variants: ["MiR600 base", "MiR600 Pallet Fork", "MiR600 Shelf"],
+      description: "The MiR600 extends the MiR AMR family into pallet-level material handling, capable of autonomously picking up, transporting, and depositing standard pallets without human intervention. Running on the same MiR Fleet platform as smaller MiR models, mixed fleets of MiR250 and MiR600 can be managed from a single interface. The pallet fork top module enables true end-to-end pallet automation in brownfield environments where traditional AGV forklift infrastructure investment is impractical.",
+      url: "https://www.mobile-industrial-robots.com/solutions/robots/mir600",
+      specs: [{ l: "Payload", v: "600 kg" }, { l: "Speed", v: "1.5 m/s" }, { l: "Navigation", v: "SLAM laser + camera" }, { l: "Lift height", v: "210 mm (fork)" }, { l: "Battery", v: "8hr operation" }],
+    },
+  ],
+
+  // SEEGRID
+  "seegrid": [
+    {
+      id: "seegrid-palion",
+      name: "Palion AMR",
+      tagline: "Autonomous mobile robot for pallet movement in manufacturing and DC",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot. Competitive with MiR and OTTO at similar payload class. Fleet management software included.",
+      highlights: ["Vision-guided navigation — no lasers or markers", "Proven in automotive and heavy manufacturing environments", "Seegrid Supervisor fleet management with analytics", "Longest continuous commercial AMR track record in North America"],
+      applications: ["Pallet transport", "Manufacturing line feeding", "Inbound receiving", "WIP movement"],
+      variants: ["Palion Lift", "Palion Tow", "Palion Pallet Truck"],
+      description: "Seegrid has the longest track record of any AMR vendor in North American manufacturing, with deployments dating back over a decade. The Palion AMR uses stereo vision rather than laser SLAM for navigation, which Seegrid claims provides more robust performance in dynamic industrial environments with changing infrastructure. The platform is particularly strong in automotive, heavy manufacturing, and high-cycle DC applications where proven uptime matters more than cutting-edge specs.",
+      url: "https://seegrid.com/palion-amr",
+      specs: [{ l: "Navigation", v: "Stereo vision (no markers)" }, { l: "Payload", v: "Up to 1,588 kg" }, { l: "Speed", v: "1.8 m/s" }, { l: "Safety", v: "ANSI B56.5" }],
+    },
+  ],
+
+  // KARDEX REMSTAR
+  "kardex-remstar": [
+    {
+      id: "kardex-shuttle",
+      name: "Kardex Shuttle XP",
+      tagline: "Vertical carousel storage for high-density parts and goods storage",
+      category: "AS/RS",
+      price_range: "$$",
+      price_notes: "Per unit. Wide range based on height and tray count — $40k–$150k per unit typical. Strong ROI in facilities replacing shelving.",
+      highlights: ["Returns up to 85% floor space vs. conventional shelving", "Goods-to-person — items come to the operator", "Integrated pick-to-light guides operator", "Fast tray retrieval — average 25 sec per tray"],
+      applications: ["Parts distribution", "MRO storage", "Manufacturing kitting", "Pharmacy"],
+      variants: ["Shuttle XP 500", "Shuttle XP 1000", "Mega Shuttle"],
+      description: "The Kardex Shuttle XP is a vertical carousel storage system that brings stored items to the operator rather than requiring the operator to walk to the item. The system stores trays vertically and rotates the carousel to deliver the required tray to an ergonomic access opening. It dramatically improves storage density compared to shelving and essentially eliminates non-value-added picker travel within the storage area. Particularly effective in manufacturing and parts distribution where thousands of SKUs are needed in relatively small quantities.",
+      url: "https://www.kardex.com/en/products/kardex-remstar-shuttle-xp",
+      specs: [{ l: "Height", v: "Up to 15m" }, { l: "Tray dimensions", v: "Up to 3,250 × 810mm" }, { l: "Payload per tray", v: "Up to 500 kg" }, { l: "Retrieval speed", v: "~25 sec average" }],
+    },
+  ],
+
+  // HYTROL
+  "hytrol": [
+    {
+      id: "hytrol-conveyor",
+      name: "E24 Zero Pressure Accumulation Conveyor",
+      tagline: "Zero pressure accumulation conveyor for carton and tote handling",
+      category: "Conveyor & Sortation",
+      price_range: "$$$",
+      price_notes: "Per linear foot plus drive and controls. Full system pricing highly variable — $200k–$2M+ depending on length, complexity, and sortation requirements.",
+      highlights: ["Zero pressure accumulation prevents carton damage at merge points", "Available in powered roller and belt configurations", "Modular design enables brownfield integration", "Large North American dealer network for service"],
+      applications: ["Carton transport", "Order accumulation", "Shipping sorter induction", "Packing station feed"],
+      variants: ["E24", "ABEZ (belt)", "3PO (photo eye zones)", "Model 190-ACC"],
+      description: "Hytrol's E24 zero pressure accumulation conveyor is the backbone of carton handling in thousands of North American distribution centers. Zero pressure accumulation means cartons stop gently behind each other rather than pushing against one another — preventing product damage and reducing backpressure on the upstream system. Hytrol's large dealer and integrator network means service and spare parts are readily available across North America, a practical advantage over imported conveyor alternatives.",
+      url: "https://hytrol.com/products/conveyors/zero-pressure-accumulation",
+      specs: [{ l: "Capacity", v: "Up to 100 lb/ft" }, { l: "Speed", v: "Up to 200 fpm" }, { l: "Zone length", v: "18–60 in configurable" }, { l: "Controls", v: "Photo eye zone control" }],
+    },
+  ],
+
+  // KÖRBER
+  "korber": [
+    {
+      id: "korber-wms",
+      name: "Körber Warehouse Management",
+      tagline: "Flexible WMS for complex DC and 3PL operations",
+      category: "WMS",
+      price_range: "$$$",
+      price_notes: "SaaS or on-premise. Mid-to-enterprise pricing — typically $200k–$1M+ annually depending on modules and volume. Strong 3PL multi-client module.",
+      highlights: ["Highly configurable without custom code", "Strong 3PL multi-client billing and management", "Deep automation integration — AS/RS, AMR, conveyor", "Rapid implementation vs. tier-1 competitors"],
+      applications: ["3PL multi-client", "Retail DC", "Industrial distribution", "Healthcare logistics"],
+      variants: ["Körber WMS Cloud", "Körber WMS Enterprise", "Körber TMS"],
+      description: "Körber's WMS platform positions between the speed and flexibility of mid-market WMS and the depth of tier-1 platforms like Manhattan and Blue Yonder. Its high configurability means most process variations can be handled without custom code — a significant advantage for 3PL operations managing diverse client requirements. The 3PL module handles multi-client billing, inventory segregation, and client-specific workflows in a single instance. The automation integration depth covers AS/RS, AMR, conveyor/sortation, and voice systems.",
+      url: "https://www.koerber.com/supply-chain/software/warehouse-management",
+      specs: [{ l: "Deployment", v: "Cloud or on-premise" }, { l: "Industries", v: "3PL, Retail, Healthcare, Industrial" }, { l: "Integration", v: "SAP, Oracle, AS/RS, AMR, Voice" }, { l: "Modules", v: "WM, Labor, Slotting, TMS, YMS" }],
+    },
+  ],
+
+  // INFOR WMS
+  "infor-wms": [
+    {
+      id: "infor-wms",
+      name: "Infor WMS",
+      tagline: "Industry-specific WMS with deep ERP integration for manufacturing and distribution",
+      category: "WMS",
+      price_range: "$$$",
+      price_notes: "SaaS subscription. Competitive with Körber and Softeon at mid-enterprise level. Pricing scales with modules and user count.",
+      highlights: ["Industry-specific editions for food & beverage, distribution, 3PL", "Native integration with Infor M3 and CloudSuite ERP", "Strong lot traceability for F&B and pharma compliance", "Embedded analytics without third-party BI tools"],
+      applications: ["Food & beverage DC", "Industrial distribution", "3PL", "Manufacturing warehousing"],
+      variants: ["Infor WMS", "Infor CloudSuite Distribution", "Infor M3 WM"],
+      description: "Infor WMS is strongest in food & beverage, chemical, and industrial manufacturing distribution where industry-specific compliance requirements — lot traceability, catch weight, FSMA, FIFO/FEFO — are non-negotiable. The native integration with Infor CloudSuite ERP and M3 eliminates the middleware complexity that plagues cross-vendor WMS/ERP implementations. Operations already running Infor ERP get a significant integration advantage. For operations not on Infor ERP, the platform is competitive but loses its primary differentiator.",
+      url: "https://www.infor.com/products/wms",
+      specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "ERP integration", v: "Native Infor M3/CloudSuite" }, { l: "Industries", v: "F&B, Distribution, 3PL, Manufacturing" }, { l: "Compliance", v: "FSMA, lot traceability, catch weight" }],
+    },
+  ],
+
+  // SWISSLOG
+  "swisslog": [
+    {
+      id: "swisslog-autostore",
+      name: "AutoStore by Swisslog",
+      tagline: "Swisslog-integrated AutoStore system with CarryPick and SynQ software",
+      category: "AS/RS",
+      price_range: "$$$$",
+      price_notes: "Full system including AutoStore grid, robots, workstations, and Swisslog SynQ WCS. Typically $4M–$25M+ depending on scale.",
+      highlights: ["Certified AutoStore integrator with 100+ installations", "SynQ WCS provides unified control across AutoStore and conveyor", "CarryPick AMR complements AutoStore for zone picking", "Full turnkey design-build-operate capability"],
+      applications: ["E-commerce fulfillment", "Grocery e-commerce", "Retail DC", "Pharma distribution"],
+      variants: ["AutoStore R5 grid", "CarryPick AMR", "SynQ WCS", "ProMove conveyor"],
+      description: "Swisslog is one of AutoStore's largest and most experienced integration partners, with over 100 AutoStore installations globally. The differentiation is Swisslog's SynQ warehouse control software, which orchestrates AutoStore, conveyor, and AMR systems in a unified layer above the WMS. This gives customers a single pane of glass for automation control rather than managing separate vendor systems. CarryPick complements AutoStore in facilities where zone picking beyond the AutoStore grid is required.",
+      url: "https://www.swisslog.com/solutions/goods-to-person/autostore",
+      specs: [{ l: "Grid capacity", v: "Project-specific" }, { l: "WCS", v: "Swisslog SynQ" }, { l: "Integration", v: "SAP, Manhattan, Blue Yonder" }, { l: "Support", v: "24/7 global" }],
+    },
+  ],
+
+  // BASTIAN SOLUTIONS
+  "bastian-solutions": [
+    {
+      id: "bastian-si",
+      name: "Systems Integration Services",
+      tagline: "Full-scope DC automation design, integration, and controls",
+      category: "Systems Integration",
+      price_range: "$$$",
+      price_notes: "Project-based. Bastian typically quotes full-scope projects — design, equipment, controls, installation, commissioning. Projects typically $1M–$30M+ depending on scope.",
+      highlights: ["Toyota subsidiary — financial backing and global reach", "Multi-vendor integrator — not tied to single equipment OEM", "Strong brownfield experience in active DC environments", "In-house controls team reduces third-party risk"],
+      applications: ["DC automation design-build", "Conveyor and sortation integration", "AMR deployment", "WCS/WES implementation"],
+      variants: ["Exacta WCS/WES", "Conveyor integration", "AMR deployment", "Robotics integration"],
+      description: "Bastian Solutions is one of North America's largest material handling systems integrators, with the financial backing of Toyota Industries following its 2017 acquisition. As a multi-vendor integrator, Bastian selects the best-fit equipment for each project rather than pushing proprietary systems. Bastian's in-house controls team designs and builds the WCS/Exacta software that ties automation systems together — a significant advantage over integrators that rely on third-party controls vendors. Strong in brownfield retrofits where managing an active DC during construction is the primary risk.",
+      url: "https://www.bastiansolutions.com",
+      specs: [{ l: "Owner", v: "Toyota Industries" }, { l: "WCS", v: "Exacta (proprietary)" }, { l: "Services", v: "Design, integration, controls, service" }, { l: "Industries", v: "Retail, E-commerce, 3PL, F&B, Manufacturing" }],
+    },
+  ],
+
+  // FORTNA
+  "fortna": [
+    {
+      id: "fortna-si",
+      name: "Distribution Center Design & Integration",
+      tagline: "DC strategy, design, and automation integration for complex supply chains",
+      category: "Systems Integration",
+      price_range: "$$$",
+      price_notes: "Project-based strategy, design, and integration fees. Strategy engagements typically $200k–$500k. Full integration projects $2M–$50M+.",
+      highlights: ["One of few SIs with dedicated supply chain strategy practice", "WFM workforce management software for post-go-live labor", "Vendor-agnostic equipment selection", "Strong in large-scale network redesign projects"],
+      applications: ["DC network strategy", "Automation design-build", "Large-scale WMS/WCS implementation", "Post-merger DC consolidation"],
+      variants: ["DC strategy consulting", "Automation integration", "WFM software", "Robotics deployment"],
+      description: "Fortna differentiates from pure-play equipment integrators by offering a full spectrum from supply chain strategy through automation implementation. A Fortna engagement often starts with a DC network strategy study that defines what to automate and where, then moves through detailed design into integration and go-live. Fortna's WFM (Workforce Management) software extends the relationship post-go-live with labor planning and productivity tools. The combination of strategic depth and integration capability makes Fortna a strong choice for large, complex multi-DC transformation programs.",
+      url: "https://www.fortna.com",
+      specs: [{ l: "Services", v: "Strategy, design, integration, software" }, { l: "WFM", v: "Fortna WFM (proprietary)" }, { l: "Industries", v: "Retail, E-commerce, 3PL, Healthcare" }, { l: "Geography", v: "North America, Europe" }],
+    },
+  ],
+
+  // DAIFUKU
+  "daifuku": [
+    {
+      id: "daifuku-as-rs",
+      name: "Unit Load AS/RS",
+      tagline: "Automated storage and retrieval system for full pallet and case handling",
+      category: "AS/RS",
+      price_range: "$$$$",
+      price_notes: "Full system pricing — typically $5M–$50M+ for unit load AS/RS. Highly variable by number of aisles, height, throughput, and automation scope.",
+      highlights: ["Global market leader in AS/RS by installations", "Deep automotive and manufacturing pedigree", "Integrated crane, conveyor, and controls from one vendor", "Proven in high-throughput food, beverage, and retail DC"],
+      applications: ["Pallet storage and retrieval", "Case-level AS/RS", "Buffer storage", "Manufacturing WIP"],
+      variants: ["Unit Load AS/RS", "Mini Load AS/RS", "Shuttle Rack", "Multishuttle"],
+      description: "Daifuku is the world's largest material handling equipment company by revenue, with the deepest AS/RS track record globally. Their unit load AS/RS systems store and retrieve full pallets or cases via automated stacker cranes operating in high-bay racking. Daifuku's competitive advantage is its ability to supply the full system — racking, cranes, conveyor, and controls — from a single vendor, reducing integration complexity on large projects. Particularly strong in automotive, food and beverage, and large retail DC applications where throughput and uptime requirements are non-negotiable.",
+      url: "https://www.daifuku.com/solution/storage",
+      specs: [{ l: "Load type", v: "Unit load (pallets) or mini load (cases)" }, { l: "Height", v: "Up to 45m" }, { l: "Throughput", v: "Project-specific" }, { l: "Controls", v: "Daifuku proprietary WCS" }],
+    },
+  ],
+
 };
 

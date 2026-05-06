@@ -145,8 +145,8 @@ const S = {
   metricN: { fontSize: 20, fontWeight: 700, color: "#f59e0b" },
   metricL: { fontSize: 11, color: "#475569", marginTop: 3 },
   // Compare table
-  compareWrap: { maxWidth: 1100, margin: "0 auto", padding: "32px 28px" },
-  compareTable: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
+  compareWrap: { maxWidth: 1100, margin: "0 auto", padding: "24px 16px" },
+  compareTable: { width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 500 },
   compareTh: { padding: "12px 16px", textAlign: "left", background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", fontSize: 12, color: "#475569", fontWeight: 600 },
   compareTd: { padding: "12px 16px", border: "1px solid rgba(255,255,255,0.06)", color: "#94a3b8", verticalAlign: "top" },
   // Homepage cards
@@ -614,8 +614,8 @@ function NavBar({ page, setPage }) {
     ["categories", "Categories"],
     ["solution", "Find Solution"],
     ["compare", "Compare"],
-    ["shortlists", "My Shortlists"],
-    ["reviews", "Reviews"],
+    ["shortlists", "Workspace"],
+    ["methodology", "Methodology"],
   ];
   return (
     <nav style={S.nav}>
@@ -676,28 +676,31 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse directory</button>
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("list")}>List your company</button>
           </div>
-          <div style={S.searchWrap}>
-            <input
-              style={S.searchInput}
-              placeholder="Search vendors, products, categories, or use cases..."
-              id="hero-search"
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  setInitialSearch(e.target.value);
-                  setPage("directory");
-                }
-              }}
-            />
-            <select style={S.searchSelect}>
-              <option>All categories</option>
-              {categories.map(c => <option key={c}>{c}</option>)}
-            </select>
-            <button style={S.searchBtn} onClick={() => {
-              const val = document.getElementById("hero-search")?.value || "";
-              setInitialSearch(val);
+          {(() => {
+            const [heroSearch, setHeroSearch] = useState("");
+            const [heroCat, setHeroCat] = useState("");
+            const doSearch = () => {
+              setInitialSearch(heroSearch);
+              if (heroCat) setCategoryFilter(heroCat);
               setPage("directory");
-            }}>Search</button>
-          </div>
+            };
+            return (
+              <div style={S.searchWrap}>
+                <input
+                  style={S.searchInput}
+                  placeholder="Search vendors, products, categories, or use cases..."
+                  value={heroSearch}
+                  onChange={e => setHeroSearch(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && doSearch()}
+                />
+                <select style={S.searchSelect} value={heroCat} onChange={e => setHeroCat(e.target.value)}>
+                  <option value="">All categories</option>
+                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button style={S.searchBtn} onClick={doSearch}>Search</button>
+              </div>
+            );
+          })()}
           <div style={S.chips}>
             {['AMR / Mobile Robots', 'Depalletizing & Palletizing', 'WMS Platforms', 'Conveyor & Sortation', 'Industrial Robotics'].map(c => (
               <div key={c} style={S.chip} onClick={() => { setCategoryFilter(c); setPage("directory"); }}>{c}</div>
@@ -788,7 +791,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
   );
 }
 
-function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter, initialSearch, setInitialSearch }) {
+function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter, initialSearch, setInitialSearch, activeWorkspaceId, onAddToWorkspace }) {
   const [search, setSearch] = useState(initialSearch || "");
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
@@ -817,6 +820,9 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
 
   const openDetailLocal = (v) => openDetail(v, "directory", "directory");
 
+  const workspaceMode = activeWorkspaceId && onAddToWorkspace;
+  const ws = workspaceMode ? getWorkspace(activeWorkspaceId) : null;
+
   return (
     <div>
       <div style={{ padding: "20px 28px 0", background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -843,6 +849,19 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
       </div>
 
       <div style={{ padding: "16px", maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+        {workspaceMode && (
+          <div style={{ ...S.compareBar, marginBottom: 10, background: "rgba(99,102,241,0.08)", borderColor: "rgba(99,102,241,0.25)" }}>
+            <span style={{ color: "#94a3b8" }}>Adding vendors to: <strong style={{ color: "#818cf8" }}>{ws?.projectName || "Workspace"}</strong> — check vendors below then click "Add to workspace"</span>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button style={{ ...S.compareBtnDisabled, padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13 }} onClick={() => setPage("workspace")}>← Back to workspace</button>
+              <button style={{ padding: "7px 18px", background: "#818cf8", border: "none", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, cursor: selected.length === 0 ? "not-allowed" : "pointer", opacity: selected.length === 0 ? 0.5 : 1 }}
+                disabled={selected.length === 0}
+                onClick={() => { onAddToWorkspace(selected); setPage("workspace"); }}>
+                Add {selected.length > 0 ? selected.length : ""} to workspace
+              </button>
+            </div>
+          </div>
+        )}
         {selected.length > 0 && (
           <div style={S.compareBar}>
             <span style={{ color: "#94a3b8" }}><strong style={{ color: "#e8edf5" }}>{selected.length}</strong> vendor{selected.length > 1 ? "s" : ""} selected for comparison</span>
@@ -1326,9 +1345,9 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
           <div style={S.detailSide}>
             <div style={S.sideCard}>
               <div style={S.sideCardTitle}>Company snapshot</div>
-              <div style={S.contactRow}><GlobeIcon /><span style={{ color: '#f59e0b' }}>{vendor.website}</span></div>
-              <div style={S.contactRow}><PhoneIcon />{vendor.phone}</div>
+              <div style={S.contactRow}><GlobeIcon /><a href={`https://${vendor.website?.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#f59e0b', textDecoration: 'none' }}>{vendor.website}</a></div>
               <div style={S.contactRow}><BuildingIcon />{vendor.hq}</div>
+              <div style={S.contactRow}><span style={{ fontSize: 11, color: "#475569" }}>Founded</span><span style={{ fontSize: 12, color: "#64748b", marginLeft: 6 }}>{vendor.founded}</span></div>
               <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.7, marginTop: 8 }}>Use the RFI form to route a structured inquiry. Listing quality and routing can be upgraded through the vendor program.</div>
             </div>
 
@@ -1408,6 +1427,7 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
 }
 
 function ComparePage({ selected, setPage, openDetail }) {
+  const isMobile = useIsMobile();
   const sel = vendors.filter(v => selected.includes(v.id));
   const [saved, setSaved] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
@@ -2627,7 +2647,9 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8" }}>{wsVendors.length} vendor{wsVendors.length !== 1 ? "s" : ""} in scope</div>
-                <button style={{ ...S.btnSecondary, width: "auto", padding: "7px 14px", fontSize: 12 }} onClick={() => setPage("directory")}>+ Add from directory</button>
+                <button style={{ ...S.btnSecondary, width: "auto", padding: "7px 14px", fontSize: 12 }} onClick={() => {
+                setPage("directory");
+              }}>+ Add vendors from directory</button>
               </div>
               {wsVendors.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
@@ -3185,12 +3207,11 @@ function SiteFooter({ setPage }) {
           <div style={{ fontSize: 12, color: '#475569', marginTop: 8, maxWidth: 420 }}>Automation vendor intelligence for warehouse, manufacturing, and industrial teams.</div>
         </div>
         <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', fontSize: 12, color: '#94a3b8' }}>
-          <span style={{ cursor: 'pointer' }} onClick={() => setPage('shortlists')}>My Shortlists</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('shortlists')}>Workspace</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('methodology')}>Methodology</span>
-          <span style={{ cursor: 'pointer' }} onClick={() => setPage('contact')}>Contact</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('reviews')}>Submit review</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('vendors')}>Vendor program</span>
-          <span style={{ cursor: 'pointer' }} onClick={() => setPage('lead-ops')}>Lead ops</span>
-          <span style={{ cursor: 'pointer' }} onClick={() => setPage('media-ops')}>Media ops</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => setPage('contact')}>Contact</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('privacy')}>Privacy</span>
           <span style={{ cursor: 'pointer' }} onClick={() => setPage('terms')}>Terms</span>
         </div>
@@ -3541,7 +3562,7 @@ export default function App() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <NavBar page={page} setPage={navigate} />
       {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} setInitialSearch={setInitialSearch} />}
-      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} />}
+      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} activeWorkspaceId={activeWorkspaceId} onAddToWorkspace={activeWorkspaceId ? (ids) => { const ws = getWorkspace(activeWorkspaceId); updateWorkspace(activeWorkspaceId, { vendorIds: [...new Set([...(ws?.vendorIds || []), ...ids])] }); setSelected([]); } : null} />}
       {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} openDetail={openDetail} />}
