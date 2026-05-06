@@ -173,6 +173,7 @@ const S = {
 const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
 const LEAD_LOG_KEY = "opexscout_local_lead_log";
 const SHORTLISTS_KEY = "opexscout_shortlists";
+const WORKSPACES_KEY = "opexscout_workspaces";
 
 // ─── SHORTLIST STORAGE ────────────────────────────────────────────────────────
 function genId() {
@@ -182,28 +183,17 @@ function genId() {
 function readShortlists() {
   try { return JSON.parse(localStorage.getItem(SHORTLISTS_KEY) || "[]"); } catch { return []; }
 }
-
 function writeShortlists(lists) {
   try { localStorage.setItem(SHORTLISTS_KEY, JSON.stringify(lists)); } catch {}
 }
-
 function saveShortlist(name, vendorIds, productIds, notes = "") {
   const lists = readShortlists();
   const id = genId();
-  const entry = {
-    id,
-    name: name || "My Shortlist",
-    vendorIds,
-    productIds,
-    notes,
-    created: new Date().toISOString(),
-    updated: new Date().toISOString(),
-  };
+  const entry = { id, name: name || "My Shortlist", vendorIds, productIds, notes, created: new Date().toISOString(), updated: new Date().toISOString() };
   lists.unshift(entry);
   writeShortlists(lists.slice(0, 50));
   return id;
 }
-
 function updateShortlist(id, patch) {
   const lists = readShortlists();
   const idx = lists.findIndex(l => l.id === id);
@@ -211,18 +201,68 @@ function updateShortlist(id, patch) {
   lists[idx] = { ...lists[idx], ...patch, updated: new Date().toISOString() };
   writeShortlists(lists);
 }
+function deleteShortlist(id) { writeShortlists(readShortlists().filter(l => l.id !== id)); }
+function getShortlistById(id) { return readShortlists().find(l => l.id === id) || null; }
+function shortlistShareUrl(id) { return `${window.location.origin}${window.location.pathname}#shortlist/${id}`; }
 
-function deleteShortlist(id) {
-  writeShortlists(readShortlists().filter(l => l.id !== id));
-}
+// ─── WORKSPACE STORAGE ────────────────────────────────────────────────────────
+const DEFAULT_WORKSPACE = {
+  // Project context
+  projectName: "",
+  facilityType: "Warehouse & DC",
+  facilitySqft: "",
+  throughputTarget: "",
+  currentWMS: "",
+  projectType: "Brownfield retrofit",
+  budgetRange: "$200k–$500k",
+  timeline: "6–12 months",
+  problemStatement: "",
+  successCriteria: "",
+  // Vendors in scope
+  vendorIds: [],
+  // Scorecard: { vendorId: { fit, implementation, support, integration, cost, notes } }
+  scorecard: {},
+  // ROI inputs
+  roi: {
+    laborHeadcount: "",
+    laborRate: "",
+    shiftsPerDay: "2",
+    daysPerYear: "250",
+    ordersPerDay: "",
+    errorRatePercent: "",
+    currentOvertimeHours: "",
+    automationCapturePercent: "70",
+  },
+  // RFI tracker: { vendorId: { contacted, contactDate, contactName, contactEmail, responseStatus, demoScheduled, demoDate, notes } }
+  rfis: {},
+  created: "",
+  updated: "",
+};
 
-function getShortlistById(id) {
-  return readShortlists().find(l => l.id === id) || null;
+function readWorkspaces() {
+  try { return JSON.parse(localStorage.getItem(WORKSPACES_KEY) || "[]"); } catch { return []; }
 }
-
-function shortlistShareUrl(id) {
-  return `${window.location.origin}${window.location.pathname}#shortlist/${id}`;
+function writeWorkspaces(ws) {
+  try { localStorage.setItem(WORKSPACES_KEY, JSON.stringify(ws)); } catch {}
 }
+function createWorkspace(name) {
+  const workspaces = readWorkspaces();
+  const id = genId();
+  const ws = { ...DEFAULT_WORKSPACE, id, projectName: name || "New Evaluation", created: new Date().toISOString(), updated: new Date().toISOString() };
+  workspaces.unshift(ws);
+  writeWorkspaces(workspaces.slice(0, 20));
+  return id;
+}
+function updateWorkspace(id, patch) {
+  const workspaces = readWorkspaces();
+  const idx = workspaces.findIndex(w => w.id === id);
+  if (idx === -1) return;
+  workspaces[idx] = { ...workspaces[idx], ...patch, updated: new Date().toISOString() };
+  writeWorkspaces(workspaces);
+  return workspaces[idx];
+}
+function deleteWorkspace(id) { writeWorkspaces(readWorkspaces().filter(w => w.id !== id)); }
+function getWorkspace(id) { return readWorkspaces().find(w => w.id === id) || null; }
 
 function makePlaceholderDataUri(label, vendorColor = "#1a3a5c", category = "", vendorLogo = "") {
   const text = String(label || "Product").slice(0, 36);
@@ -2083,17 +2123,34 @@ function AboutPage({ setPage }) {
   );
 }
 
-function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedProducts, openDetail }) {
+function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedProducts, openDetail, setActiveWorkspaceId }) {
   const isMobile = useIsMobile();
   const [lists, setLists] = useState(readShortlists());
+  const [workspaces, setWorkspaces] = useState(readWorkspaces());
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [copied, setCopied] = useState(null);
   const [newName, setNewName] = useState("");
   const [newNotes, setNewNotes] = useState("");
+  const [newWsName, setNewWsName] = useState("");
+  const [activeTab, setActiveTab] = useState("evaluations");
 
-  const refresh = () => setLists(readShortlists());
+  const refresh = () => { setLists(readShortlists()); setWorkspaces(readWorkspaces()); };
+
+  const handleCreateWorkspace = () => {
+    const name = newWsName.trim() || "New Evaluation";
+    const id = createWorkspace(name);
+    setActiveWorkspaceId(id);
+    setNewWsName("");
+    setPage("workspace");
+  };
+
+  const handleOpenWorkspace = (id) => {
+    setActiveWorkspaceId(id);
+    setPage("workspace");
+  };
+
 
   const handleDelete = (id) => {
     deleteShortlist(id);
@@ -2132,44 +2189,101 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: isMobile ? "24px 16px" : "40px 28px" }}>
+    <div style={{ maxWidth: 960, margin: "0 auto", padding: isMobile ? "24px 16px" : "40px 28px" }}>
       <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
-      <div style={S.heroEyebrow}>My Shortlists</div>
-      <div style={S.listTitle}>Saved vendor and product shortlists</div>
-      <p style={{ fontSize: 14, color: "#64748b", marginBottom: 28, lineHeight: 1.7 }}>
-        Save and share vendor shortlists with your team. Each shortlist has a unique link you can paste into Slack, email, or a project doc. Anyone with the link can view the vendors you've selected.
+      <div style={S.heroEyebrow}>Workspace</div>
+      <div style={S.listTitle}>Evaluations & shortlists</div>
+      <p style={{ fontSize: 14, color: "#64748b", marginBottom: 24, lineHeight: 1.7 }}>
+        Build a structured evaluation with scorecard, ROI calculator, and business case — or save a quick vendor shortlist to share with your team.
       </p>
 
-      {/* Create new shortlist */}
-      <div style={{ ...S.sideCard, marginBottom: 24, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginBottom: 12 }}>
-          {selectedProducts.length > 0 ? `Save current selection (${selectedProducts.length} products)` : "Create a new shortlist"}
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <input
-            style={{ ...S.rfiInput, marginBottom: 0, flex: 1, minWidth: 160 }}
-            placeholder="Shortlist name (e.g. AMR options Q3 2026)"
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleCreate()}
-          />
-          <input
-            style={{ ...S.rfiInput, marginBottom: 0, flex: 2, minWidth: 200 }}
-            placeholder="Notes (optional)"
-            value={newNotes}
-            onChange={e => setNewNotes(e.target.value)}
-          />
-          <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={handleCreate}>
-            + Save shortlist
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 24, background: "#0d1526", borderRadius: 10, padding: 4, width: "fit-content" }}>
+        {[["evaluations", "📊 Evaluations"], ["shortlists", "📋 Shortlists"]].map(([id, label]) => (
+          <button key={id} onClick={() => setActiveTab(id)} style={{ padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontWeight: activeTab === id ? 700 : 400, background: activeTab === id ? "#1a2a45" : "transparent", color: activeTab === id ? "#e8edf5" : "#64748b", fontFamily: "inherit" }}>
+            {label}
           </button>
-        </div>
-        {selectedProducts.length > 0 && (
-          <div style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {selectedProducts.map(p => (
-              <span key={p.product.id} style={{ ...S.tag, color: "#f59e0b" }}>{p.product.name}</span>
-            ))}
+        ))}
+      </div>
+
+      {/* ── EVALUATIONS TAB ── */}
+      {activeTab === "evaluations" && (
+        <div>
+          {/* Create new evaluation */}
+          <div style={{ ...S.sideCard, marginBottom: 20, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginBottom: 4 }}>New evaluation workspace</div>
+            <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12 }}>Full evaluation with project context, vendor scorecard, ROI calculator, and business case export.</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                style={{ ...S.rfiInput, marginBottom: 0, flex: 1 }}
+                placeholder="e.g. Inbound dock automation Q3 2026"
+                value={newWsName}
+                onChange={e => setNewWsName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleCreateWorkspace()}
+              />
+              <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={handleCreateWorkspace}>
+                + New evaluation
+              </button>
+            </div>
           </div>
-        )}
+
+          {workspaces.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#475569" }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
+              <div style={{ fontSize: 14, color: "#64748b", marginBottom: 8 }}>No evaluations yet</div>
+              <div style={{ fontSize: 12, color: "#475569" }}>Create your first evaluation workspace above to start building a business case.</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {workspaces.map(w => {
+                const wVendors = vendors.filter(v => (w.vendorIds || []).includes(v.id));
+                const hasROI = w.roi?.laborHeadcount && w.roi?.laborRate;
+                const hasScorecard = Object.keys(w.scorecard || {}).length > 0;
+                const pct = Math.round(([w.problemStatement, w.facilitySqft, w.vendorIds?.length > 0, hasScorecard, hasROI, Object.keys(w.rfis || {}).length > 0].filter(Boolean).length / 6) * 100);
+                return (
+                  <div key={w.id} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20, cursor: "pointer" }} onClick={() => handleOpenWorkspace(w.id)}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: "#e8edf5", marginBottom: 4 }}>{w.projectName}</div>
+                        <div style={{ fontSize: 12, color: "#475569", marginBottom: 10 }}>
+                          {w.facilityType} · {w.projectType} · {w.budgetRange} · Updated {new Date(w.updated).toLocaleDateString()}
+                        </div>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          {wVendors.slice(0, 4).map(v => (
+                            <span key={v.id} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 6, padding: "3px 8px", fontSize: 11, color: "#64748b" }}>
+                              <span style={{ width: 8, height: 8, borderRadius: "50%", background: v.color, display: "inline-block" }} />{v.name}
+                            </span>
+                          ))}
+                          {wVendors.length > 4 && <span style={{ fontSize: 11, color: "#475569" }}>+{wVendors.length - 4} more</span>}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: pct >= 80 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#475569" }}>{pct}%</div>
+                        <div style={{ fontSize: 10, color: "#475569" }}>complete</div>
+                        <button onClick={e => { e.stopPropagation(); deleteWorkspace(w.id); refresh(); }} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 11 }}>Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── SHORTLISTS TAB ── */}
+      {activeTab === "shortlists" && (<div>
+      {/* Create new shortlist */}
+      <div style={{ ...S.sideCard, marginBottom: 20, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginBottom: 4 }}>
+          {selectedProducts.length > 0 ? `Save current selection (${selectedProducts.length} products)` : "Save a quick shortlist"}
+        </div>
+        <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12 }}>Name and save a list of vendors with a shareable link.</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input style={{ ...S.rfiInput, marginBottom: 0, flex: 1, minWidth: 160 }} placeholder="Shortlist name (e.g. AMR vendors to evaluate)" value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreate()} />
+          <input style={{ ...S.rfiInput, marginBottom: 0, flex: 2, minWidth: 200 }} placeholder="Notes (optional)" value={newNotes} onChange={e => setNewNotes(e.target.value)} />
+          <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={handleCreate}>+ Save shortlist</button>
+        </div>
       </div>
 
       {/* Saved lists */}
@@ -2177,17 +2291,14 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
         <div style={{ textAlign: "center", padding: "48px 0", color: "#475569" }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
           <div style={{ fontSize: 15, color: "#64748b", marginBottom: 8 }}>No shortlists saved yet</div>
-          <div style={{ fontSize: 13, color: "#475569" }}>
-            Select vendors in the directory or compare page, then save them here to build a shareable shortlist.
-          </div>
-          <button style={{ ...S.btnSecondary, width: "auto", marginTop: 20 }} onClick={() => setPage("directory")}>
-            Browse vendors
-          </button>
+          <div style={{ fontSize: 13, color: "#475569" }}>Select vendors in the directory or compare page, then save them here to build a shareable shortlist.</div>
+          <button style={{ ...S.btnSecondary, width: "auto", marginTop: 20 }} onClick={() => setPage("directory")}>Browse vendors</button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {lists.map(list => {
             const listVendors = vendors.filter(v => (list.vendorIds || []).includes(v.id));
+
             const isEditing = editingId === list.id;
             return (
               <div key={list.id} style={{ ...S.sideCard, padding: 0, overflow: "hidden" }}>
@@ -2282,6 +2393,564 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
           })}
         </div>
       )}
+      </div>)}
+    </div>
+  );
+}
+
+function WorkspacePage({ setPage, openDetail, wsId }) {
+  const isMobile = useIsMobile();
+  const [ws, setWs] = useState(() => getWorkspace(wsId));
+  const [tab, setTab] = useState("context");
+  const [copied, setCopied] = useState(false);
+
+  if (!ws) return (
+    <div style={{ textAlign: "center", padding: "80px 32px" }}>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontSize: 16, color: "#94a3b8", marginBottom: 16 }}>Workspace not found</div>
+      <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("shortlists")}>Back to shortlists</button>
+    </div>
+  );
+
+  const save = (patch) => {
+    const updated = updateWorkspace(wsId, patch);
+    setWs(getWorkspace(wsId));
+  };
+
+  const setField = (field, val) => save({ [field]: val });
+  const setRoiField = (field, val) => save({ roi: { ...ws.roi, [field]: val } });
+  const setScorecardField = (vendorId, field, val) => {
+    const scorecard = { ...ws.scorecard, [vendorId]: { ...(ws.scorecard[vendorId] || {}), [field]: val } };
+    save({ scorecard });
+  };
+  const setRfiField = (vendorId, field, val) => {
+    const rfis = { ...ws.rfis, [vendorId]: { ...(ws.rfis[vendorId] || {}), [field]: val } };
+    save({ rfis });
+  };
+  const toggleVendor = (vendorId) => {
+    const ids = ws.vendorIds.includes(vendorId) ? ws.vendorIds.filter(id => id !== vendorId) : [...ws.vendorIds, vendorId];
+    save({ vendorIds: ids });
+  };
+
+  const wsVendors = vendors.filter(v => ws.vendorIds.includes(v.id));
+
+  // ── ROI CALCULATIONS ──────────────────────────────────────────────────────
+  const r = ws.roi;
+  const annualLaborCost = (parseFloat(r.laborHeadcount) || 0) * (parseFloat(r.laborRate) || 0) * (parseFloat(r.shiftsPerDay) || 2) * (parseFloat(r.daysPerYear) || 250) * 8;
+  const captureRate = (parseFloat(r.automationCapturePercent) || 70) / 100;
+  const annualSavings = annualLaborCost * captureRate;
+  const budgetMid = { "Under $50k": 50000, "$50k–$200k": 125000, "$200k–$500k": 350000, "$500k–$1M": 750000, "$1M+": 1500000, "Unknown": 500000 }[ws.budgetRange] || 500000;
+  const paybackMonths = annualSavings > 0 ? Math.round((budgetMid / annualSavings) * 12) : null;
+  const npv3yr = annualSavings > 0 ? Math.round(annualSavings * 3 - budgetMid) : null;
+
+  // ── SCORECARD ──────────────────────────────────────────────────────────────
+  const CRITERIA = [
+    { key: "fit", label: "Use case fit", weight: 3 },
+    { key: "implementation", label: "Implementation risk", weight: 2 },
+    { key: "support", label: "Vendor support", weight: 2 },
+    { key: "integration", label: "Integration ease", weight: 2 },
+    { key: "cost", label: "Cost / value", weight: 1 },
+  ];
+  const totalWeight = CRITERIA.reduce((s, c) => s + c.weight, 0);
+  const vendorScores = wsVendors.map(v => {
+    const sc = ws.scorecard[v.id] || {};
+    const weighted = CRITERIA.reduce((sum, c) => sum + (parseFloat(sc[c.key]) || 0) * c.weight, 0);
+    const total = Math.round((weighted / (totalWeight * 5)) * 100);
+    return { vendor: v, scores: sc, total };
+  }).sort((a, b) => b.total - a.total);
+
+  // ── BUSINESS CASE EXPORT ──────────────────────────────────────────────────
+  const exportBusinessCase = () => {
+    const lines = [
+      `AUTOMATION EVALUATION — BUSINESS CASE`,
+      `Project: ${ws.projectName}`,
+      `Generated: ${new Date().toLocaleDateString()}`,
+      ``,
+      `── PROJECT CONTEXT ───────────────────────────────────`,
+      `Facility: ${ws.facilityType} · ${ws.facilitySqft ? ws.facilitySqft + " sqft" : "Size TBD"}`,
+      `Throughput target: ${ws.throughputTarget || "TBD"}`,
+      `Current WMS/ERP: ${ws.currentWMS || "TBD"}`,
+      `Project type: ${ws.projectType}`,
+      `Budget range: ${ws.budgetRange}`,
+      `Timeline: ${ws.timeline}`,
+      ``,
+      `Problem statement:`,
+      ws.problemStatement || "(not entered)",
+      ``,
+      `Success criteria:`,
+      ws.successCriteria || "(not entered)",
+      ``,
+      `── VENDORS EVALUATED ────────────────────────────────`,
+      ...wsVendors.map(v => `• ${v.name} (${v.category}) — ${v.price_range || "pricing TBD"}`),
+      ``,
+      `── SCORECARD RANKINGS ───────────────────────────────`,
+      ...vendorScores.map((vs, i) => `#${i + 1} ${vs.vendor.name} — ${vs.total}% weighted score`),
+      ``,
+      `── ROI ANALYSIS ─────────────────────────────────────`,
+      `Annual labor cost (current): $${Math.round(annualLaborCost).toLocaleString()}`,
+      `Automation capture rate: ${r.automationCapturePercent || 70}%`,
+      `Estimated annual savings: $${Math.round(annualSavings).toLocaleString()}`,
+      `Estimated investment: $${budgetMid.toLocaleString()} (midpoint of ${ws.budgetRange})`,
+      paybackMonths ? `Payback period: ~${paybackMonths} months` : `Payback: enter labor data to calculate`,
+      npv3yr ? `3-year NPV: $${npv3yr.toLocaleString()}` : "",
+      ``,
+      `── RFI STATUS ───────────────────────────────────────`,
+      ...wsVendors.map(v => {
+        const rfi = ws.rfis[v.id] || {};
+        return `• ${v.name}: ${rfi.responseStatus || "Not contacted"} ${rfi.demoScheduled ? "| Demo: " + (rfi.demoDate || "scheduled") : ""}`;
+      }),
+      ``,
+      `── TOP RECOMMENDATION ───────────────────────────────`,
+      vendorScores[0] ? `Based on weighted scorecard: ${vendorScores[0].vendor.name} (${vendorScores[0].total}% score)` : "Complete scorecard to generate recommendation",
+      ``,
+      `── NEXT STEPS ───────────────────────────────────────`,
+      `1. Schedule demos with top 2-3 vendors`,
+      `2. Request formal proposals with scope and pricing`,
+      `3. Conduct site visits or reference calls`,
+      `4. Present shortlist to leadership for approval`,
+      ``,
+      `Generated by OpEx Scout — opexscout.com`,
+    ];
+    const text = lines.join("\n");
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${ws.projectName.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "evaluation"}-business-case.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const tabs = [
+    { id: "context", label: "📋 Project context" },
+    { id: "vendors", label: "🏭 Vendors" },
+    { id: "scorecard", label: "⭐ Scorecard" },
+    { id: "roi", label: "💰 ROI calculator" },
+    { id: "rfi", label: "📞 RFI tracker" },
+    { id: "case", label: "📄 Business case" },
+  ];
+
+  const inputStyle = { ...S.rfiInput, marginBottom: 10 };
+  const labelStyle = { ...S.rfiLabel, marginBottom: 4 };
+
+  return (
+    <div style={{ background: "#0b1220", minHeight: "100vh", paddingBottom: 60 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "16px" : "28px" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <button style={S.backBtn} onClick={() => setPage("shortlists")}><ArrowLeft /> My shortlists</button>
+            <input
+              style={{ fontSize: isMobile ? 20 : 26, fontWeight: 800, color: "#e8edf5", background: "none", border: "none", outline: "none", fontFamily: "inherit", width: "100%", letterSpacing: "-0.3px" }}
+              value={ws.projectName}
+              onChange={e => setField("projectName", e.target.value)}
+              placeholder="Project name..."
+            />
+            <div style={{ fontSize: 12, color: "#475569", marginTop: 4 }}>
+              Last updated {new Date(ws.updated).toLocaleDateString()} · {wsVendors.length} vendor{wsVendors.length !== 1 ? "s" : ""} in scope
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>⬇ Export business case</button>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        {(() => {
+          const checks = [ws.problemStatement, ws.facilitySqft, ws.vendorIds.length > 0, Object.keys(ws.scorecard).length > 0, ws.roi.laborHeadcount, Object.keys(ws.rfis).length > 0];
+          const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+          return (
+            <div style={{ marginBottom: 20, background: "#0f1c30", borderRadius: 10, padding: "12px 16px", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 12, color: "#64748b" }}>Evaluation completeness</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: pct >= 80 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#94a3b8" }}>{pct}%</span>
+              </div>
+              <div style={{ height: 6, background: "#0d1526", borderRadius: 99 }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: pct >= 80 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#475569", borderRadius: 99, transition: "width 0.4s" }} />
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Tabs */}
+        <div style={{ ...S.tabs, marginBottom: 0, borderRadius: "10px 10px 0 0", background: "#0d1526" }}>
+          {tabs.map(t => (
+            <div key={t.id} style={{ ...S.tab, ...(tab === t.id ? S.tabActive : {}), fontSize: isMobile ? 11 : 12 }} onClick={() => setTab(t.id)}>{t.label}</div>
+          ))}
+        </div>
+
+        <div style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderTop: "none", borderRadius: "0 0 14px 14px", padding: isMobile ? 16 : 28 }}>
+
+          {/* ── TAB: PROJECT CONTEXT ── */}
+          {tab === "context" && (
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>Facility details</div>
+                <label style={labelStyle}>Facility type</label>
+                <select style={inputStyle} value={ws.facilityType} onChange={e => setField("facilityType", e.target.value)}>
+                  {industries.map(i => <option key={i}>{i}</option>)}
+                </select>
+                <label style={labelStyle}>Facility size (sqft)</label>
+                <input style={inputStyle} placeholder="e.g. 450,000" value={ws.facilitySqft} onChange={e => setField("facilitySqft", e.target.value)} />
+                <label style={labelStyle}>Throughput target</label>
+                <input style={inputStyle} placeholder="e.g. 1,200 orders/day, 500 cases/hr" value={ws.throughputTarget} onChange={e => setField("throughputTarget", e.target.value)} />
+                <label style={labelStyle}>Current WMS / ERP / controls</label>
+                <input style={inputStyle} placeholder="e.g. Manhattan Active WM, SAP EWM" value={ws.currentWMS} onChange={e => setField("currentWMS", e.target.value)} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>Project details</div>
+                <label style={labelStyle}>Project type</label>
+                <select style={inputStyle} value={ws.projectType} onChange={e => setField("projectType", e.target.value)}>
+                  {["Brownfield retrofit", "Greenfield / new build", "Capacity expansion", "Vendor replacement", "Feasibility study"].map(x => <option key={x}>{x}</option>)}
+                </select>
+                <label style={labelStyle}>Budget range</label>
+                <select style={inputStyle} value={ws.budgetRange} onChange={e => setField("budgetRange", e.target.value)}>
+                  {["Under $50k", "$50k–$200k", "$200k–$500k", "$500k–$1M", "$1M+", "Unknown"].map(x => <option key={x}>{x}</option>)}
+                </select>
+                <label style={labelStyle}>Target go-live timeline</label>
+                <select style={inputStyle} value={ws.timeline} onChange={e => setField("timeline", e.target.value)}>
+                  {["0–3 months", "3–6 months", "6–12 months", "12–18 months", "18+ months", "TBD"].map(x => <option key={x}>{x}</option>)}
+                </select>
+              </div>
+              <div style={{ gridColumn: isMobile ? "1" : "1 / -1" }}>
+                <label style={labelStyle}>Problem statement — what operational problem are you solving?</label>
+                <textarea style={{ ...inputStyle, minHeight: 90, resize: "vertical" }} placeholder="e.g. High dock labor cost and injury rate on inbound. 3 doors × 2 shifts of unload labor. Volume growing 20% YoY with no room to add headcount." value={ws.problemStatement} onChange={e => setField("problemStatement", e.target.value)} />
+                <label style={labelStyle}>Success criteria — how will you measure a successful outcome?</label>
+                <textarea style={{ ...inputStyle, minHeight: 90, resize: "vertical" }} placeholder="e.g. Reduce dock labor by 40%, achieve 99.5% unit accuracy on inbound, payback within 24 months." value={ws.successCriteria} onChange={e => setField("successCriteria", e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          {/* ── TAB: VENDORS ── */}
+          {tab === "vendors" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8" }}>{wsVendors.length} vendor{wsVendors.length !== 1 ? "s" : ""} in scope</div>
+                <button style={{ ...S.btnSecondary, width: "auto", padding: "7px 14px", fontSize: 12 }} onClick={() => setPage("directory")}>+ Add from directory</button>
+              </div>
+              {wsVendors.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>🏭</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginBottom: 12 }}>No vendors added yet</div>
+                  <div style={{ fontSize: 12, color: "#475569", marginBottom: 16 }}>Go to the directory, select vendors with the Compare checkbox, then come back and add them here.</div>
+                  <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("directory")}>Browse directory</button>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+                  {wsVendors.map(v => (
+                    <div key={v.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 14 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ ...S.logoCircle, background: v.color, width: 32, height: 32, fontSize: 10, marginBottom: 0 }}>{v.logo}</div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5" }}>{v.name}</div>
+                            <div style={{ fontSize: 11, color: "#475569" }}>{v.category}</div>
+                          </div>
+                        </div>
+                        <button onClick={() => toggleVendor(v.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 16, lineHeight: 1 }}>×</button>
+                      </div>
+                      <PriceBadge tier={v.price_range} />
+                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 8, lineHeight: 1.5 }}>{v.best_for?.slice(0, 80)}...</div>
+                      <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: "6px 10px" }} onClick={() => openDetail(v, "workspace", "workspace")}>View profile →</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Add vendors by searching */}
+              <div style={{ marginTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Quick add by category</div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {categories.slice(0, 8).map(cat => {
+                    const catVendors = vendors.filter(v => v.category === cat);
+                    return (
+                      <button key={cat} style={{ ...S.chip, fontSize: 11, padding: "4px 10px" }} onClick={() => {
+                        const toAdd = catVendors.slice(0, 3).map(v => v.id).filter(id => !ws.vendorIds.includes(id));
+                        if (toAdd.length) save({ vendorIds: [...ws.vendorIds, ...toAdd] });
+                      }}>+ {cat.split(" ")[0]} ({catVendors.length})</button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── TAB: SCORECARD ── */}
+          {tab === "scorecard" && (
+            <div>
+              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+                Score each vendor 1–5 on each criterion. Weighted total score is used to rank vendors in your business case. Criteria weights: Fit ×3, Implementation ×2, Support ×2, Integration ×2, Cost ×1.
+              </div>
+              {wsVendors.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>Add vendors first to score them.</div>
+              ) : (
+                <>
+                  {/* Ranking summary */}
+                  {vendorScores.some(vs => vs.total > 0) && (
+                    <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+                      {vendorScores.filter(vs => vs.total > 0).map((vs, i) => (
+                        <div key={vs.vendor.id} style={{ background: i === 0 ? "rgba(245,158,11,0.1)" : "#0d1526", border: `1px solid ${i === 0 ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.06)"}`, borderRadius: 8, padding: "8px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: i === 0 ? "#f59e0b" : "#475569" }}>#{i + 1}</span>
+                          <div style={{ ...S.logoCircle, background: vs.vendor.color, width: 22, height: 22, fontSize: 8, marginBottom: 0 }}>{vs.vendor.logo}</div>
+                          <span style={{ fontSize: 12, color: "#e8edf5", fontWeight: 600 }}>{vs.vendor.name}</span>
+                          <span style={{ fontSize: 12, color: i === 0 ? "#f59e0b" : "#64748b", fontWeight: 700 }}>{vs.total}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...S.compareTh, width: 160 }}>Vendor</th>
+                          {CRITERIA.map(c => <th key={c.key} style={{ ...S.compareTh, textAlign: "center" }}>{c.label}<br /><span style={{ color: "#475569", fontWeight: 400 }}>weight ×{c.weight}</span></th>)}
+                          <th style={{ ...S.compareTh, textAlign: "center" }}>Score</th>
+                          <th style={{ ...S.compareTh }}>Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wsVendors.map(v => {
+                          const sc = ws.scorecard[v.id] || {};
+                          const vs = vendorScores.find(x => x.vendor.id === v.id);
+                          return (
+                            <tr key={v.id}>
+                              <td style={{ ...S.compareTd, fontWeight: 600, color: "#e8edf5" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <div style={{ ...S.logoCircle, background: v.color, width: 22, height: 22, fontSize: 8, marginBottom: 0 }}>{v.logo}</div>
+                                  {v.name}
+                                </div>
+                              </td>
+                              {CRITERIA.map(c => (
+                                <td key={c.key} style={{ ...S.compareTd, textAlign: "center", padding: 8 }}>
+                                  <select
+                                    style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: sc[c.key] ? "#f59e0b" : "#475569", padding: "4px 8px", fontSize: 13, cursor: "pointer", fontWeight: sc[c.key] ? 700 : 400 }}
+                                    value={sc[c.key] || ""}
+                                    onChange={e => setScorecardField(v.id, c.key, e.target.value)}
+                                  >
+                                    <option value="">—</option>
+                                    {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+                                  </select>
+                                </td>
+                              ))}
+                              <td style={{ ...S.compareTd, textAlign: "center" }}>
+                                <span style={{ fontSize: 16, fontWeight: 800, color: vs?.total >= 70 ? "#22c55e" : vs?.total >= 50 ? "#f59e0b" : "#475569" }}>
+                                  {vs?.total > 0 ? `${vs.total}%` : "—"}
+                                </span>
+                              </td>
+                              <td style={{ ...S.compareTd }}>
+                                <input
+                                  style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 6, color: "#64748b", padding: "4px 8px", fontSize: 11, width: "100%" }}
+                                  placeholder="Notes..."
+                                  value={sc.notes || ""}
+                                  onChange={e => setScorecardField(v.id, "notes", e.target.value)}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── TAB: ROI CALCULATOR ── */}
+          {tab === "roi" && (
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>Labor inputs</div>
+                <label style={labelStyle}>Headcount to automate (FTEs)</label>
+                <input style={inputStyle} type="number" placeholder="e.g. 8" value={r.laborHeadcount} onChange={e => setRoiField("laborHeadcount", e.target.value)} />
+                <label style={labelStyle}>Hourly fully-loaded labor rate ($/hr)</label>
+                <input style={inputStyle} type="number" placeholder="e.g. 22" value={r.laborRate} onChange={e => setRoiField("laborRate", e.target.value)} />
+                <label style={labelStyle}>Shifts per day</label>
+                <select style={inputStyle} value={r.shiftsPerDay} onChange={e => setRoiField("shiftsPerDay", e.target.value)}>
+                  {["1", "2", "3"].map(x => <option key={x}>{x}</option>)}
+                </select>
+                <label style={labelStyle}>Operating days per year</label>
+                <input style={inputStyle} type="number" placeholder="250" value={r.daysPerYear} onChange={e => setRoiField("daysPerYear", e.target.value)} />
+                <label style={labelStyle}>Estimated automation capture rate (%)</label>
+                <input style={inputStyle} type="number" placeholder="70" value={r.automationCapturePercent} onChange={e => setRoiField("automationCapturePercent", e.target.value)} />
+                <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.6, marginTop: 4 }}>
+                  Capture rate = % of current labor cost displaced. 70% is typical for brownfield AMR deployments. 90%+ for fully automated dock/conveyor.
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>ROI summary</div>
+                {[
+                  ["Annual labor cost (current)", `$${Math.round(annualLaborCost).toLocaleString()}`, annualLaborCost > 0],
+                  ["Estimated annual savings", `$${Math.round(annualSavings).toLocaleString()}`, annualSavings > 0],
+                  ["Estimated investment (budget midpoint)", `$${budgetMid.toLocaleString()}`, true],
+                  ["Payback period", paybackMonths ? `~${paybackMonths} months` : "—", paybackMonths !== null],
+                  ["3-year net savings (NPV)", npv3yr ? `$${npv3yr.toLocaleString()}` : "—", npv3yr !== null && npv3yr > 0],
+                ].map(([label, value, highlight]) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ fontSize: 13, color: "#64748b" }}>{label}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: highlight ? "#f59e0b" : "#334155" }}>{value}</span>
+                  </div>
+                ))}
+                <div style={{ marginTop: 16, padding: 14, background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10, fontSize: 12, color: "#94a3b8", lineHeight: 1.7 }}>
+                  <strong style={{ color: "#f59e0b" }}>Methodology note:</strong> This calculator uses fully-loaded labor cost × capture rate as a proxy for savings. It does not include throughput improvements, error reduction, or quality gains. Use as a directional estimate — not for board approval without vendor-validated assumptions.
+                </div>
+                {annualSavings > 0 && wsVendors.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>By vendor price tier</div>
+                    {wsVendors.filter(v => v.price_range).map(v => {
+                      const tierCost = { "$": 40000, "$$": 125000, "$$$": 350000, "$$$$": 750000, "RaaS": 0 }[v.price_range] || budgetMid;
+                      const pb = tierCost > 0 && annualSavings > 0 ? Math.round((tierCost / annualSavings) * 12) : null;
+                      return (
+                        <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
+                            <span style={{ color: "#94a3b8" }}>{v.name}</span>
+                            <PriceBadge tier={v.price_range} />
+                          </div>
+                          <span style={{ color: pb && pb <= 24 ? "#22c55e" : pb && pb <= 36 ? "#f59e0b" : "#ef4444", fontWeight: 600 }}>
+                            {v.price_range === "RaaS" ? "RaaS — compare to ongoing labor" : pb ? `~${pb}mo payback` : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── TAB: RFI TRACKER ── */}
+          {tab === "rfi" && (
+            <div>
+              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+                Track your outreach to each vendor. Log contacts, demo dates, and notes from calls so nothing falls through the cracks.
+              </div>
+              {wsVendors.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>Add vendors to the workspace first.</div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {wsVendors.map(v => {
+                    const rfi = ws.rfis[v.id] || {};
+                    return (
+                      <div key={v.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+                        <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 9, marginBottom: 0 }}>{v.logo}</div>
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5" }}>{v.name}</div>
+                              <div style={{ fontSize: 11, color: "#475569" }}>{v.category}</div>
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            {[
+                              ["Not contacted", "#475569", "rgba(255,255,255,0.05)"],
+                              ["RFI sent", "#f59e0b", "rgba(245,158,11,0.1)"],
+                              ["Responded", "#38bdf8", "rgba(56,189,248,0.1)"],
+                              ["Demo scheduled", "#818cf8", "rgba(99,102,241,0.1)"],
+                              ["Proposal received", "#22c55e", "rgba(34,197,94,0.1)"],
+                              ["Eliminated", "#ef4444", "rgba(239,68,68,0.1)"],
+                            ].map(([status, color, bg]) => (
+                              <button key={status} onClick={() => setRfiField(v.id, "responseStatus", status)}
+                                style={{ fontSize: 10, padding: "3px 8px", borderRadius: 6, border: `1px solid ${rfi.responseStatus === status ? color : "rgba(255,255,255,0.07)"}`, background: rfi.responseStatus === status ? bg : "transparent", color: rfi.responseStatus === status ? color : "#475569", cursor: "pointer", fontWeight: rfi.responseStatus === status ? 700 : 400, whiteSpace: "nowrap" }}>
+                                {status}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div style={{ padding: "14px 16px", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 10 }}>
+                          <div>
+                            <label style={labelStyle}>Contact name</label>
+                            <input style={{ ...inputStyle, marginBottom: 0 }} placeholder="e.g. Jane Smith" value={rfi.contactName || ""} onChange={e => setRfiField(v.id, "contactName", e.target.value)} />
+                          </div>
+                          <div>
+                            <label style={labelStyle}>Contact email</label>
+                            <input style={{ ...inputStyle, marginBottom: 0 }} placeholder="jane@vendor.com" type="email" value={rfi.contactEmail || ""} onChange={e => setRfiField(v.id, "contactEmail", e.target.value)} />
+                          </div>
+                          <div>
+                            <label style={labelStyle}>Demo / next meeting date</label>
+                            <input style={{ ...inputStyle, marginBottom: 0 }} type="date" value={rfi.demoDate || ""} onChange={e => setRfiField(v.id, "demoDate", e.target.value)} />
+                          </div>
+                          <div style={{ gridColumn: isMobile ? "1" : "1 / -1" }}>
+                            <label style={labelStyle}>Notes from conversations</label>
+                            <textarea style={{ ...inputStyle, marginBottom: 0, minHeight: 70, resize: "vertical" }} placeholder="Key things discussed, concerns raised, pricing mentioned, implementation timeline quoted..." value={rfi.notes || ""} onChange={e => setRfiField(v.id, "notes", e.target.value)} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── TAB: BUSINESS CASE ── */}
+          {tab === "case" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+                <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
+                  Auto-generated from your project context, scorecard, and ROI inputs. Export as a text file to paste into a PowerPoint or email.
+                </div>
+                <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>⬇ Export .txt</button>
+              </div>
+
+              {/* Summary cards */}
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+                {[
+                  ["Vendors evaluated", wsVendors.length || "—"],
+                  ["Est. annual savings", annualSavings > 0 ? `$${Math.round(annualSavings / 1000)}k` : "—"],
+                  ["Payback period", paybackMonths ? `${paybackMonths}mo` : "—"],
+                  ["Top vendor", vendorScores[0]?.total > 0 ? vendorScores[0].vendor.name : "—"],
+                ].map(([l, v]) => (
+                  <div key={l} style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "#f59e0b", marginBottom: 4 }}>{v}</div>
+                    <div style={{ fontSize: 11, color: "#475569" }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Business case preview */}
+              <div style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 20, fontFamily: "monospace", fontSize: 12, color: "#64748b", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+{`AUTOMATION EVALUATION — BUSINESS CASE
+Project: ${ws.projectName || "(name your project)"}
+Generated: ${new Date().toLocaleDateString()}
+
+── PROJECT CONTEXT ───────────────────
+Facility: ${ws.facilityType} · ${ws.facilitySqft ? ws.facilitySqft + " sqft" : "size TBD"}
+Throughput: ${ws.throughputTarget || "TBD"}
+Systems: ${ws.currentWMS || "TBD"}
+Type: ${ws.projectType} · Budget: ${ws.budgetRange} · Timeline: ${ws.timeline}
+
+Problem:
+${ws.problemStatement || "(add in Project Context tab)"}
+
+Success criteria:
+${ws.successCriteria || "(add in Project Context tab)"}
+
+── VENDORS EVALUATED ─────────────────
+${wsVendors.length ? wsVendors.map(v => `• ${v.name} (${v.category}) — ${v.price_range || "pricing TBD"}`).join("\n") : "(add vendors in Vendors tab)"}
+
+── SCORECARD RANKINGS ────────────────
+${vendorScores.some(v => v.total > 0) ? vendorScores.filter(v => v.total > 0).map((vs, i) => `#${i + 1} ${vs.vendor.name} — ${vs.total}% score`).join("\n") : "(score vendors in Scorecard tab)"}
+
+── ROI ANALYSIS ──────────────────────
+Annual labor cost: $${Math.round(annualLaborCost).toLocaleString() || "—"}
+Est. annual savings: $${Math.round(annualSavings).toLocaleString() || "—"}
+Investment: $${budgetMid.toLocaleString()} (midpoint of ${ws.budgetRange})
+Payback: ${paybackMonths ? "~" + paybackMonths + " months" : "complete ROI inputs"}
+3-yr NPV: ${npv3yr ? "$" + npv3yr.toLocaleString() : "—"}
+
+── RFI STATUS ────────────────────────
+${wsVendors.length ? wsVendors.map(v => { const rfi = ws.rfis[v.id] || {}; return `• ${v.name}: ${rfi.responseStatus || "Not contacted"}${rfi.demoDate ? " | Demo: " + rfi.demoDate : ""}`; }).join("\n") : "(track outreach in RFI Tracker tab)"}
+
+── RECOMMENDATION ────────────────────
+${vendorScores[0]?.total > 0 ? `Based on scorecard: ${vendorScores[0].vendor.name} (${vendorScores[0].total}%)` : "Complete scorecard to generate"}
+
+Generated by OpEx Scout — opexscout.com`}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -2790,6 +3459,7 @@ export default function App() {
   const [categoryPageCategory, setCategoryPageCategory] = useState(categories[0]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [initialSearch, setInitialSearch] = useState("");
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState(null);
 
   const pageTitles = {
     home: "OpEx Scout — Automation Vendor Intelligence",
@@ -2800,6 +3470,7 @@ export default function App() {
     "product-compare": "Compare Products — OpEx Scout",
     reviews: "Submit a Review — OpEx Scout",
     shortlists: "My Shortlists — OpEx Scout",
+    workspace: "Evaluation Workspace — OpEx Scout",
     list: "List Your Company — OpEx Scout",
     about: "About — OpEx Scout",
     methodology: "Methodology — OpEx Scout",
@@ -2877,7 +3548,8 @@ export default function App() {
       {page === "compare" && <ComparePage selected={selected} setPage={navigate} openDetail={openDetail} />}
       {page === "product-compare" && <ProductComparePage selectedProducts={selectedProducts} setPage={navigate} removeProduct={removeProductFromCompare} openDetail={openDetail} />}
       {page === "list" && <ListPage setPage={navigate} />}
-      {page === "shortlists" && <ShortlistsPage setPage={navigate} setSelected={setSelected} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} openDetail={openDetail} />}
+      {page === "shortlists" && <ShortlistsPage setPage={navigate} setSelected={setSelected} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} openDetail={openDetail} setActiveWorkspaceId={setActiveWorkspaceId} />}
+      {page === "workspace" && <WorkspacePage setPage={navigate} openDetail={openDetail} wsId={activeWorkspaceId} />}
       {page === "vendors" && <VendorsPage setPage={navigate} />}
       {page === "methodology" && <MethodologyPage setPage={navigate} />}
       {page === "about" && <AboutPage setPage={navigate} />}
