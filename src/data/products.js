@@ -1598,5 +1598,438 @@ export const products = {
     },
   ],
 
+
+  // BERKSHIRE GREY
+  "berkshire-grey": [
+    {
+      id: "bg-robotic-product-sortation",
+      name: "Robotic Product Sortation System",
+      tagline: "AI-powered robotic sortation for e-commerce fulfillment",
+      category: "Sortation & Picking",
+      price_range: "$$$",
+      price_notes: "Full system pricing. Typically $1M–$5M depending on throughput and configuration. RaaS model available.",
+      highlights: ["Handles 10,000+ SKUs without reprogramming", "AI vision identifies items regardless of orientation", "Integrates with existing conveyor infrastructure", "Proven at major US retailers and 3PLs"],
+      applications: ["E-commerce sortation", "Returns processing", "Ship sorter induction", "Retail fulfillment"],
+      variants: ["BG Robotic Product Sortation", "BG Robotic Put Wall", "BG Packout"],
+      description: "Berkshire Grey's robotic sortation system uses AI-powered vision to identify, pick, and sort products at throughput rates that approach manual operations while reducing labor dependency. Unlike traditional pick robots limited to simple geometries, the BG system handles the full range of e-commerce SKU profiles — polybags, irregular boxes, and multi-pack items — without operator intervention. The system is designed to integrate into existing DC footprints rather than requiring a purpose-built facility.",
+      url: "https://www.berkshiregrey.com/solutions",
+      specs: [{ l: "Throughput", v: "Up to 1,000 units/hr per cell" }, { l: "SKU range", v: "10,000+" }, { l: "Navigation", v: "AI vision — no markers" }, { l: "Integration", v: "WMS-agnostic" }],
+    },
+  ],
+
+  // KNAPP
+  "knapp": [
+    {
+      id: "knapp-oss",
+      name: "OSR Shuttle Evo",
+      tagline: "High-density shuttle-based goods-to-person storage and retrieval",
+      category: "AS/RS",
+      price_range: "$$$$",
+      price_notes: "Full system. Typically $5M–$40M+ depending on aisles, height, and throughput. Often deployed with KNAPP Pick-it-Easy workstations.",
+      highlights: ["Single-level shuttle for maximum throughput flexibility", "Modular — add aisles and levels incrementally", "Proven in pharmacy, cosmetics, and general merchandise DC", "KNAPP Vision System for automated quality control"],
+      applications: ["Goods-to-person picking", "Pharmacy DC", "Cosmetics fulfillment", "General merchandise DC"],
+      variants: ["OSR Shuttle Evo", "Pick-it-Easy workstation", "KiSoft WCS"],
+      description: "KNAPP's OSR Shuttle Evo is a single-level shuttle AS/RS that provides high-throughput goods-to-person picking for medium-to-large SKU profiles. Each shuttle operates independently within its aisle level, enabling parallel retrieval across the system. KNAPP's deep vertical expertise in pharmacy distribution — where lot tracking, compliance, and pick accuracy are non-negotiable — translates well to high-value general merchandise applications. The Pick-it-Easy workstation with vision system provides integrated quality control at the point of pick.",
+      url: "https://www.knapp.com/solutions/osr-shuttle-evo",
+      specs: [{ l: "Shuttle type", v: "Single-level" }, { l: "Tote dimensions", v: "Project-specific" }, { l: "Throughput", v: "Project-specific" }, { l: "WCS", v: "KiSoft (KNAPP proprietary)" }],
+    },
+  ],
+
+  // GREYORANGE
+  "greyorange": [
+    {
+      id: "greyorange-ranger",
+      name: "Ranger AMR Series",
+      tagline: "AI-powered fulfillment AMRs with Fulfillment AI orchestration",
+      category: "AMR / Mobile Robots",
+      price_range: "$$$",
+      price_notes: "Per robot or enterprise license. Fulfillment AI software subscription additional. Contact for fleet pricing.",
+      highlights: ["Fulfillment AI orchestrates robots, humans, and inventory in real time", "Ranger GTP for goods-to-person, Ranger Pallet for pallet movement", "Self-learning system improves with operational data", "Proven at major fashion and e-commerce retailers"],
+      applications: ["Goods-to-person fulfillment", "Pallet movement", "Sortation", "Returns processing"],
+      variants: ["Ranger GTP", "Ranger Pallet", "Butler (legacy)"],
+      description: "GreyOrange differentiates from pure-play AMR vendors through its Fulfillment AI platform — software that orchestrates the full fulfillment operation including robots, human workers, and inventory positioning. Rather than just controlling robot movement, the AI continuously optimizes where inventory is slotted, which worker handles which task, and how robots route based on real-time demand signals. The system learns from operational patterns and improves over time. Particularly strong in fashion and apparel DC environments where SKU velocity changes dramatically by season.",
+      url: "https://www.greyorange.com/ranger",
+      specs: [{ l: "Navigation", v: "Autonomous SLAM" }, { l: "Payload", v: "Tote or pallet" }, { l: "Software", v: "Fulfillment AI (GreyOrange)" }, { l: "Integration", v: "WMS-agnostic API" }],
+    },
+  ],
+
+  // INTERROLL
+  "interroll": [
+    {
+      id: "interroll-mcp",
+      name: "Modular Conveyor Platform",
+      tagline: "Zero pressure accumulation conveyor for carton and tote handling",
+      category: "Conveyor & Sortation",
+      price_range: "$$$",
+      price_notes: "Per linear meter plus controls. Full system pricing through integrator partners.",
+      highlights: ["Decentralized motor roller technology — no central control panel", "Zero pressure accumulation across all zones", "Plug-and-play modules reduce installation time", "Global availability through certified integrator network"],
+      applications: ["Carton transport", "Order accumulation", "DC conveyor backbone", "Cross-belt sortation feed"],
+      variants: ["MCP 50", "MCP 100 (24V motorized roller)", "MCP Pallet"],
+      description: "Interroll's Modular Conveyor Platform uses decentralized 24V motorized roller technology, eliminating the central motor and gearbox assemblies of traditional conveyor. Each zone controls itself — dramatically simplifying installation, reducing energy consumption, and enabling true zero-pressure accumulation without complex controls programming. The modular design allows integrators to configure virtually any conveyor layout from standard components. Interroll's global manufacturing and integrator network makes it a practical choice for multi-site rollouts requiring consistent spare parts availability.",
+      url: "https://www.interroll.com/products-services/conveyor-modules/modular-conveyor-platform",
+      specs: [{ l: "Motor type", v: "24V motorized roller" }, { l: "Control", v: "Decentralized zone control" }, { l: "Accumulation", v: "Zero pressure" }, { l: "Speed", v: "Up to 2.5 m/s" }],
+    },
+  ],
+
+  // VECNA ROBOTICS
+  "vecna-robotics": [
+    {
+      id: "vecna-cb1500",
+      name: "CB1500 Pallet AMR",
+      tagline: "High-payload autonomous pallet conveyor robot for DC operations",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot or RaaS subscription. Contact for fleet pricing.",
+      highlights: ["1,500 kg payload — full pallet capability", "Works with existing pallet conveyor infrastructure", "Pivotal orchestration software manages mixed-vendor fleets", "Proven in food & beverage and large DC environments"],
+      applications: ["Pallet transport", "End-of-line automation", "Inbound receiving", "DC floor movement"],
+      variants: ["CB1500", "CB750", "Pivotal Orchestration Platform"],
+      description: "Vecna Robotics' CB1500 is a high-payload AMR designed for pallet movement in large distribution and manufacturing environments. The standout capability is Vecna's Pivotal orchestration platform, which can manage not just Vecna robots but mixed fleets including third-party AMRs — a meaningful differentiator for operations that may deploy multiple AMR brands over time. The CB1500's ability to interface with existing pallet conveyor systems rather than replacing them reduces integration complexity and capital cost.",
+      url: "https://www.vecnarobotics.com/cb1500",
+      specs: [{ l: "Payload", v: "1,500 kg" }, { l: "Navigation", v: "Autonomous SLAM" }, { l: "Orchestration", v: "Pivotal (multi-vendor)" }, { l: "Integration", v: "WMS/ERP API" }],
+    },
+  ],
+
+  // PLUS ONE ROBOTICS
+  "plus-one-robotics": [
+    {
+      id: "plus-one-yonder",
+      name: "Yonder Piece-Picking System",
+      tagline: "AI vision pick system with remote human supervisors for e-commerce piece picking",
+      category: "Robotic Picking",
+      price_range: "$$$",
+      price_notes: "RaaS model — per pick or per robot per month. No large upfront capital. Contact for volume pricing.",
+      highlights: ["Crew Chief model — one remote operator supervises multiple robots", "Handles polybags, irregular items, and unlabeled products", "RaaS eliminates upfront capital — pay per pick", "Proven throughput: 800-1,200 items/hr per cell"],
+      applications: ["E-commerce piece picking", "Returns sortation", "Parcel induction", "Bagging and sorting"],
+      variants: ["Yonder Piece Picking", "Yonder Sort", "Crew Chief oversight platform"],
+      description: "Plus One Robotics' Yonder system pairs AI-powered robotic arms with remote human 'Crew Chief' supervisors who monitor multiple robots simultaneously and intervene via teleoperation when the AI encounters items it can't handle confidently. This hybrid model achieves near-manual throughput rates while eliminating most on-floor picking labor. The RaaS pricing model is particularly attractive for 3PL and e-commerce operations that need automation economics without the capital commitment of a traditional system purchase.",
+      url: "https://www.plusonerobotics.com/yonder",
+      specs: [{ l: "Throughput", v: "800–1,200 items/hr" }, { l: "SKU range", v: "Handles polybags, irregular items" }, { l: "Model", v: "AI + remote human supervision" }, { l: "Pricing", v: "RaaS per pick" }],
+    },
+  ],
+
+  // OTTO MOTORS
+  "otto-motors": [
+    {
+      id: "otto-1500",
+      name: "OTTO 1500",
+      tagline: "Heavy-payload autonomous mobile robot for manufacturing material transport",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot. Fleet management software included. Contact for fleet pricing above 5 units.",
+      highlights: ["1,500 kg payload — handles heavy manufacturing loads", "Industry-leading obstacle detection for mixed human/robot environments", "OTTO Fleet Manager scales to large deployments", "Proven in automotive, aerospace, and heavy manufacturing"],
+      applications: ["Manufacturing line feeding", "WIP transport", "Raw material delivery", "Finished goods movement"],
+      variants: ["OTTO 1500", "OTTO 750", "OTTO 100", "OTTO Fleet Manager"],
+      description: "OTTO 1500 is the flagship heavy-payload AMR from OTTO Motors, designed for manufacturing environments where material loads are heavy, traffic is mixed, and operational uptime is non-negotiable. The robot's autonomous navigation handles the dynamic obstacles typical of manufacturing floors — forklifts, pedestrians, and changing infrastructure — more robustly than many DC-focused AMR competitors. OTTO Fleet Manager provides enterprise-grade deployment management for large robot fleets, with integration hooks to MES, ERP, and WMS systems.",
+      url: "https://www.ottomotors.com/otto-1500",
+      specs: [{ l: "Payload", v: "1,500 kg" }, { l: "Speed", v: "2.0 m/s" }, { l: "Navigation", v: "Autonomous SLAM + lidar" }, { l: "Safety", v: "ISO 3691-4 certified" }],
+    },
+  ],
+
+  // CIMCORP
+  "cimcorp": [
+    {
+      id: "cimcorp-dreamsorter",
+      name: "DreamSorter",
+      tagline: "Gantry robot order fulfillment system for tire and food & beverage operations",
+      category: "AS/RS",
+      price_range: "$$$$",
+      price_notes: "Full system. Turnkey design-build by Cimcorp. Highly application-specific — pricing requires detailed scoping.",
+      highlights: ["Handles cylindrical and irregular products other AS/RS systems cannot", "Zero-pressure buffer storage between production and dispatch", "24/7 automated operation without human intervention in the buffer", "Proven in tire, bread, dairy, and beverage applications globally"],
+      applications: ["Tire DC buffer and sortation", "Bakery and dairy DC", "Beverage case handling", "End-of-line buffer storage"],
+      variants: ["DreamSorter (tire)", "DreamSorter (food & beverage)", "DreamPicker"],
+      description: "Cimcorp's DreamSorter uses overhead gantry robots to handle products in ways that floor-based AS/RS systems cannot — particularly cylindrical and stacked products like tires, bread trays, dairy crates, and beverage cases. The gantry picks entire stacks rather than individual items, dramatically increasing throughput in applications where stack integrity is important. Cimcorp's global reference base in tire manufacturing (Michelin, Bridgestone, Goodyear) and food & beverage gives it unmatched application depth in these verticals.",
+      url: "https://www.cimcorp.com/solutions/dreamsorter",
+      specs: [{ l: "Robot type", v: "Overhead gantry" }, { l: "Applications", v: "Tire, F&B, general manufacturing" }, { l: "Operation", v: "24/7 unattended" }, { l: "Integration", v: "ERP/WMS via API" }],
+    },
+  ],
+
+  // AMBI ROBOTICS
+  "ambi-robotics": [
+    {
+      id: "ambi-pickone",
+      name: "AmbiSort",
+      tagline: "AI-powered robotic sortation for parcel and e-commerce operations",
+      category: "Robotic Picking",
+      price_range: "$$$",
+      price_notes: "RaaS model. Per-pick or monthly subscription. Contact for volume pricing.",
+      highlights: ["Trained on billions of real pick data points", "Handles polybags, soft goods, and irregular items", "RaaS model — no upfront capital commitment", "Improves pick success rate over time with operational data"],
+      applications: ["Parcel sortation", "E-commerce piece picking", "Returns processing", "Bin-to-belt picking"],
+      variants: ["AmbiSort", "AmbiPick"],
+      description: "Ambi Robotics' AI pick system is trained on one of the largest real-world robotic pick datasets available, giving it strong out-of-box performance on difficult SKU profiles that challenge competitors. The system continuously learns from operational pick data — success rates improve over the first months of deployment as the AI adapts to each customer's specific SKU mix. The RaaS pricing model removes the capital barrier typical of robotic pick investments and aligns vendor incentives with operational performance.",
+      url: "https://www.ambirobotics.com",
+      specs: [{ l: "Pick types", v: "Polybags, irregular, soft goods" }, { l: "Model", v: "AI vision + continuous learning" }, { l: "Pricing", v: "RaaS per pick" }, { l: "Integration", v: "WMS API" }],
+    },
+  ],
+
+  // BRAIN CORP
+  "brain-corp": [
+    {
+      id: "brainos-platform",
+      name: "BrainOS Autonomy Platform",
+      tagline: "Autonomous software platform for commercial floor care robots",
+      category: "Facility Automation",
+      price_range: "$",
+      price_notes: "Software subscription per robot per month. Hardware (robot) purchased separately from OEM partner — Tennant, Nilfisk, etc.",
+      highlights: ["Powers the largest deployed autonomous cleaning robot fleet in North America", "Runs on multiple OEM hardware platforms — not locked to one robot", "BrainOS Analytics tracks cleaning coverage, anomalies, and fleet efficiency", "Deployed in major retail, airport, and DC environments"],
+      applications: ["Autonomous floor scrubbing", "Retail store cleaning", "DC facility maintenance", "Airport terminal cleaning"],
+      variants: ["BrainOS (software)", "BrainOS Analytics", "BrainOS Fleet Manager"],
+      description: "BrainOS is the software layer that makes commercial floor care robots autonomous. Rather than building its own hardware, Brain Corp licenses BrainOS to robot OEMs — Tennant, Nilfisk, and others — who integrate it into their scrubbers and sweepers. The result is autonomous operation on proven commercial hardware rather than purpose-built robotics. The fleet management and analytics platform provides cleaning coverage verification and operational insights that manual cleaning programs cannot generate. Widely deployed in Walmart, Sam's Club, and major airport environments.",
+      url: "https://www.braincorp.com/brainos",
+      specs: [{ l: "Type", v: "Software platform (not hardware)" }, { l: "OEM partners", v: "Tennant, Nilfisk, others" }, { l: "Fleet size", v: "15,000+ robots deployed" }, { l: "Analytics", v: "Coverage verification, anomaly detection" }],
+    },
+  ],
+
+  // PRIME ROBOTICS
+  "prime-robotics": [
+    {
+      id: "prime-pallet-amr",
+      name: "PR Pallet AMR",
+      tagline: "Autonomous pallet AMR for DC inbound, outbound, and floor movement",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot. Competitive pricing vs larger pallet AMR vendors. Contact for fleet pricing.",
+      highlights: ["Purpose-built for pallet handling in DC environments", "Natural navigation — no infrastructure modifications", "Integrates with WMS for task management", "Fast deployment — operational in weeks not months"],
+      applications: ["Inbound pallet receiving", "Outbound pallet staging", "DC floor movement", "Cross-docking"],
+      variants: ["PR Pallet AMR (standard)", "PR Pallet AMR (high capacity)"],
+      description: "Prime Robotics focuses specifically on pallet-level AMR for distribution center environments — inbound receiving, outbound staging, and floor-level pallet movement. The natural navigation approach means no floor tape, QR codes, or infrastructure changes are required. Fast deployment timelines (weeks vs months for larger system vendors) make Prime an option for operations that need to move quickly. The WMS integration handles task assignment, so robots work from the same order and receiving data as human fork operators.",
+      url: "https://www.primerobotics.com",
+      specs: [{ l: "Payload", v: "Up to 1,500 kg" }, { l: "Navigation", v: "Natural SLAM" }, { l: "Integration", v: "WMS API" }, { l: "Deployment", v: "Weeks" }],
+    },
+  ],
+
+  // WAYPOINT ROBOTICS
+  "waypoint-robotics": [
+    {
+      id: "waypoint-vector",
+      name: "Vector AMR",
+      tagline: "Heavy-payload autonomous tugger for manufacturing material transport",
+      category: "AMR / Mobile Robots",
+      price_range: "$$",
+      price_notes: "Per robot. Pricing competitive with OTTO and MiR at similar payload class.",
+      highlights: ["Pulls up to 6,000 kg in tugger configuration", "Designed for demanding manufacturing floor conditions", "Natural navigation — no infrastructure changes", "Built-in safety for mixed human and robot environments"],
+      applications: ["Manufacturing line feeding", "Heavy material transport", "WIP movement", "Raw material delivery"],
+      variants: ["Vector (standard)", "Vector (tugger configuration)"],
+      description: "Waypoint's Vector AMR targets the heavy manufacturing segment where payload requirements exceed what most DC-focused AMRs can handle. In tugger configuration, Vector pulls carts loaded with up to 6,000 kg — covering train pulls, heavy component delivery, and finished goods movement in automotive, aerospace, and heavy industrial environments. The natural navigation approach eliminates the floor modification cost that was historically a barrier for AMR adoption in established manufacturing facilities.",
+      url: "https://www.waypointrobotics.com/vector",
+      specs: [{ l: "Payload (tugger)", v: "Up to 6,000 kg" }, { l: "Navigation", v: "Natural SLAM" }, { l: "Environment", v: "Heavy manufacturing" }, { l: "Safety", v: "ISO 3691-4" }],
+    },
+  ],
+
+  // INVIA ROBOTICS
+  "invia-robotics": [
+    {
+      id: "invia-fulfillment",
+      name: "inVia Fulfillment System",
+      tagline: "Goods-to-person AMR fulfillment on a pure subscription model",
+      category: "AMR / Mobile Robots",
+      price_range: "RaaS",
+      price_notes: "Pure RaaS — no upfront capital. Monthly subscription per robot or per pick. Scales with volume. Contact for pricing.",
+      highlights: ["Zero upfront capital — pure subscription model", "Robots, software, installation, and support all included", "Scales seasonally — add robots during peak, reduce in off-peak", "Proven goods-to-person fulfillment in major 3PL environments"],
+      applications: ["E-commerce goods-to-person", "3PL unit fulfillment", "Seasonal peak scaling", "Returns processing"],
+      variants: ["inVia Picker AMR", "inVia Coordinator software"],
+      description: "inVia Robotics offers goods-to-person AMR fulfillment on a pure subscription model — no robots to buy, no software to license, no installation cost. The monthly subscription includes the robots, fleet management software, installation, maintenance, and support. This model is particularly attractive for 3PL and e-commerce operations that need automation economics without capital commitment, or that have seasonal volume swings that make fixed automation investment hard to justify. Operations can scale robot count up for peak season and back down in the off-peak.",
+      url: "https://www.inviarobotics.com",
+      specs: [{ l: "Model", v: "Pure RaaS subscription" }, { l: "Type", v: "Goods-to-person AMR" }, { l: "Includes", v: "Robots, software, installation, support" }, { l: "Scaling", v: "Add/remove robots by season" }],
+    },
+  ],
+
+  // FOX ROBOTICS
+  "fox-robotics": [
+    {
+      id: "fox-autonomous-forklift",
+      name: "Autonomous Trailer Loading/Unloading",
+      tagline: "Fully autonomous trailer unloading — no human on the dock floor",
+      category: "Dock Automation",
+      price_range: "$$$$",
+      price_notes: "Per door system. High per-door cost — ROI case requires high daily volume per door. Contact for full system pricing.",
+      highlights: ["Fully autonomous — zero humans required on dock floor during unload", "Works with standard 53-foot trailers without modification", "AI vision identifies and handles mixed pallet loads", "Strongest ROI in high-volume food and retail inbound operations"],
+      applications: ["Trailer unloading", "DC inbound automation", "High-volume dock", "Food & retail DC"],
+      variants: ["Fox Autonomous Unloading System"],
+      description: "Fox Robotics has built the most capable autonomous trailer unloading system commercially available, capable of fully unloading a standard 53-foot trailer without any human on the dock floor. The AI vision system handles mixed pallet loads, damaged pallets, and non-standard trailer configurations that trip up simpler automation approaches. The use case is highly specific — high-volume inbound dock doors — but the labor elimination and injury reduction potential in those specific doors is significant. The system does not require trailer modification, which removes a major barrier for adoption across mixed carrier fleets.",
+      url: "https://www.foxrobotics.com",
+      specs: [{ l: "Operation", v: "Fully autonomous (no human on floor)" }, { l: "Trailer type", v: "Standard 53-foot (no modification)" }, { l: "Load types", v: "Mixed pallets, damaged loads" }, { l: "Safety", v: "Full safety system, door-controlled" }],
+    },
+  ],
+
+  // SOFTEON
+  "softeon": [
+    {
+      id: "softeon-wms",
+      name: "Softeon WMS",
+      tagline: "Flexible cloud WMS for 3PL and omnichannel distribution",
+      category: "WMS",
+      price_range: "$$",
+      price_notes: "SaaS subscription. More affordable than tier-1 WMS at comparable functionality for mid-market. Contact for pricing by site and volume.",
+      highlights: ["Strong 3PL multi-client billing and value-added services module", "Cloud-native with modern REST API integration layer", "Faster implementation vs. tier-1 WMS — typically 3–6 months", "Active automation integration roadmap including AMR and AS/RS"],
+      applications: ["3PL multi-client DC", "Omnichannel retail", "Mid-market distribution", "E-commerce fulfillment"],
+      variants: ["Softeon WMS", "Softeon WES", "Softeon LM"],
+      description: "Softeon positions as the flexible, faster-to-implement alternative to Manhattan and Blue Yonder for mid-market 3PL and omnichannel operations. The 3PL module handles multi-client billing, inventory segregation, and client-specific workflows without custom code — a key competitive advantage. Cloud-native architecture and REST API integration make it more approachable for operations without large IT teams. Implementation timelines of 3–6 months compare favorably to the 12–18 months typical of tier-1 implementations.",
+      url: "https://www.softeon.com/wms",
+      specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Implementation", v: "3–6 months typical" }, { l: "Industries", v: "3PL, Omnichannel, E-commerce" }, { l: "Integration", v: "REST API, EDI, AMR, AS/RS" }],
+    },
+  ],
+
+  // DEPOSCO
+  "deposco": [
+    {
+      id: "deposco-bright-suite",
+      name: "Deposco Bright Suite",
+      tagline: "Cloud WMS for omnichannel retail and direct-to-consumer fulfillment",
+      category: "WMS",
+      price_range: "$$",
+      price_notes: "SaaS subscription. Mid-market pricing — more affordable than tier-1 platforms with faster implementation.",
+      highlights: ["Purpose-built for omnichannel — handles store, DTC, BOPIS, marketplace", "Native inventory visibility across all fulfillment channels", "Fast implementation — 60–90 day go-lives common", "Strong integration with Shopify, NetSuite, and Salesforce Commerce"],
+      applications: ["Omnichannel retail fulfillment", "DTC brand DC", "Store replenishment", "Marketplace fulfillment"],
+      variants: ["Deposco WMS", "Deposco OMS", "Deposco Analytics"],
+      description: "Deposco's Bright Suite is built for omnichannel brands and retailers who need to fulfill from DC and store simultaneously across multiple channels — their own website, Amazon, physical stores, and BOPIS. The unified inventory engine ensures every channel sees the same stock position in real time, preventing oversell and enabling ship-from-store when DC inventory runs short. Native integrations with Shopify, NetSuite, and Salesforce Commerce Cloud make it a fast-to-deploy choice for DTC brands scaling their operations.",
+      url: "https://www.deposco.com/wms",
+      specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Go-live", v: "60–90 days typical" }, { l: "Channels", v: "DTC, store, marketplace, BOPIS" }, { l: "Integration", v: "Shopify, NetSuite, Salesforce" }],
+    },
+  ],
+
+  // LONGBOW ADVANTAGE
+  "longbow-advantage": [
+    {
+      id: "longbow-rebus",
+      name: "Rebus Analytics Platform",
+      tagline: "Real-time operations analytics and labor management for SAP EWM users",
+      category: "Labor Management",
+      price_range: "$$",
+      price_notes: "Annual SaaS license on top of existing SAP investment. Priced by site and user count. Contact for enterprise pricing.",
+      highlights: ["Purpose-built for SAP EWM — no middleware or translation layer", "Real-time operational dashboards SAP alone cannot provide", "Labor standards and productivity benchmarking integrated", "Typically deployed in 8–12 weeks vs. months for custom SAP development"],
+      applications: ["SAP EWM analytics", "Labor management", "Productivity benchmarking", "DC operations visibility"],
+      variants: ["Rebus Analytics", "Rebus Labor", "Rebus Real-Time"],
+      description: "Longbow's Rebus platform fills the operational visibility gap that SAP EWM users consistently report — SAP has excellent transaction depth but poor real-time operational analytics. Rebus connects natively to SAP EWM data without middleware, providing real-time dashboards, labor productivity metrics, and performance benchmarking that would require months of custom SAP development to replicate. For operations on SAP EWM that need faster labor management without replacing their WMS, Rebus is typically the most practical path.",
+      url: "https://www.longbowadvantage.com/rebus",
+      specs: [{ l: "Integration", v: "Native SAP EWM (no middleware)" }, { l: "Deployment", v: "8–12 weeks" }, { l: "Type", v: "Analytics + LMS overlay" }, { l: "Pricing", v: "SaaS on top of SAP" }],
+    },
+  ],
+
+  // RIGHTHAND ROBOTICS
+  "righthand-robotics": [
+    {
+      id: "rhr-rightpick",
+      name: "RightPick System",
+      tagline: "AI-powered robotic piece picking for e-commerce and 3PL fulfillment",
+      category: "Robotic Picking",
+      price_range: "$$$",
+      price_notes: "Per cell or RaaS subscription. Pricing scales with throughput commitments. Contact for multi-cell fleet pricing.",
+      highlights: ["Handles soft goods, polybags, and irregular items at scale", "AI trained on billions of real picks across customer deployments", "Integrates with goods-to-person AMR systems for end-to-end automation", "Proven throughput: 600–1,000 items/hr per cell"],
+      applications: ["E-commerce piece picking", "3PL unit fulfillment", "Returns processing", "Polybag handling"],
+      variants: ["RightPick 3", "RightPick at Workstation", "RightPick Integrated (with GTP)"],
+      description: "RightHand Robotics' RightPick system specializes in the piece-picking challenge that trips up most robotic solutions — soft goods, polybags, and irregular e-commerce items that lack rigid geometry for standard gripper approaches. The system uses a combination of suction and pinch grasping with AI vision to handle the full range of e-commerce SKU profiles. Integration with goods-to-person AMR systems from multiple vendors enables end-to-end automation from storage to pack — the AMR presents the bin, RightPick picks the item, and the human packer receives a pre-picked order.",
+      url: "https://www.righthandrobotics.com/rightpick",
+      specs: [{ l: "Throughput", v: "600–1,000 items/hr" }, { l: "Gripper", v: "Suction + pinch (hybrid)" }, { l: "SKUs", v: "Polybags, soft goods, irregular" }, { l: "Integration", v: "Multi-vendor GTP compatible" }],
+    },
+  ],
+
+  // SOFT ROBOTICS
+  "soft-robotics": [
+    {
+      id: "soft-robotics-mgrip",
+      name: "mGrip Modular Gripper",
+      tagline: "Soft gripper technology for delicate food and irregular product handling",
+      category: "End-of-Arm Tooling",
+      price_range: "$$$",
+      price_notes: "Per gripper module plus integration. Requires robot arm (from separate vendor). Priced per application configuration.",
+      highlights: ["Handles produce, proteins, baked goods, and fragile items without damage", "Modular design — configure finger count and pattern for each application", "Compatible with major robot arm OEMs (FANUC, UR, ABB, KUKA)", "Pneumatic actuation — simple, reliable, field-repairable"],
+      applications: ["Fresh produce handling", "Poultry and protein picking", "Bakery product handling", "Fragile packaged goods"],
+      variants: ["mGrip M (medium)", "mGrip L (large)", "mGrip XL", "Custom configurations"],
+      description: "Soft Robotics' mGrip uses compliant soft actuators that conform to the shape of whatever they're gripping — enabling handling of products that would be damaged or dropped by hard gripper alternatives. For food processing and grocery automation, where product damage rates directly hit margins and hard grippers have historically been unreliable, mGrip opens applications that were previously impossible to automate. The modular design means the same robot can be reconfigured for different product types by changing finger configurations.",
+      url: "https://www.softroboticsinc.com/mgrip",
+      specs: [{ l: "Type", v: "Compliant soft actuator" }, { l: "Actuation", v: "Pneumatic" }, { l: "Compatibility", v: "FANUC, UR, ABB, KUKA" }, { l: "Applications", v: "Food, produce, fragile goods" }],
+    },
+  ],
+
+  // TENNANT COMPANY
+  "tennant-company": [
+    {
+      id: "tennant-t16amr",
+      name: "T16AMR Autonomous Scrubber",
+      tagline: "Industrial autonomous floor scrubber for large DC and manufacturing facilities",
+      category: "Facility Automation",
+      price_range: "$$",
+      price_notes: "Per machine purchase or subscription. Premium vs. standard Tennant scrubbers. Contact for fleet pricing.",
+      highlights: ["Largest autonomous scrubber in Tennant lineup — covers very large floor areas", "Tennant IRIS technology for autonomous navigation and mapping", "Proven Tennant hardware reliability with autonomous software layer", "Service network across North America for hardware support"],
+      applications: ["Large DC floor maintenance", "Manufacturing facility cleaning", "Airport hangar cleaning", "Big-box retail cleaning"],
+      variants: ["T16AMR", "T7AMR", "T380AMR"],
+      description: "Tennant's T16AMR brings autonomous navigation to Tennant's industrial scrubber hardware — one of the most trusted brands in commercial cleaning. Unlike pure-play cleaning robot startups, the T16AMR is built on Tennant's proven machine platform with an established North American service network. The IRIS autonomy system maps facility layouts, plans cleaning routes, and navigates autonomously around obstacles and people. The T16 covers very large floor areas in a single charge — well-suited to the large footprints of modern DCs and manufacturing facilities.",
+      url: "https://www.tennantco.com/en-us/machines/scrubbers/t16amr",
+      specs: [{ l: "Cleaning width", v: "32 inches" }, { l: "Coverage rate", v: "Up to 55,000 sqft/hr" }, { l: "Navigation", v: "IRIS autonomous (Tennant)" }, { l: "Battery", v: "Lithium-ion, multi-shift" }],
+    },
+  ],
+
+  // DMW&H
+  "dmwh": [
+    {
+      id: "dmwh-integration",
+      name: "DC Automation Systems Integration",
+      tagline: "Vendor-agnostic systems integration for warehouse and DC automation",
+      category: "Systems Integration",
+      price_range: "$$$",
+      price_notes: "Project-based. Full-scope integration projects typically $2M–$20M+ depending on automation scope and complexity.",
+      highlights: ["Vendor-agnostic — selects best-fit equipment for each project", "In-house controls and WCS engineering reduces third-party risk", "Deep brownfield experience in active DC environments", "Long track record with major retail and food distribution customers"],
+      applications: ["DC conveyor and sortation integration", "AMR deployment", "AS/RS integration", "WCS/WES implementation"],
+      variants: ["Conveyor & sortation integration", "Robotics integration", "WCS/WES implementation", "Consulting"],
+      description: "DMW&H is a vendor-agnostic DC automation systems integrator with particular strength in brownfield retrofits — projects where the DC must remain operational during construction. The in-house controls team designs and builds the WCS layer that ties automation equipment together, rather than relying on a third-party controls vendor. This reduces the finger-pointing that can occur between equipment and controls suppliers when integration issues arise. Long customer relationships with major retailers and food distributors reflect consistent project delivery performance.",
+      url: "https://www.dmwh.com",
+      specs: [{ l: "Type", v: "Systems Integrator (vendor-agnostic)" }, { l: "Controls", v: "In-house WCS engineering" }, { l: "Strength", v: "Brownfield active-DC retrofits" }, { l: "Industries", v: "Retail, Food & Beverage, 3PL" }],
+    },
+  ],
+
+  // NUMINA GROUP
+  "numina-group": [
+    {
+      id: "numina-rds",
+      name: "RDS Warehouse Control System",
+      tagline: "WCS/WES platform for conveyor, sortation, and robotics orchestration",
+      category: "WCS / WES",
+      price_range: "$$$",
+      price_notes: "Software license plus implementation. Mid-market pricing — significantly below tier-1 SI WCS platforms.",
+      highlights: ["Deep automation integration across conveyor, sortation, AMR, and AS/RS", "Can layer on top of existing WMS without full replacement", "In-house implementation team with 30+ years of DC experience", "Strong in food, beverage, and retail DC environments"],
+      applications: ["WCS/WES for DC automation", "Conveyor and sortation control", "AMR orchestration", "Pick and pack automation"],
+      variants: ["RDS WCS", "RDS WES", "RDS Labor Management"],
+      description: "Numina Group's RDS WCS/WES platform sits between the WMS and automation equipment — coordinating conveyors, sorters, AMRs, and pick systems in real time based on orders and inventory from the WMS above. This layer is what many WMS platforms lack: the ability to actually orchestrate automation equipment at the speed and granularity the equipment requires. Numina's 30+ years of DC operations experience means the platform reflects real operational patterns rather than theoretical engineering assumptions.",
+      url: "https://www.numinagroup.com/rds-wcs",
+      specs: [{ l: "Type", v: "WCS/WES (not a WMS replacement)" }, { l: "Integration", v: "Any WMS via API" }, { l: "Equipment", v: "Conveyor, sortation, AMR, AS/RS, voice" }, { l: "Industries", v: "Retail, F&B, 3PL" }],
+    },
+  ],
+
+  // CONVEYCO
+  "conveyco": [
+    {
+      id: "conveyco-integration",
+      name: "Distribution Center Integration Services",
+      tagline: "Full-scope DC automation design, integration, and controls for mid-market operations",
+      category: "Systems Integration",
+      price_range: "$$$",
+      price_notes: "Project-based. Mid-market SI scope typically $1M–$15M. More agile than tier-1 SIs for projects in this range.",
+      highlights: ["Vendor-agnostic equipment selection across all major brands", "Strong mid-market project execution without tier-1 overhead", "In-house engineering for conveyor, controls, and robotics", "Good track record in brownfield retrofits and phased implementations"],
+      applications: ["DC conveyor and sortation integration", "AMR deployment", "Pick system integration", "WCS implementation"],
+      variants: ["Conveyor integration", "Robotics integration", "WCS/WES", "DC design consulting"],
+      description: "Conveyco fills the gap between small local integrators and the large tier-1 firms — delivering full-scope DC automation integration at project sizes and speeds that Dematic, Vanderlande, and Honeywell typically don't compete for. As a vendor-agnostic integrator, Conveyco selects equipment based on fit rather than vendor relationships. The mid-market positioning means responsive project teams without the bureaucracy of larger firms, which matters on brownfield projects where flexibility and quick decision-making are essential.",
+      url: "https://www.conveyco.com",
+      specs: [{ l: "Type", v: "Systems Integrator (vendor-agnostic)" }, { l: "Project range", v: "$1M–$15M typical" }, { l: "Controls", v: "In-house engineering" }, { l: "Industries", v: "Retail, E-commerce, 3PL, F&B" }],
+    },
+  ],
+
+  // SIEMENS DIGITAL INDUSTRIES
+  "siemens-digital": [
+    {
+      id: "siemens-simatic",
+      name: "SIMATIC PLC Platform",
+      tagline: "Industrial PLC and automation controllers for DC and manufacturing",
+      category: "Controls & Sensing",
+      price_range: "$$",
+      price_notes: "Per controller plus I/O modules. SIMATIC S7-1500 series $2,000–$15,000+ per controller depending on configuration. TIA Portal engineering software additional.",
+      highlights: ["Global standard in industrial automation controls", "TIA Portal unified engineering environment reduces programming time", "Profinet and Profibus for DC conveyor and sortation integration", "Deep library of pre-built function blocks for material handling"],
+      applications: ["Conveyor and sortation controls", "AS/RS controls", "DC automation integration", "Manufacturing automation"],
+      variants: ["SIMATIC S7-1500", "SIMATIC S7-1200", "SIMATIC ET 200SP", "TIA Portal"],
+      description: "Siemens SIMATIC is the global alternative to Rockwell Automation's ControlLogix for industrial PLC applications. The S7-1500 series covers the full range from machine-level to system-level control in DC and manufacturing environments. TIA Portal provides a unified programming and configuration environment across all SIMATIC hardware, reducing engineering time and training overhead. In conveyor and sortation applications, Profinet provides the deterministic communication backbone required for high-speed sorting control. Common in European-manufactured automation equipment and increasingly specified by North American SIs.",
+      url: "https://new.siemens.com/us/en/products/automation/systems/industrial/plc.html",
+      specs: [{ l: "Series", v: "S7-1500, S7-1200" }, { l: "Comms", v: "Profinet, Profibus, OPC-UA" }, { l: "Software", v: "TIA Portal" }, { l: "Safety", v: "Integrated safety (F-CPU)" }],
+    },
+  ],
+
 };
 

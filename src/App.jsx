@@ -568,7 +568,17 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
       onClick={onClick}
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-        <div style={{ ...S.logoCircle, background: vendor.color, marginBottom: 0 }}>{vendor.logo}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+          <div style={{ ...S.logoCircle, background: vendor.color, marginBottom: 0 }}>{vendor.logo}</div>
+          {vendor.vendor_type && (
+            <span style={{
+              fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, letterSpacing: "0.04em",
+              background: vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.1)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.1)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.1)" : "rgba(56,189,248,0.1)",
+              color: vendor.vendor_type === "Manufacturer" ? "#22c55e" : vendor.vendor_type === "Software" ? "#818cf8" : vendor.vendor_type === "Systems Integrator" ? "#f59e0b" : "#38bdf8",
+              border: `1px solid ${vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.2)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.2)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.2)" : "rgba(56,189,248,0.2)"}`,
+            }}>{vendor.vendor_type}</span>
+          )}
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
           {vendor.featured && <span style={{ fontSize: 10, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em" }}>FEATURED</span>}
           <ProfileScoreBadge vendor={vendor} />
@@ -795,6 +805,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
   const [search, setSearch] = useState(initialSearch || "");
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [view, setView] = useState("grid");
 
   // Consume initialSearch once on mount
@@ -805,13 +816,26 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
     }
   }, []);
 
-  const filtered = useMemo(() => vendors.filter(v => {
+  // Build a searchable text blob per vendor including product names and descriptions
+  const vendorSearchIndex = useMemo(() => {
+    return vendors.map(v => {
+      const vendorProds = allProducts[v.slug] || [];
+      const prodText = vendorProds.map(p => `${p.name} ${p.tagline} ${p.category} ${(p.applications||[]).join(" ")} ${p.description || ""}`).join(" ");
+      return {
+        vendor: v,
+        searchText: [v.name, v.tagline, v.desc, v.category, v.best_for || "", ...(v.tags || []), ...(v.industry || []), prodText].join(" ").toLowerCase(),
+      };
+    });
+  }, []);
+
+  const filtered = useMemo(() => vendorSearchIndex.filter(({ vendor: v, searchText }) => {
     const q = search.toLowerCase();
-    const matchQ = !q || v.name.toLowerCase().includes(q) || v.tagline.toLowerCase().includes(q) || v.tags.some(t => t.toLowerCase().includes(q));
+    const matchQ = !q || searchText.includes(q);
     const matchCat = !catFilter || v.category === catFilter || v.tags.some(t => t.toLowerCase().includes(catFilter.toLowerCase()));
     const matchInd = !indFilter || v.industry.includes(indFilter);
-    return matchQ && matchCat && matchInd;
-  }), [search, catFilter, indFilter]);
+    const matchType = !typeFilter || v.vendor_type === typeFilter;
+    return matchQ && matchCat && matchInd && matchType;
+  }).map(x => x.vendor), [search, catFilter, indFilter, typeFilter, vendorSearchIndex]);
 
   const toggleSelect = (id, checked) => {
     if (checked) setSelected(s => [...s, id]);
@@ -835,6 +859,14 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
             <option value="">All categories</option>
             {categories.map(c => <option key={c}>{c}</option>)}
           </select>
+          <select style={{ ...S.rfiInput, marginBottom: 0, width: "auto", padding: "11px 14px" }} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+            <option value="">All types</option>
+            <option value="Manufacturer">Manufacturer</option>
+            <option value="Systems Integrator">Systems Integrator</option>
+            <option value="Manufacturer + SI">Manufacturer + SI</option>
+            <option value="Software">Software</option>
+            <option value="Component Supplier">Component Supplier</option>
+          </select>
           <select style={{ ...S.rfiInput, marginBottom: 0, width: "auto", padding: "11px 14px" }} value={indFilter} onChange={e => setIndFilter(e.target.value)}>
             <option value="">All industries</option>
             {industries.map(i => <option key={i}>{i}</option>)}
@@ -843,6 +875,11 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
         <div style={S.chips}>
           {["", ...categories.slice(0, 6)].map((c, i) => (
             <div key={i} style={{ ...S.chip, ...(catFilter === c ? S.chipActive : {}) }} onClick={() => setCatFilter(c)}>{c || "All"}</div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "8px 0 0" }}>
+          {[["", "All types"], ["Manufacturer", "🏭 Manufacturer"], ["Systems Integrator", "🔧 Systems Integrator"], ["Manufacturer + SI", "🏭🔧 Mfr + SI"], ["Software", "💻 Software"]].map(([val, label]) => (
+            <div key={val} style={{ ...S.chip, ...(typeFilter === val ? S.chipActive : {}), fontSize: 11, padding: "4px 10px" }} onClick={() => setTypeFilter(val)}>{label}</div>
           ))}
         </div>
         <div style={{ height: 16 }} />
@@ -873,7 +910,11 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
         )}
 
         <div style={S.contentHeader}>
-          <span style={S.resultCount}>Showing <strong style={{ color: "#94a3b8" }}>{filtered.length}</strong> vendor{filtered.length !== 1 ? "s" : ""}</span>
+          <span style={S.resultCount}>
+            Showing <strong style={{ color: "#94a3b8" }}>{filtered.length}</strong> vendor{filtered.length !== 1 ? "s" : ""}
+            {(catFilter || typeFilter || indFilter) && <span style={{ color: "#475569" }}> · {[catFilter, typeFilter, indFilter].filter(Boolean).join(", ")}</span>}
+            {(catFilter || typeFilter || indFilter) && <span style={{ color: "#f59e0b", cursor: "pointer", marginLeft: 8, fontSize: 11 }} onClick={() => { setCatFilter(""); setTypeFilter(""); setIndFilter(""); }}>Clear filters</span>}
+          </span>
           <div style={{ display: "flex", gap: 6 }}>
             {[["grid", <GridIcon />], ["list", <ListIcon />]].map(([v, icon]) => (
               <button key={v} style={{ padding: "6px 10px", background: view === v ? "#1a2a45" : "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: view === v ? "#e8edf5" : "#475569" }} onClick={() => setView(v)}>{icon}</button>
@@ -1204,7 +1245,17 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
               <div>
                 <div style={S.detailName}>{vendor.name}</div>
                 <div style={S.detailSub}>{vendor.category} · {vendor.hq} · Founded {vendor.founded}</div>
-                <div style={S.tags}>{vendor.tags.map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
+                  {vendor.vendor_type && (
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6,
+                      background: vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.1)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.1)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.1)" : "rgba(56,189,248,0.1)",
+                      color: vendor.vendor_type === "Manufacturer" ? "#22c55e" : vendor.vendor_type === "Software" ? "#818cf8" : vendor.vendor_type === "Systems Integrator" ? "#f59e0b" : "#38bdf8",
+                      border: `1px solid ${vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.2)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.2)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.2)" : "rgba(56,189,248,0.2)"}`,
+                    }}>{vendor.vendor_type}</span>
+                  )}
+                  {vendor.tags.map(t => <span key={t} style={S.tag}>{t}</span>)}
+                </div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
                   <PriceBadge tier={vendor.price_range} large={true} />
                   <span style={{ ...S.tag, color: "#94a3b8" }}>Commercial model: {inferCommercialModel(vendor)}</span>
@@ -1380,14 +1431,19 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                 <div style={S.sideCardTitle}>Similar vendors</div>
                 {similarVendors.map(v => (
                   <div key={v.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 10 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                       <div style={{ ...S.logoCircle, background: v.color, width: 26, height: 26, fontSize: 10, marginBottom: 0 }}>{v.logo}</div>
-                      <div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, color: '#e8edf5', fontWeight: 600 }}>{v.name}</div>
-                        <div style={{ fontSize: 11, color: '#64748b' }}>{v.category}</div>
+                        <div style={{ fontSize: 11, color: '#475569' }}>{v.category}</div>
                       </div>
                     </div>
-                    <button style={{ ...S.btnSecondary, marginTop: 10, fontSize: 11, padding: '6px 10px' }} onClick={(e) => { e.stopPropagation(); openDetail(v, 'detail', vendor.name); }}>View profile</button>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                      {v.vendor_type && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "rgba(99,102,241,0.1)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.2)" }}>{v.vendor_type}</span>}
+                      {v.price_range && <PriceBadge tier={v.price_range} />}
+                    </div>
+                    {v.best_for && <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5, marginBottom: 8 }}>{v.best_for.slice(0, 80)}...</div>}
+                    <button style={{ ...S.btnSecondary, fontSize: 11, padding: '6px 10px' }} onClick={(e) => { e.stopPropagation(); openDetail(v, 'detail', vendor.name); }}>View profile →</button>
                   </div>
                 ))}
               </div>

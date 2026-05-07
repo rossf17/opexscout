@@ -30,6 +30,7 @@ export const industries = [
 export const vendors = [
   {
     id: 1, name: "Geek+", slug: "geekplus",
+    vendor_type: "Manufacturer",
     tagline: "AI-powered AMR solutions for goods-to-person and sorting",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "3PL"],
     tags: ["AMR", "Goods-to-person", "Sorting", "E-commerce"],
@@ -50,6 +51,7 @@ export const vendors = [
   },
   {
     id: 2, name: "Slip Robotics", slug: "slip-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Autonomous truck loading and unloading for dock automation",
     category: "Dock Automation", industry: ["Warehouse & DC", "Food & Beverage", "3PL"],
     tags: ["Dock", "Truck loading", "Unloading", "Trailer"],
@@ -70,6 +72,7 @@ export const vendors = [
   },
   {
     id: 3, name: "FANUC", slug: "fanuc",
+    vendor_type: "Manufacturer",
     tagline: "Industrial robots for palletizing, depalletizing, and material handling",
     category: "Industrial Robotics", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
     tags: ["Depalletizing", "Palletizing", "Industrial robot", "CNC"],
@@ -90,6 +93,7 @@ export const vendors = [
   },
   {
     id: 4, name: "Locus Robotics", slug: "locus-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Collaborative AMRs for unit-pick fulfillment operations",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["AMR", "Unit pick", "Collaborative", "E-commerce"],
@@ -110,6 +114,7 @@ export const vendors = [
   },
   {
     id: 5, name: "Honeywell Intelligrated", slug: "honeywell-intelligrated",
+    vendor_type: "Manufacturer + SI",
     tagline: "Integrated conveyor, sortation, and material handling systems",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["Conveyor", "Sortation", "Integration", "WCS"],
@@ -130,6 +135,7 @@ export const vendors = [
   },
   {
     id: 6, name: "Boston Dynamics", slug: "boston-dynamics",
+    vendor_type: "Manufacturer",
     tagline: "Stretch — the mobile case-handling robot for truck unloading",
     category: "Depalletizing & Palletizing", industry: ["Warehouse & DC", "3PL", "E-commerce & Fulfillment"],
     tags: ["Depalletizing", "Case handling", "Mobile robot", "Autonomous"],
@@ -150,6 +156,7 @@ export const vendors = [
   },
   {
     id: 7, name: "Blue Yonder", slug: "blue-yonder",
+    vendor_type: "Software",
     tagline: "AI-driven WMS and labor management for distribution",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Retail", "3PL", "Food & Beverage"],
     tags: ["WMS", "Labor management", "AI", "Cloud"],
@@ -170,6 +177,7 @@ export const vendors = [
   },
   {
     id: 8, name: "Dematic", slug: "dematic",
+    vendor_type: "Manufacturer + SI",
     tagline: "End-to-end intralogistics automation, AS/RS, and software",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "Pharma & Healthcare"],
     tags: ["AS/RS", "Conveyor", "Micro-fulfillment", "Goods-to-person"],
@@ -190,6 +198,7 @@ export const vendors = [
   },
   {
     id: 9, name: "Manhattan Associates", slug: "manhattan-associates",
+    vendor_type: "Software",
     tagline: "Supply chain WMS platform for omnichannel distribution",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Retail", "E-commerce & Fulfillment", "3PL"],
     tags: ["WMS", "Omnichannel", "Supply chain", "SaaS"],
@@ -210,6 +219,7 @@ export const vendors = [
   },
   {
     id: 10, name: "Zebra Technologies", slug: "zebra-technologies",
+    vendor_type: "Manufacturer",
     tagline: "Barcode, RFID, and vision-based sensing for warehouse operations",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "3PL"],
     tags: ["Barcode", "RFID", "Vision", "Scanning", "Mobile computing"],
@@ -230,6 +240,7 @@ export const vendors = [
   },
   {
     id: 11, name: "Rockwell Automation", slug: "rockwell-automation",
+    vendor_type: "Manufacturer",
     tagline: "Industrial automation, controls, and information software",
     category: "Manufacturing Automation", industry: ["Manufacturing", "Food & Beverage", "Automotive", "Pharma & Healthcare"],
     tags: ["PLC", "SCADA", "Controls", "MES", "Industrial IoT"],
@@ -250,6 +261,7 @@ export const vendors = [
   },
   {
     id: 12, name: "Siemens Digital Industries", slug: "siemens-digital",
+    vendor_type: "Software",
     tagline: "Automation, drives, and digitalization for manufacturing",
     category: "Manufacturing Automation", industry: ["Manufacturing", "Automotive", "Pharma & Healthcare", "Food & Beverage"],
     tags: ["PLC", "Drives", "SCADA", "Digital twin", "MES"],
@@ -270,6 +282,7 @@ export const vendors = [
   },
   {
     id: 13, name: "6 River Systems", slug: "6-river-systems",
+    vendor_type: "Manufacturer",
     tagline: "Chuck — the collaborative mobile robot for fulfillment picking",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["AMR", "Collaborative", "Fulfillment", "Picking"],
@@ -290,6 +303,7 @@ export const vendors = [
   },
   {
     id: 14, name: "Universal Robots", slug: "universal-robots",
+    vendor_type: "Manufacturer",
     tagline: "Collaborative robots (cobots) for flexible manufacturing tasks",
     category: "Industrial Robotics", industry: ["Manufacturing", "Food & Beverage", "Automotive", "Pharma & Healthcare"],
     tags: ["Cobot", "Collaborative robot", "Flexible", "Assembly"],
@@ -310,6 +324,7 @@ export const vendors = [
   },
   {
     id: 15, name: "Swisslog", slug: "swisslog",
+    vendor_type: "Manufacturer + SI",
     tagline: "Automated storage, goods-to-person, and pharmacy automation",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "Pharma & Healthcare", "E-commerce & Fulfillment", "Cold Storage"],
     tags: ["AS/RS", "Goods-to-person", "Pharmacy", "AutoStore"],
@@ -330,6 +345,7 @@ export const vendors = [
   },
   {
     id: 16, name: "AutoStore", slug: "autostore",
+    vendor_type: "Manufacturer",
     tagline: "Cube storage AS/RS with robotic bin retrieval — maximum density",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "Pharma & Healthcare", "Grocery"],
     tags: ["AS/RS", "Cube storage", "High density", "Goods-to-person"],
@@ -350,6 +366,7 @@ export const vendors = [
   },
   {
     id: 17, name: "Daifuku", slug: "daifuku",
+    vendor_type: "Manufacturer + SI",
     tagline: "Material handling systems, conveyors, and AS/RS for global DCs",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "Automotive", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["Conveyor", "AS/RS", "Sortation", "Airport", "Automotive"],
@@ -370,6 +387,7 @@ export const vendors = [
   },
   {
     id: 18, name: "Seegrid", slug: "seegrid",
+    vendor_type: "Manufacturer",
     tagline: "Vision-guided AMRs for autonomous pallet transport in manufacturing",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Automotive", "Food & Beverage"],
     tags: ["AGV", "Vision-guided", "Pallet transport", "Autonomous"],
@@ -390,6 +408,7 @@ export const vendors = [
   },
   {
     id: 19, name: "Mobile Industrial Robots (MiR)", slug: "mir-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Collaborative AMRs for internal logistics and material transport",
     category: "AMR / Mobile Robots", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "3PL"],
     tags: ["AMR", "Collaborative", "Internal logistics", "Flexible"],
@@ -410,6 +429,7 @@ export const vendors = [
   },
   {
     id: 20, name: "Berkshire Grey", slug: "berkshire-grey",
+    vendor_type: "Manufacturer",
     tagline: "AI-powered robotic picking and sortation for e-commerce",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "Retail", "3PL"],
     tags: ["AI picking", "Robotic sorting", "E-commerce", "Returns"],
@@ -430,6 +450,7 @@ export const vendors = [
   },
   {
     id: 21, name: "KNAPP", slug: "knapp",
+    vendor_type: "Manufacturer + SI",
     tagline: "Intelligent warehouse solutions — AS/RS, GTP, and pharmacy automation",
     category: "AS/RS & Storage", industry: ["Pharma & Healthcare", "Retail", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["AS/RS", "Goods-to-person", "Pharmacy", "Shuttle"],
@@ -450,6 +471,7 @@ export const vendors = [
   },
   {
     id: 22, name: "Bastian Solutions", slug: "bastian-solutions",
+    vendor_type: "Systems Integrator",
     tagline: "Systems integrator for conveyor, robotics, and automation projects",
     category: "Systems Integration", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["Integrator", "Conveyor", "Robotics", "Turnkey"],
@@ -470,6 +492,7 @@ export const vendors = [
   },
   {
     id: 23, name: "Fortna", slug: "fortna",
+    vendor_type: "Systems Integrator",
     tagline: "Distribution and fulfillment systems integrator and consultant",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
     tags: ["Integrator", "Consulting", "Fulfillment", "Design"],
@@ -490,6 +513,7 @@ export const vendors = [
   },
   {
     id: 24, name: "GreyOrange", slug: "greyorange",
+    vendor_type: "Manufacturer",
     tagline: "Ranger AMRs and Fulfilment AI for adaptive warehouse automation",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Warehouse & DC"],
     tags: ["AMR", "AI", "Fulfilment", "Adaptive"],
@@ -510,6 +534,7 @@ export const vendors = [
   },
   {
     id: 25, name: "Kardex Remstar", slug: "kardex-remstar",
+    vendor_type: "Manufacturer",
     tagline: "Vertical lift modules and carousels for high-density parts storage",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "Retail"],
     tags: ["VLM", "Vertical lift", "Carousel", "Parts storage"],
@@ -530,6 +555,7 @@ export const vendors = [
   },
   {
     id: 26, name: "Hytrol", slug: "hytrol",
+    vendor_type: "Manufacturer",
     tagline: "Conveyor systems and integration for distribution and manufacturing",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["Conveyor", "Sortation", "Integration", "Accumulation"],
@@ -550,6 +576,7 @@ export const vendors = [
   },
   {
     id: 27, name: "Interroll", slug: "interroll",
+    vendor_type: "Manufacturer",
     tagline: "Conveyor platforms, sorters, and drives for global material handling",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Food & Beverage", "Manufacturing"],
     tags: ["Conveyor", "Sorter", "Drum motor", "Modular"],
@@ -570,6 +597,7 @@ export const vendors = [
   },
   {
     id: 28, name: "FlexSim Software", slug: "flexsim",
+    vendor_type: "Software",
     tagline: "3D simulation software for warehouse and manufacturing planning",
     category: "Simulation & Digital Twin", industry: ["Warehouse & DC", "Manufacturing", "3PL", "E-commerce & Fulfillment"],
     tags: ["Simulation", "Digital twin", "3D modeling", "Planning"],
@@ -590,6 +618,7 @@ export const vendors = [
   },
   {
     id: 29, name: "Cognex", slug: "cognex",
+    vendor_type: "Manufacturer",
     tagline: "Machine vision systems and barcode readers for industrial automation",
     category: "Vision & AI",industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Pharma & Healthcare"],
     tags: ["Machine vision", "Barcode", "AI inspection", "Quality"],
@@ -610,6 +639,7 @@ export const vendors = [
   },
   {
     id: 30, name: "Vecna Robotics", slug: "vecna-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Autonomous pallet handling AMRs for warehouse and manufacturing",
     category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage", "3PL"],
     tags: ["AMR", "AGV", "Pallet handling", "Autonomous"],
@@ -629,6 +659,7 @@ export const vendors = [
   },
   {
     id: 31, name: "Plus One Robotics", slug: "plus-one-robotics",
+    vendor_type: "Manufacturer",
     tagline: "AI-powered robotic piece picking and parcel handling",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["AI picking", "Parcel", "Piece pick", "Vision"],
@@ -648,6 +679,7 @@ export const vendors = [
   },
   {
     id: 32, name: "OTTO Motors", slug: "otto-motors",
+    vendor_type: "Manufacturer",
     tagline: "Heavy-payload AMRs for manufacturing material transport",
     category: "AGV Systems", industry: ["Manufacturing", "Automotive", "Warehouse & DC", "Food & Beverage"],
     tags: ["AMR", "Heavy payload", "Manufacturing", "Autonomous"],
@@ -667,6 +699,7 @@ export const vendors = [
   },
   {
     id: 33, name: "Körber Supply Chain", slug: "korber",
+    vendor_type: "Software",
     tagline: "WMS, WCS, and automation software for complex DC environments",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Pharma & Healthcare", "3PL", "Cold Storage"],
     tags: ["WMS", "WCS", "Pharma", "Cold chain"],
@@ -687,6 +720,7 @@ export const vendors = [
   },
   {
     id: 34, name: "Infor WMS", slug: "infor-wms",
+    vendor_type: "Software",
     tagline: "Cloud WMS for distribution, 3PL, and manufacturing",
     category: "WMS Platforms", industry: ["Warehouse & DC", "3PL", "Manufacturing", "Retail"],
     tags: ["WMS", "Cloud", "3PL", "ERP integrated"],
@@ -707,6 +741,7 @@ export const vendors = [
   },
   {
     id: 35, name: "Jungheinrich", slug: "jungheinrich",
+    vendor_type: "Manufacturer",
     tagline: "Forklifts, AGVs, and warehouse equipment from a global leader",
     category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage", "Cold Storage"],
     tags: ["AGV", "Forklift", "Electric", "Warehouse equipment"],
@@ -727,6 +762,7 @@ export const vendors = [
   },
   {
     id: 36, name: "Agility Robotics", slug: "agility-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Digit — the humanoid robot for warehouse material handling",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment"],
     tags: ["Humanoid", "AMR", "Bipedal", "Emerging tech"],
@@ -747,6 +783,7 @@ export const vendors = [
   },
   {
     id: 37, name: "Covariant", slug: "covariant",
+    vendor_type: "Manufacturer",
     tagline: "AI robotics platform for piece picking and depalletizing",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail", "Warehouse & DC"],
     tags: ["AI", "Piece picking", "Depalletizing", "Vision"],
@@ -767,6 +804,7 @@ export const vendors = [
   },
   {
     id: 38, name: "Exotec", slug: "exotec",
+    vendor_type: "Manufacturer",
     tagline: "Skypod — 3D goods-to-person AS/RS with climbing robots",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Food & Beverage"],
     tags: ["AS/RS", "Goods-to-person", "3D robot", "High density"],
@@ -787,6 +825,7 @@ export const vendors = [
   },
   {
     id: 39, name: "Fetch Robotics", slug: "fetch-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Cloud-driven AMRs for warehouse and manufacturing logistics",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment"],
     tags: ["AMR", "Cloud", "Flexible", "Material transport"],
@@ -806,6 +845,7 @@ export const vendors = [
   },
   {
     id: 40, name: "HAI Robotics", slug: "hai-robotics",
+    vendor_type: "Manufacturer",
     tagline: "HAIPICK autonomous case-handling robots for high-density storage",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Cold Storage"],
     tags: ["AS/RS", "Case handling", "High density", "Goods-to-person"],
@@ -825,6 +865,7 @@ export const vendors = [
   },
   {
     id: 41, name: "Schaefer Systems International", slug: "schaefer-systems",
+    vendor_type: "Manufacturer + SI",
     tagline: "Warehouse systems, AS/RS, and logistics software",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "Food & Beverage"],
     tags: ["AS/RS", "Shuttle", "Conveyor", "Logistics software"],
@@ -844,6 +885,7 @@ export const vendors = [
   },
   {
     id: 42, name: "TGW Systems", slug: "tgw-systems",
+    vendor_type: "Manufacturer + SI",
     tagline: "Automated fulfillment systems — shuttles, conveyors, and robotics",
     category: "Conveyor & Sortation", industry: ["E-commerce & Fulfillment", "Retail", "Food & Beverage", "Pharma & Healthcare"],
     tags: ["Shuttle", "Conveyor", "Fulfillment", "AS/RS"],
@@ -863,6 +905,7 @@ export const vendors = [
   },
   {
     id: 43, name: "Vanderlande", slug: "vanderlande",
+    vendor_type: "Manufacturer + SI",
     tagline: "Automated material handling for airports, parcel, and warehouses",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail"],
     tags: ["Sortation", "Conveyor", "Parcel", "Airport"],
@@ -882,6 +925,7 @@ export const vendors = [
   },
   {
     id: 44, name: "Witron", slug: "witron",
+    vendor_type: "Manufacturer + SI",
     tagline: "Automated food retail and grocery DC fulfillment systems",
     category: "AS/RS & Storage", industry: ["Food & Beverage", "Retail", "Grocery", "Cold Storage"],
     tags: ["Grocery", "Food retail", "AS/RS", "Order fulfillment"],
@@ -901,6 +945,7 @@ export const vendors = [
   },
   {
     id: 45, name: "Cimcorp", slug: "cimcorp",
+    vendor_type: "Manufacturer + SI",
     tagline: "Robotic order fulfillment for tire, grocery, and e-commerce",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Food & Beverage", "E-commerce & Fulfillment"],
     tags: ["Gantry robot", "Order fulfillment", "Tire", "Grocery"],
@@ -920,6 +965,7 @@ export const vendors = [
   },
   {
     id: 46, name: "Ambi Robotics", slug: "ambi-robotics",
+    vendor_type: "Manufacturer",
     tagline: "AI-powered robotic piece picking for e-commerce and 3PL",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["AI picking", "E-commerce", "Piece pick", "Vision"],
@@ -939,6 +985,7 @@ export const vendors = [
   },
   {
     id: 47, name: "AutoGuide Mobile Robots", slug: "autoguide",
+    vendor_type: "Manufacturer",
     tagline: "Heavy-payload autonomous forklifts and tuggers for manufacturing",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
     tags: ["AGV", "Autonomous forklift", "Heavy payload", "Tugger"],
@@ -958,6 +1005,7 @@ export const vendors = [
   },
   {
     id: 48, name: "Avidbots", slug: "avidbots",
+    vendor_type: "Manufacturer",
     tagline: "Neo autonomous floor scrubbers for commercial and industrial facilities",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "3PL"],
     tags: ["Autonomous cleaning", "Floor scrubber", "Facility management"],
@@ -977,6 +1025,7 @@ export const vendors = [
   },
   {
     id: 49, name: "Brain Corp", slug: "brain-corp",
+    vendor_type: "Software",
     tagline: "BrainOS autonomous navigation platform for commercial robots",
     category: "Controls & Sensing", industry: ["Retail", "Warehouse & DC", "Manufacturing"],
     tags: ["Autonomous navigation", "OS platform", "Floor care", "Inventory"],
@@ -996,6 +1045,7 @@ export const vendors = [
   },
   {
     id: 50, name: "Modula", slug: "modula",
+    vendor_type: "Manufacturer",
     tagline: "Vertical lift modules for parts, tools, and inventory storage",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "Retail"],
     tags: ["VLM", "Vertical lift", "Parts storage", "Inventory"],
@@ -1015,6 +1065,7 @@ export const vendors = [
   },
   {
     id: 51, name: "Prime Robotics", slug: "prime-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Autonomous pallet-level AMRs for DC inbound and outbound",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "3PL", "E-commerce & Fulfillment"],
     tags: ["AMR", "Pallet", "Inbound", "Autonomous"],
@@ -1034,6 +1085,7 @@ export const vendors = [
   },
   {
     id: 52, name: "Waypoint Robotics", slug: "waypoint-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Heavy-duty AMRs for industrial and manufacturing material handling",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
     tags: ["AMR", "Heavy duty", "Manufacturing", "Omnidirectional"],
@@ -1053,6 +1105,7 @@ export const vendors = [
   },
   {
     id: 53, name: "inVia Robotics", slug: "invia-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Goods-to-person AMR system with subscription pricing model",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["AMR", "Goods-to-person", "Subscription", "E-commerce"],
@@ -1072,6 +1125,7 @@ export const vendors = [
   },
   {
     id: 54, name: "Fox Robotics", slug: "fox-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Autonomous forklift for trailer unloading at the dock",
     category: "Dock Automation", industry: ["Warehouse & DC", "Food & Beverage", "3PL", "Retail"],
     tags: ["Autonomous forklift", "Dock", "Trailer unloading", "Pallet"],
@@ -1091,6 +1145,7 @@ export const vendors = [
   },
   {
     id: 55, name: "Softeon", slug: "softeon",
+    vendor_type: "Software",
     tagline: "WMS and distributed order management for complex fulfillment",
     category: "WMS Platforms", industry: ["E-commerce & Fulfillment", "3PL", "Retail", "Warehouse & DC"],
     tags: ["WMS", "DOM", "Omnichannel", "3PL"],
@@ -1110,6 +1165,7 @@ export const vendors = [
   },
   {
     id: 56, name: "Deposco", slug: "deposco",
+    vendor_type: "Software",
     tagline: "Cloud WMS and order management for growing omnichannel brands",
     category: "WMS Platforms", industry: ["E-commerce & Fulfillment", "Retail", "3PL"],
     tags: ["WMS", "Cloud", "Omnichannel", "SMB to mid-market"],
@@ -1129,6 +1185,7 @@ export const vendors = [
   },
   {
     id: 57, name: "Lucas Systems", slug: "lucas-systems",
+    vendor_type: "Software",
     tagline: "Voice-directed work and labor optimization for DC operations",
     category: "Labor Management", industry: ["Warehouse & DC", "Food & Beverage", "3PL", "Retail"],
     tags: ["Voice", "Labor optimization", "Directed work", "Picking"],
@@ -1149,6 +1206,7 @@ export const vendors = [
   },
   {
     id: 58, name: "Easy Metrics", slug: "easy-metrics",
+    vendor_type: "Software",
     tagline: "Labor management and workforce intelligence for DCs",
     category: "Labor Management", industry: ["Warehouse & DC", "Manufacturing", "3PL"],
     tags: ["Labor management", "LMS", "Analytics", "Productivity"],
@@ -1168,6 +1226,7 @@ export const vendors = [
   },
   {
     id: 59, name: "Longbow Advantage", slug: "longbow-advantage",
+    vendor_type: "Software",
     tagline: "Warehouse analytics and labor management platform",
     category: "Labor Management", industry: ["Warehouse & DC", "3PL", "Manufacturing", "Retail"],
     tags: ["Analytics", "Labor management", "WMS analytics", "Workforce"],
@@ -1187,6 +1246,7 @@ export const vendors = [
   },
   {
     id: 60, name: "Samsara", slug: "samsara",
+    vendor_type: "Software",
     tagline: "Connected operations platform for fleet and industrial IoT",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "3PL"],
     tags: ["IoT", "Fleet management", "Telematics", "Safety"],
@@ -1207,6 +1267,7 @@ export const vendors = [
   },
   {
     id: 61, name: "Yaskawa Motoman", slug: "yaskawa-motoman",
+    vendor_type: "Manufacturer",
     tagline: "Industrial robots for welding, handling, and assembly",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Warehouse & DC"],
     tags: ["Industrial robot", "Welding", "Palletizing", "Assembly"],
@@ -1227,6 +1288,7 @@ export const vendors = [
   },
   {
     id: 62, name: "ABB Robotics", slug: "abb-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Industrial and collaborative robots for manufacturing and logistics",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Warehouse & DC"],
     tags: ["Industrial robot", "Cobot", "Palletizing", "Welding"],
@@ -1247,6 +1309,7 @@ export const vendors = [
   },
   {
     id: 63, name: "KUKA Robotics", slug: "kuka-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Industrial robots and automation systems for manufacturing",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Aerospace", "Food & Beverage"],
     tags: ["Industrial robot", "Cobot", "Automotive", "Welding"],
@@ -1267,6 +1330,7 @@ export const vendors = [
   },
   {
     id: 64, name: "Righthand Robotics", slug: "righthand-robotics",
+    vendor_type: "Manufacturer",
     tagline: "RightPick — AI-powered robotic piece picking for e-commerce",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["Piece picking", "AI", "E-commerce", "Gripper"],
@@ -1286,6 +1350,7 @@ export const vendors = [
   },
   {
     id: 65, name: "Soft Robotics", slug: "soft-robotics",
+    vendor_type: "Manufacturer",
     tagline: "Soft gripper technology for food, e-commerce, and pharmaceutical handling",
     category: "Controls & Sensing", industry: ["Food & Beverage", "E-commerce & Fulfillment", "Pharma & Healthcare"],
     tags: ["Gripper", "End effector", "Food handling", "Soft robotics"],
@@ -1305,6 +1370,7 @@ export const vendors = [
   },
   {
     id: 66, name: "Photoneo", slug: "photoneo",
+    vendor_type: "Manufacturer",
     tagline: "3D vision systems for robotic guidance and bin picking",
     category: "Vision & AI", industry: ["Manufacturing", "Warehouse & DC", "Automotive", "Pharma & Healthcare"],
     tags: ["3D vision", "Bin picking", "Robot guidance", "Structured light"],
@@ -1324,6 +1390,7 @@ export const vendors = [
   },
   {
     id: 67, name: "Sick Inc.", slug: "sick-inc",
+    vendor_type: "Manufacturer",
     tagline: "Industrial sensors, safety systems, and vision for factory automation",
     category: "Controls & Sensing", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
     tags: ["Sensors", "Safety", "LiDAR", "Vision", "Barcode"],
@@ -1344,6 +1411,7 @@ export const vendors = [
   },
   {
     id: 68, name: "Keyence", slug: "keyence",
+    vendor_type: "Manufacturer",
     tagline: "Vision systems, sensors, and measurement instruments for manufacturing",
     category: "Vision & AI", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Pharma & Healthcare"],
     tags: ["Vision", "Sensors", "Measurement", "Barcode", "Inspection"],
@@ -1364,6 +1432,7 @@ export const vendors = [
   },
   {
     id: 69, name: "Rockwell Automation — Emulate3D", slug: "emulate3d",
+    vendor_type: "Software",
     tagline: "Digital twin and simulation for controls and automation design",
     category: "Simulation & Digital Twin", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
     tags: ["Digital twin", "Simulation", "Controls testing", "3D"],
@@ -1383,6 +1452,7 @@ export const vendors = [
   },
   {
     id: 70, name: "Interlake Mecalux", slug: "mecalux",
+    vendor_type: "Manufacturer + SI",
     tagline: "Racking, shelving, and automated storage systems for warehouses",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
     tags: ["Racking", "Shelving", "AS/RS", "Pallet rack"],
@@ -1403,6 +1473,7 @@ export const vendors = [
   },
   {
     id: 71, name: "Westfalia Technologies", slug: "westfalia-technologies",
+    vendor_type: "Manufacturer + SI",
     tagline: "High-density pallet AS/RS and warehouse management software",
     category: "AS/RS & Storage", industry: ["Food & Beverage", "Warehouse & DC", "Manufacturing", "Cold Storage"],
     tags: ["AS/RS", "Pallet", "High density", "Satellite"],
@@ -1423,6 +1494,7 @@ export const vendors = [
   },
   {
     id: 72, name: "Tennant Company", slug: "tennant-company",
+    vendor_type: "Manufacturer",
     tagline: "Industrial floor care — scrubbers, sweepers, and autonomous cleaning",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "Food & Beverage"],
     tags: ["Floor scrubber", "Sweeper", "Autonomous", "Industrial cleaning"],
@@ -1442,6 +1514,7 @@ export const vendors = [
   },
   {
     id: 73, name: "Fortna (formerly DMW&H)", slug: "dmwh",
+    vendor_type: "Systems Integrator",
     tagline: "Systems integration and DC automation for retail and e-commerce",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
     tags: ["Integrator", "Conveyor", "Systems design", "DC automation"],
@@ -1461,6 +1534,7 @@ export const vendors = [
   },
   {
     id: 74, name: "Numina Group", slug: "numina-group",
+    vendor_type: "Systems Integrator",
     tagline: "Real-time DC intelligence and WCS for automated distribution",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "3PL", "Retail"],
     tags: ["WCS", "Real-time intelligence", "Integrator", "DC software"],
@@ -1480,6 +1554,7 @@ export const vendors = [
   },
   {
     id: 75, name: "Conveyco Technologies", slug: "conveyco",
+    vendor_type: "Systems Integrator",
     tagline: "End-to-end DC automation design and systems integration",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
     tags: ["Integrator", "Automation design", "Consulting", "DC systems"],
