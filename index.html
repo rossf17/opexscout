@@ -45,8 +45,12 @@
       @media (max-width: 900px) {
         h1 { font-size: 32px !important; }
       }
-      @media (max-width: 700px) {
-        nav { padding: 0 16px !important; }
+      @media print {
+        body { background: #fff !important; color: #000 !important; }
+        nav, .email-capture, footer, button, [data-vendor-card]:hover { display: none !important; }
+        pre, code { white-space: pre-wrap; font-size: 11px; background: #f5f5f5; padding: 12px; border-radius: 4px; }
+        h1, h2, h3 { color: #000 !important; }
+        a { color: #000 !important; }
       }
     </style>
   </head>

@@ -1284,6 +1284,8 @@ export const products = {
       name: "ETV Automated Narrow Aisle Truck",
       tagline: "Fully automated very narrow aisle forklift for high-bay storage",
       category: "AGV Forklift",
+      price_range: "$$$",
+      price_notes: "Per vehicle. VNA AGV pricing typically $150k–$400k per truck including navigation and controls. Full system with racking typically $1M–$5M+.",
       payload: "1,200–1,400 kg",
       reach: "Up to 13 m",
       axes: null,

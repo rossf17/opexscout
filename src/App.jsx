@@ -235,6 +235,8 @@ const DEFAULT_WORKSPACE = {
   },
   // RFI tracker: { vendorId: { contacted, contactDate, contactName, contactEmail, responseStatus, demoScheduled, demoDate, notes } }
   rfis: {},
+  // File links: [{ id, label, url, type, notes, added }]
+  fileLinks: [],
   created: "",
   updated: "",
 };
@@ -807,6 +809,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
   const [indFilter, setIndFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [view, setView] = useState("grid");
+  const [sortBy, setSortBy] = useState("featured");
 
   // Consume initialSearch once on mount
   useEffect(() => {
@@ -836,6 +839,20 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
     const matchType = !typeFilter || v.vendor_type === typeFilter;
     return matchQ && matchCat && matchInd && matchType;
   }).map(x => x.vendor), [search, catFilter, indFilter, typeFilter, vendorSearchIndex]);
+
+  const priceTierOrder = { "$": 1, "$$": 2, "$$$": 3, "$$$$": 4, "RaaS": 5 };
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    switch (sortBy) {
+      case "az": return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case "za": return arr.sort((a, b) => b.name.localeCompare(a.name));
+      case "price-asc": return arr.sort((a, b) => (priceTierOrder[a.price_range] || 9) - (priceTierOrder[b.price_range] || 9));
+      case "price-desc": return arr.sort((a, b) => (priceTierOrder[b.price_range] || 0) - (priceTierOrder[a.price_range] || 0));
+      case "products": return arr.sort((a, b) => (allProducts[b.slug]?.length || 0) - (allProducts[a.slug]?.length || 0));
+      case "featured": default: return arr.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+    }
+  }, [filtered, sortBy]);
 
   const toggleSelect = (id, checked) => {
     if (checked) setSelected(s => [...s, id]);
@@ -915,22 +932,46 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
             {(catFilter || typeFilter || indFilter) && <span style={{ color: "#475569" }}> · {[catFilter, typeFilter, indFilter].filter(Boolean).join(", ")}</span>}
             {(catFilter || typeFilter || indFilter) && <span style={{ color: "#f59e0b", cursor: "pointer", marginLeft: 8, fontSize: 11 }} onClick={() => { setCatFilter(""); setTypeFilter(""); setIndFilter(""); }}>Clear filters</span>}
           </span>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <select style={{ ...S.rfiInput, marginBottom: 0, padding: "6px 10px", fontSize: 12, width: "auto" }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <option value="featured">Featured first</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+              <option value="price-asc">Price: low → high</option>
+              <option value="price-desc">Price: high → low</option>
+              <option value="products">Most products</option>
+            </select>
             {[["grid", <GridIcon />], ["list", <ListIcon />]].map(([v, icon]) => (
               <button key={v} style={{ padding: "6px 10px", background: view === v ? "#1a2a45" : "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, cursor: "pointer", color: view === v ? "#e8edf5" : "#475569" }} onClick={() => setView(v)}>{icon}</button>
             ))}
           </div>
         </div>
 
-        {view === "grid" ? (
+        {sorted.length === 0 && (
+          <div style={{ textAlign: "center", padding: "60px 32px", color: "#475569" }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontSize: 16, color: "#94a3b8", marginBottom: 8 }}>No vendors match these filters</div>
+            <div style={{ fontSize: 13, color: "#475569", marginBottom: 20 }}>
+              {search && <span>No results for "<strong style={{ color: "#64748b" }}>{search}</strong>". </span>}
+              Try broadening your search or clearing some filters.
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => { setSearch(""); setCatFilter(""); setTypeFilter(""); setIndFilter(""); }}>Clear all filters</button>
+              <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("solution")}>Try Find Solution instead</button>
+            </div>
+          </div>
+        )}
+
+        {view === "grid" && sorted.length > 0 && (
           <div style={S.grid}>
-            {filtered.map(v => (
+            {sorted.map(v => (
               <VendorCard key={v.id} vendor={v} selected={selected.includes(v.id)} onSelect={toggleSelect} onClick={() => openDetailLocal(v)} compareCount={selected.length} />
             ))}
           </div>
-        ) : (
+        )}
+        {view === "list" && sorted.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filtered.map(v => (
+            {sorted.map(v => (
               <div key={v.id} style={{ ...S.card, display: "flex", alignItems: "center", gap: 16 }} onClick={() => openDetailLocal(v)}>
                 <div style={{ ...S.logoCircle, background: v.color, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -940,7 +981,6 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
                   </div>
                   <div style={{ fontSize: 12, color: "#475569" }}>{v.category} · {v.hq}</div>
                 </div>
-                <div style={{ fontSize: 12, color: "#475569" }}>{v.category} · {v.hq}</div>
                 <div style={S.tags}>
                   {v.tags.slice(0, 2).map(t => <span key={t} style={S.tag}>{t}</span>)}
                 </div>
@@ -1323,8 +1363,12 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Commercial snapshot</div>
                       <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>
                         <div><strong style={{ color: '#e8edf5' }}>Commercial model:</strong> {playbook.commercial}</div>
-                        <div><strong style={{ color: '#e8edf5' }}>Typical deployment:</strong> {playbook.deployment}</div>
+                        <div><strong style={{ color: '#e8edf5' }}>Vendor type:</strong> {vendor.vendor_type || "—"}</div>
+                        {vendor.implementation_pilot && <div><strong style={{ color: '#e8edf5' }}>Pilot timeline:</strong> {vendor.implementation_pilot}</div>}
+                        {vendor.implementation_rollout && <div><strong style={{ color: '#e8edf5' }}>Full rollout:</strong> {vendor.implementation_rollout}</div>}
+                        {!vendor.implementation_pilot && <div><strong style={{ color: '#e8edf5' }}>Typical deployment:</strong> {playbook.deployment}</div>}
                         <div><strong style={{ color: '#e8edf5' }}>ROI pattern:</strong> {playbook.roi}</div>
+                        {vendor.implementation_risks && <div style={{ marginTop: 6, padding: '8px 10px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: 6, fontSize: 12 }}><strong style={{ color: '#ef4444' }}>Key risks:</strong> {vendor.implementation_risks}</div>}
                       </div>
                     </div>
                     <div style={{ background: '#0d1526', borderRadius: 10, padding: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -1517,6 +1561,7 @@ function ComparePage({ selected, setPage, openDetail }) {
   );
 
   const rows = [
+    { label: "Type", fn: v => v.vendor_type || "—" },
     { label: "Category", fn: v => v.category },
     { label: "HQ", fn: v => v.hq },
     { label: "Founded", fn: v => v.founded },
@@ -1802,6 +1847,9 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
     const text = [v.name, v.category, v.tagline, v.desc, ...(v.tags || []), ...(v.industry || []), v.best_for || ""].join(" ").toLowerCase();
     let score = 0;
 
+    // Vendor type filter — hard exclude if buyer specified a preference
+    if (form.vendorType && v.vendor_type && v.vendor_type !== form.vendorType) return -1;
+
     // Category match — strongest signal
     if (selectedUse.categories.includes(v.category)) score += 8;
     else return -1; // Must be in right category to appear at all
@@ -1904,6 +1952,14 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
             <select style={S.rfiInput} value={form.budget} onChange={e => setForm(f => ({ ...f, budget: e.target.value }))}>{["Under $50k", "$50k–$200k", "$200k–$500k", "$500k–$1M", "$1M+", "Unknown"].map(x => <option key={x}>{x}</option>)}</select>
             <label style={S.rfiLabel}>Timeline</label>
             <select style={S.rfiInput} value={form.timeline} onChange={e => setForm(f => ({ ...f, timeline: e.target.value }))}>{["0–3 months", "3–6 months", "6–12 months", "12+ months", "Researching only"].map(x => <option key={x}>{x}</option>)}</select>
+            <label style={S.rfiLabel}>Vendor type preference</label>
+            <select style={S.rfiInput} value={form.vendorType || ""} onChange={e => setForm(f => ({ ...f, vendorType: e.target.value }))}>
+              <option value="">Any (manufacturer, SI, software)</option>
+              <option value="Manufacturer">OEM / Manufacturer only</option>
+              <option value="Systems Integrator">Systems integrators only</option>
+              <option value="Manufacturer + SI">Manufacturer + SI</option>
+              <option value="Software">Software only</option>
+            </select>
             <label style={S.rfiLabel}>Throughput target (optional)</label>
             <input style={S.rfiInput} value={form.throughput} onChange={e => setForm(f => ({ ...f, throughput: e.target.value }))} placeholder="e.g. 500 cases/hr, 1,000 orders/day" />
             <label style={S.rfiLabel}>Facility size (optional)</label>
@@ -2474,6 +2530,96 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
   );
 }
 
+function WorkspaceFilesTab({ ws, wsVendors, save, isMobile, labelStyle, inputStyle }) {
+  const links = ws.fileLinks || [];
+  const FILE_TYPES = ["Quote", "Proposal", "Spec sheet", "RFP / RFI", "Site layout", "Org chart", "Contract", "Case study", "Demo recording", "Other"];
+  const [newUrl, setNewUrl] = useState("");
+  const [newLabel, setNewLabel] = useState("");
+  const [newType, setNewType] = useState("Quote");
+  const [newNotes, setNewNotes] = useState("");
+
+  const addLink = () => {
+    if (!newUrl.trim() || !newLabel.trim()) return;
+    const entry = { id: genId(), label: newLabel, url: newUrl, type: newType, notes: newNotes, added: new Date().toISOString() };
+    save({ fileLinks: [entry, ...links] });
+    setNewUrl(""); setNewLabel(""); setNewNotes(""); setNewType("Quote");
+  };
+
+  const removeLink = (id) => save({ fileLinks: links.filter(l => l.id !== id) });
+
+  const typeColors = {
+    "Quote": "#f59e0b", "Proposal": "#22c55e", "Spec sheet": "#38bdf8",
+    "RFP / RFI": "#818cf8", "Contract": "#ef4444", "Demo recording": "#f87171",
+    "Site layout": "#a78bfa", "Org chart": "#fb923c", "Case study": "#34d399", "Other": "#94a3b8",
+  };
+  const typeEmoji = { "Quote": "💰", "Proposal": "📝", "Spec sheet": "📋", "RFP / RFI": "📄", "Contract": "⚖️", "Demo recording": "▶️", "Site layout": "🏗️", "Org chart": "👥", "Case study": "📊", "Other": "📎" };
+
+  return (
+    <div>
+      <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+        Paste links to project files stored in Google Drive, SharePoint, Dropbox, or anywhere else. Label each link so your team knows what it is.
+      </div>
+      <div style={{ ...S.sideCard, marginBottom: 20, background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 12 }}>Add a file link</div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "2fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+          <div>
+            <label style={labelStyle}>Label *</label>
+            <input style={inputStyle} placeholder="e.g. Slip Robotics — Q2 quote" value={newLabel} onChange={e => setNewLabel(e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>File type</label>
+            <select style={inputStyle} value={newType} onChange={e => setNewType(e.target.value)}>
+              {FILE_TYPES.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Quick label from vendor</label>
+            <select style={inputStyle} value="" onChange={e => { if (e.target.value) setNewLabel(`${e.target.value} — ${newType}`); }}>
+              <option value="">Select vendor...</option>
+              {wsVendors.map(v => <option key={v.id} value={v.name}>{v.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <label style={labelStyle}>URL *</label>
+        <input style={inputStyle} placeholder="https://drive.google.com/... or any URL" value={newUrl} onChange={e => setNewUrl(e.target.value)} onKeyDown={e => e.key === "Enter" && addLink()} />
+        <label style={labelStyle}>Notes (optional)</label>
+        <input style={inputStyle} placeholder="e.g. Received 5/12, expires 6/30. Includes installation." value={newNotes} onChange={e => setNewNotes(e.target.value)} />
+        <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={addLink} disabled={!newUrl || !newLabel}>+ Add link</button>
+      </div>
+      {links.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>📁</div>
+          <div style={{ fontSize: 14, color: "#64748b", marginBottom: 6 }}>No files linked yet</div>
+          <div style={{ fontSize: 12, color: "#475569" }}>Add links to quotes, proposals, spec sheets, and other project documents above.</div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {links.map(link => (
+            <div key={link.id} style={{ background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${typeColors[link.type] || "#94a3b8"}18`, border: `1px solid ${typeColors[link.type] || "#94a3b8"}33`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16 }}>
+                {typeEmoji[link.type] || "📎"}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5" }}>{link.label}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: `${typeColors[link.type] || "#94a3b8"}18`, color: typeColors[link.type] || "#94a3b8", border: `1px solid ${typeColors[link.type] || "#94a3b8"}33` }}>{link.type}</span>
+                </div>
+                <div style={{ fontSize: 11, color: "#475569", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link.url}</div>
+                {link.notes && <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>{link.notes}</div>}
+                <div style={{ fontSize: 11, color: "#334155", marginTop: 4 }}>Added {new Date(link.added).toLocaleDateString()}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ ...S.navCta, padding: "6px 12px", fontSize: 11, textDecoration: "none", display: "inline-block" }}>Open →</a>
+                <button onClick={() => removeLink(link.id)} style={{ ...S.btnSecondary, width: "auto", padding: "6px 10px", fontSize: 11, color: "#ef4444", borderColor: "rgba(239,68,68,0.2)" }}>Remove</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function WorkspacePage({ setPage, openDetail, wsId }) {
   const isMobile = useIsMobile();
   const [ws, setWs] = useState(() => getWorkspace(wsId));
@@ -2603,6 +2749,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
     { id: "scorecard", label: "⭐ Scorecard" },
     { id: "roi", label: "💰 ROI calculator" },
     { id: "rfi", label: "📞 RFI tracker" },
+    { id: "files", label: "📁 Files & links" },
     { id: "case", label: "📄 Business case" },
   ];
 
@@ -2961,6 +3108,9 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             </div>
           )}
 
+          {/* ── TAB: FILES & LINKS ── */}
+          {tab === "files" && <WorkspaceFilesTab ws={ws} wsVendors={wsVendors} save={save} isMobile={isMobile} labelStyle={labelStyle} inputStyle={inputStyle} />}
+
           {/* ── TAB: BUSINESS CASE ── */}
           {tab === "case" && (
             <div>
@@ -2968,7 +3118,10 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
                 <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
                   Auto-generated from your project context, scorecard, and ROI inputs. Export as a text file to paste into a PowerPoint or email.
                 </div>
+                <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>⬇ Export .txt</button>
+                <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => window.print()}>🖨 Print</button>
+              </div>
               </div>
 
               {/* Summary cards */}

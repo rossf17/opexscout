@@ -30,6 +30,9 @@ export const industries = [
 export const vendors = [
   {
     id: 1, name: "Geek+", slug: "geekplus",
+    implementation_pilot: "8–12 weeks pilot",
+    implementation_rollout: "4–8 months full rollout",
+    implementation_risks: "WMS integration, Wi-Fi infrastructure, change management",
     vendor_type: "Manufacturer",
     tagline: "AI-powered AMR solutions for goods-to-person and sorting",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "3PL"],
@@ -51,6 +54,9 @@ export const vendors = [
   },
   {
     id: 2, name: "Slip Robotics", slug: "slip-robotics",
+    implementation_pilot: "4–6 weeks per door",
+    implementation_rollout: "3–6 months site-wide",
+    implementation_risks: "Dock readiness, trailer mix, conveyor integration",
     vendor_type: "Manufacturer",
     tagline: "Autonomous truck loading and unloading for dock automation",
     category: "Dock Automation", industry: ["Warehouse & DC", "Food & Beverage", "3PL"],
@@ -72,6 +78,9 @@ export const vendors = [
   },
   {
     id: 3, name: "FANUC", slug: "fanuc",
+    implementation_pilot: "8–16 weeks",
+    implementation_rollout: "4–8 months",
+    implementation_risks: "End-of-arm tooling, controls integration, guarding, safety validation",
     vendor_type: "Manufacturer",
     tagline: "Industrial robots for palletizing, depalletizing, and material handling",
     category: "Industrial Robotics", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
@@ -93,6 +102,9 @@ export const vendors = [
   },
   {
     id: 4, name: "Locus Robotics", slug: "locus-robotics",
+    implementation_pilot: "6–10 weeks",
+    implementation_rollout: "3–5 months",
+    implementation_risks: "Pick path redesign, operator training, WMS integration",
     vendor_type: "Manufacturer",
     tagline: "Collaborative AMRs for unit-pick fulfillment operations",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -114,6 +126,9 @@ export const vendors = [
   },
   {
     id: 5, name: "Honeywell Intelligrated", slug: "honeywell-intelligrated",
+    implementation_pilot: "12–24 months",
+    implementation_rollout: "18–36 months",
+    implementation_risks: "Civil, controls, WCS integration, go-live timing vs peak",
     vendor_type: "Manufacturer + SI",
     tagline: "Integrated conveyor, sortation, and material handling systems",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -135,6 +150,9 @@ export const vendors = [
   },
   {
     id: 6, name: "Boston Dynamics", slug: "boston-dynamics",
+    implementation_pilot: "8–16 weeks",
+    implementation_rollout: "4–8 months",
+    implementation_risks: "Cell integration, end-effector validation, safety guarding",
     vendor_type: "Manufacturer",
     tagline: "Stretch — the mobile case-handling robot for truck unloading",
     category: "Depalletizing & Palletizing", industry: ["Warehouse & DC", "3PL", "E-commerce & Fulfillment"],
@@ -156,6 +174,9 @@ export const vendors = [
   },
   {
     id: 7, name: "Blue Yonder", slug: "blue-yonder",
+    implementation_pilot: "3–6 months (single site)",
+    implementation_rollout: "12–24 months (network)",
+    implementation_risks: "Data migration, process re-engineering, change management",
     vendor_type: "Software",
     tagline: "AI-driven WMS and labor management for distribution",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Retail", "3PL", "Food & Beverage"],
@@ -177,6 +198,9 @@ export const vendors = [
   },
   {
     id: 8, name: "Dematic", slug: "dematic",
+    implementation_pilot: "12–24 months",
+    implementation_rollout: "18–36 months full system",
+    implementation_risks: "Civil work, controls integration, WMS cutover, peak timing",
     vendor_type: "Manufacturer + SI",
     tagline: "End-to-end intralogistics automation, AS/RS, and software",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "Pharma & Healthcare"],
@@ -198,6 +222,9 @@ export const vendors = [
   },
   {
     id: 9, name: "Manhattan Associates", slug: "manhattan-associates",
+    implementation_pilot: "4–8 months (single site)",
+    implementation_rollout: "12–24 months",
+    implementation_risks: "Configuration depth, integration complexity, operator training",
     vendor_type: "Software",
     tagline: "Supply chain WMS platform for omnichannel distribution",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Retail", "E-commerce & Fulfillment", "3PL"],
@@ -282,6 +309,9 @@ export const vendors = [
   },
   {
     id: 13, name: "6 River Systems", slug: "6-river-systems",
+    implementation_pilot: "4–8 weeks",
+    implementation_rollout: "2–4 months",
+    implementation_risks: "Operator adoption, layout optimization, WMS cutover",
     vendor_type: "Manufacturer",
     tagline: "Chuck — the collaborative mobile robot for fulfillment picking",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -303,6 +333,9 @@ export const vendors = [
   },
   {
     id: 14, name: "Universal Robots", slug: "universal-robots",
+    implementation_pilot: "4–8 weeks",
+    implementation_rollout: "2–5 months",
+    implementation_risks: "Lower than traditional robots — no guarding required for most apps",
     vendor_type: "Manufacturer",
     tagline: "Collaborative robots (cobots) for flexible manufacturing tasks",
     category: "Industrial Robotics", industry: ["Manufacturing", "Food & Beverage", "Automotive", "Pharma & Healthcare"],
@@ -324,6 +357,9 @@ export const vendors = [
   },
   {
     id: 15, name: "Swisslog", slug: "swisslog",
+    implementation_pilot: "10–20 months",
+    implementation_rollout: "18–36 months",
+    implementation_risks: "Civil, controls, WCS, multi-vendor coordination",
     vendor_type: "Manufacturer + SI",
     tagline: "Automated storage, goods-to-person, and pharmacy automation",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "Pharma & Healthcare", "E-commerce & Fulfillment", "Cold Storage"],
@@ -345,6 +381,9 @@ export const vendors = [
   },
   {
     id: 16, name: "AutoStore", slug: "autostore",
+    implementation_pilot: "6–12 months",
+    implementation_rollout: "12–24 months",
+    implementation_risks: "Grid design freeze, WCS integration, bin loading process",
     vendor_type: "Manufacturer",
     tagline: "Cube storage AS/RS with robotic bin retrieval — maximum density",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "Pharma & Healthcare", "Grocery"],
@@ -366,6 +405,9 @@ export const vendors = [
   },
   {
     id: 17, name: "Daifuku", slug: "daifuku",
+    implementation_pilot: "12–24 months",
+    implementation_rollout: "18–36+ months",
+    implementation_risks: "Civil scope, controls integration, FAT/SAT process",
     vendor_type: "Manufacturer + SI",
     tagline: "Material handling systems, conveyors, and AS/RS for global DCs",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "Automotive", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -387,6 +429,9 @@ export const vendors = [
   },
   {
     id: 18, name: "Seegrid", slug: "seegrid",
+    implementation_pilot: "6–10 weeks",
+    implementation_rollout: "3–6 months",
+    implementation_risks: "Vision map training, route design, mixed-traffic management",
     vendor_type: "Manufacturer",
     tagline: "Vision-guided AMRs for autonomous pallet transport in manufacturing",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Automotive", "Food & Beverage"],
@@ -408,6 +453,9 @@ export const vendors = [
   },
   {
     id: 19, name: "Mobile Industrial Robots (MiR)", slug: "mir-robotics",
+    implementation_pilot: "4–8 weeks",
+    implementation_rollout: "2–6 months",
+    implementation_risks: "Traffic management, map stability, payload fixture design",
     vendor_type: "Manufacturer",
     tagline: "Collaborative AMRs for internal logistics and material transport",
     category: "AMR / Mobile Robots", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "3PL"],
@@ -450,6 +498,9 @@ export const vendors = [
   },
   {
     id: 21, name: "KNAPP", slug: "knapp",
+    implementation_pilot: "12–20 months",
+    implementation_rollout: "18–36 months",
+    implementation_risks: "Complex system integration, controls, WCS, SAP/WMS cutover",
     vendor_type: "Manufacturer + SI",
     tagline: "Intelligent warehouse solutions — AS/RS, GTP, and pharmacy automation",
     category: "AS/RS & Storage", industry: ["Pharma & Healthcare", "Retail", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -471,6 +522,9 @@ export const vendors = [
   },
   {
     id: 22, name: "Bastian Solutions", slug: "bastian-solutions",
+    implementation_pilot: "8–18 months",
+    implementation_rollout: "12–30 months",
+    implementation_risks: "Project complexity drives timeline — brownfield harder than greenfield",
     vendor_type: "Systems Integrator",
     tagline: "Systems integrator for conveyor, robotics, and automation projects",
     category: "Systems Integration", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -492,6 +546,9 @@ export const vendors = [
   },
   {
     id: 23, name: "Fortna", slug: "fortna",
+    implementation_pilot: "10–20 months",
+    implementation_rollout: "16–36 months",
+    implementation_risks: "Strategy + design + integration — longer but more comprehensive",
     vendor_type: "Systems Integrator",
     tagline: "Distribution and fulfillment systems integrator and consultant",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
@@ -534,6 +591,9 @@ export const vendors = [
   },
   {
     id: 25, name: "Kardex Remstar", slug: "kardex-remstar",
+    implementation_pilot: "2–6 weeks per unit",
+    implementation_rollout: "1–3 months site-wide",
+    implementation_risks: "WMS integration, bin loading, operator training",
     vendor_type: "Manufacturer",
     tagline: "Vertical lift modules and carousels for high-density parts storage",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "Retail"],
@@ -555,6 +615,9 @@ export const vendors = [
   },
   {
     id: 26, name: "Hytrol", slug: "hytrol",
+    implementation_pilot: "4–12 months",
+    implementation_rollout: "6–18 months",
+    implementation_risks: "Integrator-dependent — Hytrol is equipment only",
     vendor_type: "Manufacturer",
     tagline: "Conveyor systems and integration for distribution and manufacturing",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -576,6 +639,9 @@ export const vendors = [
   },
   {
     id: 27, name: "Interroll", slug: "interroll",
+    implementation_pilot: "3–8 months",
+    implementation_rollout: "6–12 months",
+    implementation_risks: "Integrator-dependent — controls and WCS from SI",
     vendor_type: "Manufacturer",
     tagline: "Conveyor platforms, sorters, and drives for global material handling",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Food & Beverage", "Manufacturing"],
@@ -679,6 +745,9 @@ export const vendors = [
   },
   {
     id: 32, name: "OTTO Motors", slug: "otto-motors",
+    implementation_pilot: "6–10 weeks",
+    implementation_rollout: "3–6 months",
+    implementation_risks: "MES/ERP integration, manufacturing traffic complexity",
     vendor_type: "Manufacturer",
     tagline: "Heavy-payload AMRs for manufacturing material transport",
     category: "AGV Systems", industry: ["Manufacturing", "Automotive", "Warehouse & DC", "Food & Beverage"],
@@ -699,6 +768,9 @@ export const vendors = [
   },
   {
     id: 33, name: "Körber Supply Chain", slug: "korber",
+    implementation_pilot: "3–6 months",
+    implementation_rollout: "8–18 months",
+    implementation_risks: "Faster than tier-1 peers, still complex for large operations",
     vendor_type: "Software",
     tagline: "WMS, WCS, and automation software for complex DC environments",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Pharma & Healthcare", "3PL", "Cold Storage"],
@@ -720,6 +792,9 @@ export const vendors = [
   },
   {
     id: 34, name: "Infor WMS", slug: "infor-wms",
+    implementation_pilot: "4–8 months",
+    implementation_rollout: "10–18 months",
+    implementation_risks: "ERP integration scope, industry-specific configuration",
     vendor_type: "Software",
     tagline: "Cloud WMS for distribution, 3PL, and manufacturing",
     category: "WMS Platforms", industry: ["Warehouse & DC", "3PL", "Manufacturing", "Retail"],
@@ -762,6 +837,9 @@ export const vendors = [
   },
   {
     id: 36, name: "Agility Robotics", slug: "agility-robotics",
+    implementation_pilot: "12–24 weeks pilot",
+    implementation_rollout: "6–12+ months",
+    implementation_risks: "Early commercial stage — expect significant implementation complexity",
     vendor_type: "Manufacturer",
     tagline: "Digit — the humanoid robot for warehouse material handling",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment"],
@@ -804,6 +882,9 @@ export const vendors = [
   },
   {
     id: 38, name: "Exotec", slug: "exotec",
+    implementation_pilot: "6–12 months",
+    implementation_rollout: "12–18 months",
+    implementation_risks: "Grid civil work, WCS integration, workstation ergonomics",
     vendor_type: "Manufacturer",
     tagline: "Skypod — 3D goods-to-person AS/RS with climbing robots",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Food & Beverage"],
@@ -825,6 +906,9 @@ export const vendors = [
   },
   {
     id: 39, name: "Fetch Robotics", slug: "fetch-robotics",
+    implementation_pilot: "4–8 weeks",
+    implementation_rollout: "2–5 months",
+    implementation_risks: "WMS integration, cart design, charging infrastructure",
     vendor_type: "Manufacturer",
     tagline: "Cloud-driven AMRs for warehouse and manufacturing logistics",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment"],
@@ -865,6 +949,9 @@ export const vendors = [
   },
   {
     id: 41, name: "Schaefer Systems International", slug: "schaefer-systems",
+    implementation_pilot: "14–24 months",
+    implementation_rollout: "24–42 months",
+    implementation_risks: "Complex full-system — one of longest implementation timelines",
     vendor_type: "Manufacturer + SI",
     tagline: "Warehouse systems, AS/RS, and logistics software",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "Food & Beverage"],
@@ -885,6 +972,9 @@ export const vendors = [
   },
   {
     id: 42, name: "TGW Systems", slug: "tgw-systems",
+    implementation_pilot: "12–20 months",
+    implementation_rollout: "18–36 months",
+    implementation_risks: "Large project — civil, controls, commissioning, training",
     vendor_type: "Manufacturer + SI",
     tagline: "Automated fulfillment systems — shuttles, conveyors, and robotics",
     category: "Conveyor & Sortation", industry: ["E-commerce & Fulfillment", "Retail", "Food & Beverage", "Pharma & Healthcare"],
@@ -905,6 +995,9 @@ export const vendors = [
   },
   {
     id: 43, name: "Vanderlande", slug: "vanderlande",
+    implementation_pilot: "14–24 months",
+    implementation_rollout: "24–42 months",
+    implementation_risks: "Airport/parcel complexity — large civil and controls scope",
     vendor_type: "Manufacturer + SI",
     tagline: "Automated material handling for airports, parcel, and warehouses",
     category: "Conveyor & Sortation", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail"],
@@ -925,6 +1018,9 @@ export const vendors = [
   },
   {
     id: 44, name: "Witron", slug: "witron",
+    implementation_pilot: "18–36 months",
+    implementation_rollout: "24–48 months",
+    implementation_risks: "Design-build-operate model — longest timeline in category",
     vendor_type: "Manufacturer + SI",
     tagline: "Automated food retail and grocery DC fulfillment systems",
     category: "AS/RS & Storage", industry: ["Food & Beverage", "Retail", "Grocery", "Cold Storage"],
@@ -1045,6 +1141,9 @@ export const vendors = [
   },
   {
     id: 50, name: "Modula", slug: "modula",
+    implementation_pilot: "2–4 weeks per unit",
+    implementation_rollout: "1–2 months",
+    implementation_risks: "WMS API, tray configuration, item master setup",
     vendor_type: "Manufacturer",
     tagline: "Vertical lift modules for parts, tools, and inventory storage",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Pharma & Healthcare", "Retail"],
@@ -1145,6 +1244,9 @@ export const vendors = [
   },
   {
     id: 55, name: "Softeon", slug: "softeon",
+    implementation_pilot: "3–5 months",
+    implementation_rollout: "6–12 months",
+    implementation_risks: "Faster implementation than tier-1 — key competitive advantage",
     vendor_type: "Software",
     tagline: "WMS and distributed order management for complex fulfillment",
     category: "WMS Platforms", industry: ["E-commerce & Fulfillment", "3PL", "Retail", "Warehouse & DC"],
@@ -1165,6 +1267,9 @@ export const vendors = [
   },
   {
     id: 56, name: "Deposco", slug: "deposco",
+    implementation_pilot: "2–4 months",
+    implementation_rollout: "4–8 months",
+    implementation_risks: "One of fastest WMS implementations — 60–90 day go-lives common",
     vendor_type: "Software",
     tagline: "Cloud WMS and order management for growing omnichannel brands",
     category: "WMS Platforms", industry: ["E-commerce & Fulfillment", "Retail", "3PL"],
@@ -1267,6 +1372,9 @@ export const vendors = [
   },
   {
     id: 61, name: "Yaskawa Motoman", slug: "yaskawa-motoman",
+    implementation_pilot: "8–14 weeks",
+    implementation_rollout: "4–8 months",
+    implementation_risks: "Tooling, controls, and safety commissioning",
     vendor_type: "Manufacturer",
     tagline: "Industrial robots for welding, handling, and assembly",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Warehouse & DC"],
@@ -1288,6 +1396,9 @@ export const vendors = [
   },
   {
     id: 62, name: "ABB Robotics", slug: "abb-robotics",
+    implementation_pilot: "8–14 weeks",
+    implementation_rollout: "4–8 months",
+    implementation_risks: "Controls integration, tooling, commissioning",
     vendor_type: "Manufacturer",
     tagline: "Industrial and collaborative robots for manufacturing and logistics",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Warehouse & DC"],
@@ -1309,6 +1420,9 @@ export const vendors = [
   },
   {
     id: 63, name: "KUKA Robotics", slug: "kuka-robotics",
+    implementation_pilot: "8–16 weeks",
+    implementation_rollout: "4–10 months",
+    implementation_risks: "European-spec controls, integration complexity in US installs",
     vendor_type: "Manufacturer",
     tagline: "Industrial robots and automation systems for manufacturing",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Aerospace", "Food & Beverage"],
@@ -1514,6 +1628,9 @@ export const vendors = [
   },
   {
     id: 73, name: "Fortna (formerly DMW&H)", slug: "dmwh",
+    implementation_pilot: "6–14 months",
+    implementation_rollout: "10–24 months",
+    implementation_risks: "Active-DC brownfield expertise — manages timeline risk well",
     vendor_type: "Systems Integrator",
     tagline: "Systems integration and DC automation for retail and e-commerce",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
@@ -1534,6 +1651,9 @@ export const vendors = [
   },
   {
     id: 74, name: "Numina Group", slug: "numina-group",
+    implementation_pilot: "3–6 months (WCS only)",
+    implementation_rollout: "8–18 months",
+    implementation_risks: "WCS layer faster than full SI — WMS dependency adds complexity",
     vendor_type: "Systems Integrator",
     tagline: "Real-time DC intelligence and WCS for automated distribution",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "3PL", "Retail"],
@@ -1554,6 +1674,9 @@ export const vendors = [
   },
   {
     id: 75, name: "Conveyco Technologies", slug: "conveyco",
+    implementation_pilot: "6–12 months",
+    implementation_rollout: "10–20 months",
+    implementation_risks: "Mid-market scope — faster than tier-1 SI timelines",
     vendor_type: "Systems Integrator",
     tagline: "End-to-end DC automation design and systems integration",
     category: "Systems Integration", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Retail", "3PL"],
