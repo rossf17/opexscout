@@ -707,6 +707,105 @@ function NavBar({ page, setPage }) {
 }
 
 // ─── PAGES ───────────────────────────────────────────────────────────────────
+function HeroSearch({ setPage, setCategoryFilter, setInitialSearch, openDetail }) {
+  const [heroSearch, setHeroSearch] = useState("");
+  const [heroCat, setHeroCat] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
+
+  const doSearch = (term) => {
+    const q = term !== undefined ? term : heroSearch;
+    if (q) setInitialSearch(q);
+    if (heroCat) setCategoryFilter(heroCat);
+    setShowSuggestions(false);
+    setPage("directory");
+  };
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowSuggestions(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    if (!heroSearch || heroSearch.length < 2) return [];
+    const q = heroSearch.toLowerCase();
+    const vendorMatches = vendors
+      .filter(v => v.name.toLowerCase().includes(q))
+      .slice(0, 5)
+      .map(v => ({ type: "vendor", label: v.name, sub: v.category, vendor: v }));
+    const categoryMatches = categories
+      .filter(c => c.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map(c => ({ type: "category", label: c, sub: `${vendors.filter(v => v.category === c).length} vendors` }));
+    const tagMatches = [...new Set(vendors.flatMap(v => v.tags || []))]
+      .filter(t => t.toLowerCase().includes(q))
+      .slice(0, 2)
+      .map(t => ({ type: "tag", label: t, sub: "Technology" }));
+    return [...vendorMatches, ...categoryMatches, ...tagMatches].slice(0, 8);
+  }, [heroSearch]);
+
+  return (
+    <div ref={searchRef} style={{ maxWidth: 620, margin: "0 auto 16px", position: "relative" }}>
+      <div style={S.searchWrap}>
+        <input
+          style={S.searchInput}
+          placeholder="Search vendors, products, categories, or use cases..."
+          value={heroSearch}
+          onChange={e => { setHeroSearch(e.target.value); setShowSuggestions(e.target.value.length >= 2); }}
+          onFocus={() => heroSearch.length >= 2 && setShowSuggestions(true)}
+          onKeyDown={e => { if (e.key === "Enter") doSearch(); if (e.key === "Escape") setShowSuggestions(false); }}
+        />
+        <select style={S.searchSelect} value={heroCat} onChange={e => setHeroCat(e.target.value)}>
+          <option value="">All categories</option>
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <button style={S.searchBtn} onClick={() => doSearch()}>Search</button>
+      </div>
+
+      {showSuggestions && suggestions.length > 0 && (
+        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 300, background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, marginTop: 4, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+          {suggestions.map((s, i) => (
+            <div key={i}
+              style={{ padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, borderBottom: i < suggestions.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+              onMouseDown={e => {
+                e.preventDefault();
+                if (s.type === "vendor") {
+                  openDetail(s.vendor, "home", "home");
+                  setShowSuggestions(false);
+                } else if (s.type === "category") {
+                  setCategoryFilter(s.label);
+                  setPage("directory");
+                  setShowSuggestions(false);
+                } else {
+                  doSearch(s.label);
+                }
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700,
+                background: s.type === "vendor" ? (s.vendor?.color || "#1a2a45") : s.type === "category" ? "rgba(245,158,11,0.15)" : "rgba(99,102,241,0.15)",
+                color: s.type === "vendor" ? "#fff" : s.type === "category" ? "#f59e0b" : "#818cf8",
+              }}>
+                {s.type === "vendor" ? (s.vendor?.logo || s.label[0]) : s.type === "category" ? "⊞" : "#"}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, color: "#e8edf5", fontWeight: s.type === "vendor" ? 600 : 400 }}>{s.label}</div>
+                <div style={{ fontSize: 11, color: "#475569" }}>{s.sub}</div>
+              </div>
+              <div style={{ fontSize: 11, color: "#475569", flexShrink: 0 }}>
+                {s.type === "vendor" ? "View profile →" : s.type === "category" ? "Browse category →" : "Search →"}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch }) {
   const isMobile = useIsMobile();
   const recentIds = getRecentlyViewed();
@@ -726,31 +825,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
             <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find vendors for my project</button>
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse all vendors</button>
           </div>
-          {(() => {
-            const [heroSearch, setHeroSearch] = useState("");
-            const [heroCat, setHeroCat] = useState("");
-            const doSearch = () => {
-              setInitialSearch(heroSearch);
-              if (heroCat) setCategoryFilter(heroCat);
-              setPage("directory");
-            };
-            return (
-              <div style={S.searchWrap}>
-                <input
-                  style={S.searchInput}
-                  placeholder="Search vendors, products, categories, or use cases..."
-                  value={heroSearch}
-                  onChange={e => setHeroSearch(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && doSearch()}
-                />
-                <select style={S.searchSelect} value={heroCat} onChange={e => setHeroCat(e.target.value)}>
-                  <option value="">All categories</option>
-                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-                <button style={S.searchBtn} onClick={doSearch}>Search</button>
-              </div>
-            );
-          })()}
+          <HeroSearch setPage={setPage} setCategoryFilter={setCategoryFilter} setInitialSearch={setInitialSearch} openDetail={openDetail} />
           <div style={S.chips}>
             {['AMR / Mobile Robots', 'Depalletizing & Palletizing', 'WMS Platforms', 'Conveyor & Sortation', 'Industrial Robotics'].map(c => (
               <div key={c} style={S.chip} onClick={() => { setCategoryFilter(c); setPage("directory"); }}>{c}</div>
