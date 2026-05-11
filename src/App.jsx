@@ -1780,7 +1780,81 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
   );
 }
 
-function ComparePage({ selected, setPage, openDetail }) {
+function CompareVendorSearch({ sel, setSelected, openDetail, setPage }) {
+  const [q, setQ] = useState("");
+  const results = q.length > 1 ? vendors.filter(v =>
+    v.name.toLowerCase().includes(q.toLowerCase()) ||
+    v.category.toLowerCase().includes(q.toLowerCase()) ||
+    (v.tags || []).some(t => t.toLowerCase().includes(q.toLowerCase()))
+  ).slice(0, 8) : vendors.filter(v => v.featured).slice(0, 6);
+
+  return (
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>Compare vendors side by side</div>
+        <div style={{ fontSize: 14, color: "#64748b" }}>Search and select 2–4 vendors below to start comparing</div>
+      </div>
+
+      <div style={{ position: "relative", marginBottom: 16 }}>
+        <div style={{ display: "flex", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden" }}>
+          <div style={{ padding: "0 14px", display: "flex", alignItems: "center", color: "#475569" }}><SearchIcon /></div>
+          <input
+            autoFocus
+            style={{ flex: 1, background: "transparent", border: "none", padding: "13px 0", fontSize: 14, color: "#e8edf5", outline: "none" }}
+            placeholder="Search vendors by name, category, or technology..."
+            value={q}
+            onChange={e => setQ(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {sel.length > 0 && (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, padding: "10px 14px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10 }}>
+          <span style={{ fontSize: 12, color: "#f59e0b", fontWeight: 600, alignSelf: "center" }}>Selected ({sel.length}/4):</span>
+          {sel.map(id => {
+            const v = vendors.find(x => x.id === id);
+            return v ? (
+              <span key={id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0d1526", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#e8edf5" }}>
+                {v.name}
+                <button onClick={() => setSelected(s => s.filter(x => x !== id))} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+              </span>
+            ) : null;
+          })}
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        {!q && <div style={{ fontSize: 11, color: "#475569", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>Featured vendors — or search above</div>}
+        {results.map(v => {
+          const isSelected = sel.includes(v.id);
+          return (
+            <div key={v.id}
+              onClick={() => isSelected ? setSelected(s => s.filter(x => x !== v.id)) : sel.length < 4 ? setSelected(s => [...s, v.id]) : null}
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isSelected ? "rgba(245,158,11,0.06)" : "#0f1c30", border: `1px solid ${isSelected ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, cursor: sel.length >= 4 && !isSelected ? "not-allowed" : "pointer", opacity: sel.length >= 4 && !isSelected ? 0.5 : 1 }}>
+              <div style={{ ...S.logoCircle, background: v.color, width: 32, height: 32, fontSize: 10, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#e8edf5" }}>{v.name}</div>
+                <div style={{ fontSize: 11, color: "#475569" }}>{v.category} · {v.vendor_type || ""} · {v.price_range || "Pricing varies"}</div>
+              </div>
+              <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${isSelected ? "#f59e0b" : "rgba(255,255,255,0.2)"}`, background: isSelected ? "#f59e0b" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {isSelected && <span style={{ color: "#0b1220", fontSize: 13, fontWeight: 800 }}>✓</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {sel.length >= 2 && (
+        <button style={{ ...S.navCta, width: "100%", fontFamily: "inherit", padding: "14px", fontSize: 15 }} onClick={() => window.scrollTo(0, 0)}>
+          Compare {sel.length} vendors →
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ComparePage({ selected, setSelected, setPage, openDetail }) {
   const isMobile = useIsMobile();
   const sel = vendors.filter(v => selected.includes(v.id));
   const [saved, setSaved] = useState(false);
@@ -1803,77 +1877,7 @@ function ComparePage({ selected, setPage, openDetail }) {
     });
   };
 
-  if (sel.length < 2) return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>Compare vendors side by side</div>
-        <div style={{ fontSize: 14, color: "#64748b" }}>Search and select 2–4 vendors below to start comparing</div>
-      </div>
-      {(() => {
-        const [q, setQ] = useState("");
-        const results = q.length > 1 ? vendors.filter(v =>
-          v.name.toLowerCase().includes(q.toLowerCase()) ||
-          v.category.toLowerCase().includes(q.toLowerCase()) ||
-          (v.tags || []).some(t => t.toLowerCase().includes(q.toLowerCase()))
-        ).slice(0, 8) : vendors.filter(v => v.featured).slice(0, 6);
-        return (
-          <div>
-            <div style={{ position: "relative", marginBottom: 16 }}>
-              <div style={{ display: "flex", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden" }}>
-                <div style={{ padding: "0 14px", display: "flex", alignItems: "center", color: "#475569" }}><SearchIcon /></div>
-                <input
-                  autoFocus
-                  style={{ flex: 1, background: "transparent", border: "none", padding: "13px 0", fontSize: 14, color: "#e8edf5", outline: "none" }}
-                  placeholder="Search vendors by name, category, or technology..."
-                  value={q}
-                  onChange={e => setQ(e.target.value)}
-                />
-              </div>
-            </div>
-            {sel.length > 0 && (
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, padding: "10px 14px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10 }}>
-                <span style={{ fontSize: 12, color: "#f59e0b", fontWeight: 600, alignSelf: "center" }}>Selected ({sel.length}/4):</span>
-                {sel.map(id => {
-                  const v = vendors.find(x => x.id === id);
-                  return v ? (
-                    <span key={id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0d1526", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#e8edf5" }}>
-                      {v.name}
-                      <button onClick={() => setSelected(s => s.filter(x => x !== id))} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
-                    </span>
-                  ) : null;
-                })}
-              </div>
-            )}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-              {!q && <div style={{ fontSize: 11, color: "#475569", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>Featured vendors — or search above</div>}
-              {results.map(v => {
-                const isSelected = sel.includes(v.id);
-                return (
-                  <div key={v.id} onClick={() => !isSelected && sel.length < 4 ? setSelected(s => [...s, v.id]) : isSelected ? setSelected(s => s.filter(x => x !== v.id)) : null}
-                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isSelected ? "rgba(245,158,11,0.06)" : "#0f1c30", border: `1px solid ${isSelected ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, cursor: sel.length >= 4 && !isSelected ? "not-allowed" : "pointer", opacity: sel.length >= 4 && !isSelected ? 0.5 : 1 }}>
-                    <div style={{ ...S.logoCircle, background: v.color, width: 32, height: 32, fontSize: 10, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "#e8edf5" }}>{v.name}</div>
-                      <div style={{ fontSize: 11, color: "#475569" }}>{v.category} · {v.vendor_type || ""} · {v.price_range || "Pricing varies"}</div>
-                    </div>
-                    <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${isSelected ? "#f59e0b" : "rgba(255,255,255,0.2)"}`, background: isSelected ? "#f59e0b" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {isSelected && <span style={{ color: "#0b1220", fontSize: 13, fontWeight: 800 }}>✓</span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            {sel.length >= 2 && (
-              <button style={{ ...S.navCta, width: "100%", fontFamily: "inherit", padding: "14px", fontSize: 15 }} onClick={() => window.scrollTo(0,0)}>
-                Compare {sel.length} vendors →
-              </button>
-            )}
-          </div>
-        );
-      })()}
-    </div>
-  );
+  if (sel.length < 2) return <CompareVendorSearch sel={sel} setSelected={setSelected} openDetail={openDetail} setPage={setPage} />;
 
   const rows = [
     { label: "Type", fn: v => v.vendor_type || "—" },
