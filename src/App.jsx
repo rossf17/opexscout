@@ -174,6 +174,19 @@ const FORM_ENDPOINT = "https://formspree.io/f/mgodkjpy";
 const LEAD_LOG_KEY = "opexscout_local_lead_log";
 const SHORTLISTS_KEY = "opexscout_shortlists";
 const WORKSPACES_KEY = "opexscout_workspaces";
+const RECENTLY_VIEWED_KEY = "opexscout_recently_viewed";
+
+// ─── RECENTLY VIEWED ──────────────────────────────────────────────────────────
+function addRecentlyViewed(vendorId) {
+  try {
+    const existing = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || "[]");
+    const updated = [vendorId, ...existing.filter(id => id !== vendorId)].slice(0, 8);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(updated));
+  } catch {}
+}
+function getRecentlyViewed() {
+  try { return JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || "[]"); } catch { return []; }
+}
 
 // ─── SHORTLIST STORAGE ────────────────────────────────────────────────────────
 function genId() {
@@ -563,46 +576,72 @@ function Stars({ rating }) {
 
 function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
   const profile = getProfileScore(vendor);
+  const typeColor = { "Manufacturer": "#22c55e", "Software": "#818cf8", "Systems Integrator": "#f59e0b", "Manufacturer + SI": "#38bdf8", "Component Supplier": "#94a3b8" };
+  const typeBg = { "Manufacturer": "rgba(34,197,94,0.1)", "Software": "rgba(99,102,241,0.1)", "Systems Integrator": "rgba(245,158,11,0.1)", "Manufacturer + SI": "rgba(56,189,248,0.1)", "Component Supplier": "rgba(148,163,184,0.1)" };
+  const typeBorder = { "Manufacturer": "rgba(34,197,94,0.2)", "Software": "rgba(99,102,241,0.2)", "Systems Integrator": "rgba(245,158,11,0.2)", "Manufacturer + SI": "rgba(56,189,248,0.2)", "Component Supplier": "rgba(148,163,184,0.2)" };
+
   return (
     <div
       data-vendor-card
       style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}), boxShadow: selected ? "0 0 0 2px #f59e0b" : "none", transition: "all 0.18s ease" }}
       onClick={onClick}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-          <div style={{ ...S.logoCircle, background: vendor.color, marginBottom: 0 }}>{vendor.logo}</div>
-          {vendor.vendor_type && (
-            <span style={{
-              fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, letterSpacing: "0.04em",
-              background: vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.1)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.1)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.1)" : "rgba(56,189,248,0.1)",
-              color: vendor.vendor_type === "Manufacturer" ? "#22c55e" : vendor.vendor_type === "Software" ? "#818cf8" : vendor.vendor_type === "Systems Integrator" ? "#f59e0b" : "#38bdf8",
-              border: `1px solid ${vendor.vendor_type === "Manufacturer" ? "rgba(34,197,94,0.2)" : vendor.vendor_type === "Software" ? "rgba(99,102,241,0.2)" : vendor.vendor_type === "Systems Integrator" ? "rgba(245,158,11,0.2)" : "rgba(56,189,248,0.2)"}`,
-            }}>{vendor.vendor_type}</span>
-          )}
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ ...S.logoCircle, background: vendor.color, marginBottom: 0, flexShrink: 0 }}>{vendor.logo}</div>
+          <div>
+            <div style={S.cardName}>{vendor.name}</div>
+            <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>{vendor.hq} · Est. {vendor.founded}</div>
+          </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
-          {vendor.featured && <span style={{ fontSize: 10, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em" }}>FEATURED</span>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end", flexShrink: 0 }}>
+          {vendor.featured && <span style={{ fontSize: 9, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em" }}>FEATURED</span>}
           <ProfileScoreBadge vendor={vendor} />
         </div>
       </div>
-      <div style={S.cardName}>{vendor.name}</div>
-      <div style={S.cardTagline}>{vendor.tagline}</div>
-      <div style={S.tags}>
-        {vendor.tags.slice(0, 3).map(t => <span key={t} style={S.tag}>{t}</span>)}
+
+      {/* Type + Category badges */}
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+        {vendor.vendor_type && (
+          <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: typeBg[vendor.vendor_type] || "rgba(148,163,184,0.1)", color: typeColor[vendor.vendor_type] || "#94a3b8", border: `1px solid ${typeBorder[vendor.vendor_type] || "rgba(148,163,184,0.2)"}` }}>
+            {vendor.vendor_type}
+          </span>
+        )}
+        <span style={{ ...S.tag, fontSize: 10 }}>{vendor.category}</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
-        <div style={{ background: "#0d1526", borderRadius: 8, padding: "8px 10px" }}>
-          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Products</div>
-          <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: 700 }}>{profile.productCount || "Pending"}</div>
+
+      {/* Tagline */}
+      <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8, lineHeight: 1.5 }}>{vendor.tagline}</div>
+
+      {/* Best for snippet */}
+      {vendor.best_for && (
+        <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.5, marginBottom: 10, padding: "6px 8px", background: "rgba(34,197,94,0.05)", borderRadius: 6, borderLeft: "2px solid rgba(34,197,94,0.3)" }}>
+          <span style={{ color: "#22c55e", fontWeight: 600 }}>Best for: </span>{vendor.best_for.slice(0, 80)}{vendor.best_for.length > 80 ? "..." : ""}
         </div>
-        <div style={{ background: "#0d1526", borderRadius: 8, padding: "8px 10px" }}>
-          <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>Price range</div>
+      )}
+
+      {/* Stats row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+        <div style={{ background: "#0d1526", borderRadius: 6, padding: "6px 8px" }}>
+          <div style={{ fontSize: 9, color: "#475569", marginBottom: 2 }}>Products</div>
+          <div style={{ fontSize: 12, color: "#e8edf5", fontWeight: 700 }}>{profile.productCount || "—"}</div>
+        </div>
+        <div style={{ background: "#0d1526", borderRadius: 6, padding: "6px 8px" }}>
+          <div style={{ fontSize: 9, color: "#475569", marginBottom: 2 }}>Price</div>
           <div style={{ fontSize: 12, color: vendor.price_range ? "#94a3b8" : "#334155", fontWeight: 700 }}>{vendor.price_range || "—"}</div>
         </div>
+        <div style={{ background: "#0d1526", borderRadius: 6, padding: "6px 8px" }}>
+          <div style={{ fontSize: 9, color: "#475569", marginBottom: 2 }}>Timeline</div>
+          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, lineHeight: 1.2 }}>{vendor.implementation_pilot?.split(" ")[0] || "—"}</div>
+        </div>
       </div>
-      <div style={S.cardFooter}>
-        <span style={{ fontSize: 12, color: "#475569" }}>{vendor.category}</span>
+
+      {/* Footer */}
+      <div style={{ ...S.cardFooter }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+          {vendor.tags.slice(0, 2).map(t => <span key={t} style={S.tag}>{t}</span>)}
+        </div>
         <label style={S.compareCheck} onClick={e => e.stopPropagation()}>
           <input
             type="checkbox"
@@ -642,7 +681,12 @@ function NavBar({ page, setPage }) {
         </div>
       )}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {!isMobile && <button style={S.navCta} onClick={() => setPage("list")}>Claim Listing</button>}
+        {!isMobile && (
+          <>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "7px 14px", fontSize: 12 }} onClick={() => setPage("solution")}>Find solution</button>
+            <button style={{ padding: "7px 14px", background: "transparent", color: "#64748b", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, fontSize: 12, cursor: "pointer" }} onClick={() => setPage("list")}>For vendors</button>
+          </>
+        )}
         {isMobile && (
           <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 12px", color: "#94a3b8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>
             {menuOpen ? "✕" : "☰"}
@@ -669,6 +713,8 @@ function NavBar({ page, setPage }) {
 // ─── PAGES ───────────────────────────────────────────────────────────────────
 function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch }) {
   const isMobile = useIsMobile();
+  const recentIds = getRecentlyViewed();
+  const recentVendors = recentIds.map(id => vendors.find(v => v.id === id)).filter(Boolean);
   const catCounts = categories.map(c => ({ name: c, count: vendors.filter(v => v.category === c).length }));
   const featured = vendors.filter(v => v.featured).slice(0, 3);
   const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭", "🚚", "📊", "👁️", "🧩"];
@@ -682,7 +728,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
           </div>
           <div style={S.heroEyebrow}>Independent automation vendor intelligence</div>
           <h1 style={S.heroH1}>Compare automation vendors like a buyer, not a booth visitor</h1>
-          <p style={S.heroSub}>OpEx Scout helps warehouse, manufacturing, and industrial teams research vendors, review products, compare fit, and submit qualified RFIs from one place.</p>
+          <p style={S.heroSub}>75 vendor profiles with pricing context, implementation timelines, strengths, watch-outs, and practitioner-grade evaluation tools. Built by IEs, for IEs.</p>
           <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20, flexWrap: "wrap", padding: "0 16px" }}>
             <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find a solution</button>
             <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse directory</button>
@@ -760,6 +806,27 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
         </div>
       </div>
 
+      {recentVendors.length > 0 && (
+        <div style={S.section}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={S.sectionTitle}>Recently viewed</div>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "5px 12px", fontSize: 12 }} onClick={() => setPage("directory")}>View all →</button>
+          </div>
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+            {recentVendors.map(v => (
+              <div key={v.id} onClick={() => openDetail(v, "home", "home")}
+                style={{ flexShrink: 0, background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, minWidth: 180, maxWidth: 220 }}>
+                <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 9, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
+                  <div style={{ fontSize: 10, color: "#475569", marginTop: 2 }}>{v.category}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={{ background: "#0d1526", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={S.section}>
           <div style={S.sectionTitle}>Featured vendor profiles</div>
@@ -808,6 +875,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [integrationFilter, setIntegrationFilter] = useState("");
   const [view, setView] = useState("grid");
   const [sortBy, setSortBy] = useState("featured");
 
@@ -837,8 +905,9 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
     const matchCat = !catFilter || v.category === catFilter || v.tags.some(t => t.toLowerCase().includes(catFilter.toLowerCase()));
     const matchInd = !indFilter || v.industry.includes(indFilter);
     const matchType = !typeFilter || v.vendor_type === typeFilter;
-    return matchQ && matchCat && matchInd && matchType;
-  }).map(x => x.vendor), [search, catFilter, indFilter, typeFilter, vendorSearchIndex]);
+    const matchIntegration = !integrationFilter || (v.integrations || []).some(i => i.toLowerCase().includes(integrationFilter.toLowerCase()));
+    return matchQ && matchCat && matchInd && matchType && matchIntegration;
+  }).map(x => x.vendor), [search, catFilter, indFilter, typeFilter, integrationFilter, vendorSearchIndex]);
 
   const priceTierOrder = { "$": 1, "$$": 2, "$$$": 3, "$$$$": 4, "RaaS": 5 };
 
@@ -888,6 +957,10 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
             <option value="">All industries</option>
             {industries.map(i => <option key={i}>{i}</option>)}
           </select>
+          <select style={{ ...S.rfiInput, marginBottom: 0, width: "auto", padding: "11px 14px" }} value={integrationFilter} onChange={e => setIntegrationFilter(e.target.value)}>
+            <option value="">Works with...</option>
+            {["Manhattan Associates", "SAP EWM", "Blue Yonder", "Oracle WMS", "Rockwell Automation", "Siemens", "Zebra", "Körber", "Infor", "Softeon", "All major WMS"].map(i => <option key={i} value={i}>{i}</option>)}
+          </select>
         </div>
         <div style={S.chips}>
           {["", ...categories.slice(0, 6)].map((c, i) => (
@@ -929,8 +1002,8 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
         <div style={S.contentHeader}>
           <span style={S.resultCount}>
             Showing <strong style={{ color: "#94a3b8" }}>{filtered.length}</strong> vendor{filtered.length !== 1 ? "s" : ""}
-            {(catFilter || typeFilter || indFilter) && <span style={{ color: "#475569" }}> · {[catFilter, typeFilter, indFilter].filter(Boolean).join(", ")}</span>}
-            {(catFilter || typeFilter || indFilter) && <span style={{ color: "#f59e0b", cursor: "pointer", marginLeft: 8, fontSize: 11 }} onClick={() => { setCatFilter(""); setTypeFilter(""); setIndFilter(""); }}>Clear filters</span>}
+            {(catFilter || typeFilter || indFilter || integrationFilter) && <span style={{ color: "#475569" }}> · {[catFilter, typeFilter, indFilter, integrationFilter && `Works with ${integrationFilter}`].filter(Boolean).join(", ")}</span>}
+            {(catFilter || typeFilter || indFilter || integrationFilter) && <span style={{ color: "#f59e0b", cursor: "pointer", marginLeft: 8, fontSize: 11 }} onClick={() => { setCatFilter(""); setTypeFilter(""); setIndFilter(""); setIntegrationFilter(""); }}>Clear filters</span>}
           </span>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <select style={{ ...S.rfiInput, marginBottom: 0, padding: "6px 10px", fontSize: 12, width: "auto" }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
@@ -956,7 +1029,7 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
               Try broadening your search or clearing some filters.
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-              <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => { setSearch(""); setCatFilter(""); setTypeFilter(""); setIndFilter(""); }}>Clear all filters</button>
+              <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => { setSearch(""); setCatFilter(""); setTypeFilter(""); setIndFilter(""); setIntegrationFilter(""); }}>Clear all filters</button>
               <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("solution")}>Try Find Solution instead</button>
             </div>
           </div>
@@ -1733,15 +1806,27 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "260px 1fr", gap: 20 }}>
-        <div style={S.sideCard}>
-          <div style={S.sideCardTitle}>Categories</div>
-          {categories.map(c => (
-            <div key={c} style={{ ...S.filterItem, color: activeCategory === c ? "#f59e0b" : "#64748b", background: activeCategory === c ? "rgba(245,158,11,0.08)" : "transparent" }} onClick={() => setCategoryPageCategory(c)}>
-              <span>{c}</span>
-              <span style={{ marginLeft: "auto", fontSize: 11, color: "#475569" }}>{vendors.filter(v => v.category === c).length}</span>
-            </div>
-          ))}
-        </div>
+        {isMobile ? (
+          <div style={{ overflowX: "auto", display: "flex", gap: 8, paddingBottom: 4, marginBottom: 4 }}>
+            {categories.map(c => (
+              <button key={c} onClick={() => setCategoryPageCategory(c)} style={{ flexShrink: 0, padding: "6px 14px", borderRadius: 20, border: `1px solid ${activeCategory === c ? "#f59e0b" : "rgba(255,255,255,0.1)"}`, background: activeCategory === c ? "rgba(245,158,11,0.1)" : "transparent", color: activeCategory === c ? "#f59e0b" : "#64748b", fontSize: 12, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                {c} <span style={{ opacity: 0.6 }}>({vendors.filter(v => v.category === c).length})</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={S.sideCard}>
+            <div style={S.sideCardTitle}>Categories</div>
+            {categories.map(c => (
+              <div key={c} style={{ ...S.filterItem, color: activeCategory === c ? "#f59e0b" : "#64748b", background: activeCategory === c ? "rgba(245,158,11,0.08)" : "transparent" }} onClick={() => setCategoryPageCategory(c)}>
+                <span>{c}</span>
+                <span style={{ marginLeft: "auto", fontSize: 11, color: "#475569" }}>{vendors.filter(v => v.category === c).length}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        )}
 
         <div>
           <div style={{ ...S.sideCard, marginBottom: 16 }}>
@@ -2781,7 +2866,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
 
         {/* Progress bar */}
         {(() => {
-          const checks = [ws.problemStatement, ws.facilitySqft, ws.vendorIds.length > 0, Object.keys(ws.scorecard).length > 0, ws.roi.laborHeadcount, Object.keys(ws.rfis).length > 0];
+          const checks = [ws.problemStatement, ws.facilitySqft || ws.throughputTarget, ws.vendorIds.length > 0, Object.keys(ws.scorecard).length > 0, ws.roi.laborHeadcount && ws.roi.laborRate, Object.keys(ws.rfis).length > 0];
           const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
           return (
             <div style={{ marginBottom: 20, background: "#0f1c30", borderRadius: 10, padding: "12px 16px", border: "1px solid rgba(255,255,255,0.06)" }}>
@@ -3764,6 +3849,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
     window.history.pushState({ page: "detail", slug: vendor.slug }, "", `#vendor/${vendor.slug}`);
     document.title = `${vendor.name} — OpEx Scout`;
+    addRecentlyViewed(vendor.id);
   };
 
   return (
