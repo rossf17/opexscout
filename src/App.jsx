@@ -659,11 +659,10 @@ function NavBar({ page, setPage }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = [
     ["directory", "Directory"],
+    ["matrix", "Compare Matrix"],
     ["categories", "Categories"],
     ["solution", "Find Solution"],
-    ["compare", "Compare"],
     ["shortlists", "Workspace"],
-    ["methodology", "Methodology"],
   ];
   return (
     <nav style={S.nav}>
@@ -862,7 +861,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
   );
 }
 
-function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter, initialSearch, setInitialSearch, activeWorkspaceId, onAddToWorkspace }) {
+function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFilter, setCategoryFilter, initialSearch, setInitialSearch, activeWorkspaceId, onAddToWorkspace, setMatrixCategory }) {
   const [search, setSearch] = useState(initialSearch || "");
   const [catFilter, setCatFilter] = useState(categoryFilter || "");
   const [indFilter, setIndFilter] = useState("");
@@ -998,6 +997,12 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
             {(catFilter || typeFilter || indFilter || integrationFilter) && <span style={{ color: "#f59e0b", cursor: "pointer", marginLeft: 8, fontSize: 11 }} onClick={() => { setCatFilter(""); setTypeFilter(""); setIndFilter(""); setIntegrationFilter(""); }}>Clear filters</span>}
           </span>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            {catFilter && (
+              <button style={{ padding: "6px 12px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, color: "#f59e0b", fontSize: 11, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}
+                onClick={() => { setMatrixCategory(catFilter); setPage("matrix"); }}>
+                ⊞ Compare matrix
+              </button>
+            )}
             <select style={{ ...S.rfiInput, marginBottom: 0, padding: "6px 10px", fontSize: 12, width: "auto" }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
               <option value="featured">Featured first</option>
               <option value="az">A → Z</option>
@@ -1559,10 +1564,19 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
             )}
 
             <div style={{ ...S.sideCard }} id="rfi-form">
-              <div style={S.sideCardTitle}>Get info from {vendor.name}</div>
-              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12, lineHeight: 1.5 }}>Your info goes directly to {vendor.name}. OpEx Scout does not sell your data.</div>
+              <div style={S.sideCardTitle}>Contact {vendor.name}</div>
+              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12, lineHeight: 1.6 }}>
+                OpEx Scout will forward your request to {vendor.name} on your behalf. You may not receive a reply if the vendor hasn't claimed their listing — in that case, contact them directly at <a href={`https://${vendor.website?.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: "#f59e0b" }}>{vendor.website}</a>.
+              </div>
               {rfiSent ? (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: '#f59e0b' }}><div style={{ fontSize: 28, marginBottom: 8 }}>✓</div><div style={{ fontSize: 14, fontWeight: 600 }}>Request sent</div><div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>Expect to hear from {vendor.name} within 2–3 business days.</div></div>
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>✓</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#e8edf5", marginBottom: 6 }}>Request logged</div>
+                  <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
+                    Your inquiry has been recorded. Since {vendor.name} hasn't claimed their listing yet, we recommend also reaching out directly at{' '}
+                    <a href={`https://${vendor.website?.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: "#f59e0b" }}>{vendor.website}</a>.
+                  </div>
+                </div>
               ) : (
                 <>
                   <label style={S.rfiLabel}>Name *</label>
@@ -1582,7 +1596,12 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
                     <label style={S.rfiLabel}>Project type</label>
                     <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}><option>New DC / greenfield build</option><option>Brownfield retrofit</option><option>Capacity expansion</option><option>Vendor replacement</option><option>Feasibility study</option><option>Manufacturing automation</option></select>
                   </details>
-                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>{rfiLoading ? 'Sending...' : `Contact ${vendor.name}`}</button>
+                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>{rfiLoading ? 'Logging...' : 'Log this inquiry'}</button>
+                  <div style={{ marginTop: 8, textAlign: "center" }}>
+                    <a href={`https://${vendor.website?.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#f59e0b", textDecoration: "none" }}>
+                      Go directly to {vendor.name} →
+                    </a>
+                  </div>
                 </>
               )}
             </div>
@@ -1827,7 +1846,7 @@ function ComparePage({ selected, setPage, openDetail }) {
   );
 }
 
-function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageCategory, setCategoryPageCategory, addProductToCompare, selectedProducts }) {
+function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageCategory, setCategoryPageCategory, addProductToCompare, selectedProducts, setMatrixCategory }) {
   const isMobile = useIsMobile();
   const activeCategory = categoryPageCategory || categories[0];
   const categoryVendors = vendors.filter(v => v.category === activeCategory || v.tags.some(t => t.toLowerCase().includes(activeCategory.toLowerCase().split(" ")[0])));
@@ -1891,7 +1910,11 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
                 <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 18 }}>{categoryCopy[activeCategory] || "Vendor and product research for this automation category."}</p>
                 <div style={S.tags}>{["Vendor shortlist", "Product specs", "Buyer questions", "RFI-ready"].map(t => <span key={t} style={S.tag}>{t}</span>)}</div>
               </div>
-              <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={() => { setCategoryFilter(activeCategory); setPage("directory"); }}>Open directory</button>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button style={{ padding: "8px 14px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, color: "#f59e0b", fontSize: 12, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap", fontFamily: "inherit" }}
+                  onClick={() => { setMatrixCategory(activeCategory); setPage("matrix"); }}>⊞ Compare matrix</button>
+                <button style={{ ...S.navCta, fontFamily: "inherit", whiteSpace: "nowrap" }} onClick={() => { setCategoryFilter(activeCategory); setPage("directory"); }}>All vendors →</button>
+              </div>
             </div>
           </div>
 
@@ -2355,6 +2378,151 @@ function ListPage({ setPage }) {
           <button style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }} onClick={submit} disabled={loading}>{loading ? 'Submitting...' : 'Submit listing request'}</button>
         </>
       )}
+    </div>
+  );
+}
+
+function CategoryMatrixPage({ setPage, openDetail, initialCategory }) {
+  const isMobile = useIsMobile();
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "AMR / Mobile Robots");
+
+  const categoryVendors = vendors.filter(v => v.category === selectedCategory);
+
+  // Matrix columns vary by category type
+  const getMatrixColumns = (cat) => {
+    const common = [
+      { key: "vendor_type", label: "Type" },
+      { key: "price_range", label: "Price tier" },
+      { key: "implementation_pilot", label: "Pilot timeline" },
+      { key: "installs", label: "Installations" },
+      { key: "hq", label: "HQ" },
+    ];
+    const byCategory = {
+      "AMR / Mobile Robots": [
+        { key: "payload_spec", label: "Max payload", fn: v => (allProducts[v.slug]||[]).find(p => p.payload)?.payload || "—" },
+        { key: "nav_spec", label: "Navigation", fn: v => (allProducts[v.slug]||[]).find(p => p.navigation)?.navigation || "—" },
+        { key: "speed_spec", label: "Speed", fn: v => (allProducts[v.slug]||[]).find(p => p.speed)?.speed || "—" },
+        ...common,
+        { key: "best_for_short", label: "Best for", fn: v => (v.best_for || "").slice(0, 60) + (v.best_for?.length > 60 ? "…" : "") },
+        { key: "not_for_short", label: "Watch-out", fn: v => (v.not_for || "").slice(0, 60) + (v.not_for?.length > 60 ? "…" : "") },
+      ],
+      "Industrial Robotics": [
+        { key: "payload_spec", label: "Max payload", fn: v => (allProducts[v.slug]||[]).find(p => p.payload)?.payload || "—" },
+        { key: "reach_spec", label: "Reach", fn: v => (allProducts[v.slug]||[]).find(p => p.reach)?.reach || "—" },
+        { key: "axes_spec", label: "Axes", fn: v => (allProducts[v.slug]||[]).find(p => p.axes)?.axes || "—" },
+        ...common,
+        { key: "best_for_short", label: "Best for", fn: v => (v.best_for || "").slice(0, 60) + (v.best_for?.length > 60 ? "…" : "") },
+      ],
+      "WMS Platforms": [
+        { key: "deployment_spec", label: "Deployment", fn: v => (allProducts[v.slug]||[]).find(p => p.deployment)?.deployment || v.implementation_pilot || "—" },
+        ...common,
+        { key: "integrations_short", label: "Key integrations", fn: v => (v.integrations || []).slice(0, 3).join(", ") },
+        { key: "best_for_short", label: "Best for", fn: v => (v.best_for || "").slice(0, 60) + (v.best_for?.length > 60 ? "…" : "") },
+        { key: "not_for_short", label: "Watch-out", fn: v => (v.not_for || "").slice(0, 60) + (v.not_for?.length > 60 ? "…" : "") },
+      ],
+    };
+    return byCategory[cat] || [
+      ...common,
+      { key: "best_for_short", label: "Best for", fn: v => (v.best_for || "").slice(0, 60) + (v.best_for?.length > 60 ? "…" : "") },
+      { key: "not_for_short", label: "Watch-out", fn: v => (v.not_for || "").slice(0, 60) + (v.not_for?.length > 60 ? "…" : "") },
+    ];
+  };
+
+  const columns = getMatrixColumns(selectedCategory);
+
+  const getCellValue = (vendor, col) => {
+    if (col.fn) return col.fn(vendor);
+    return vendor[col.key] || "—";
+  };
+
+  const priceTierColor = { "$": "#22c55e", "$$": "#f59e0b", "$$$": "#f97316", "$$$$": "#ef4444", "RaaS": "#818cf8" };
+  const typeColor = { "Manufacturer": "#22c55e", "Software": "#818cf8", "Systems Integrator": "#f59e0b", "Manufacturer + SI": "#38bdf8" };
+
+  return (
+    <div style={{ background: "#0b1220", minHeight: "100vh" }}>
+      <div style={{ maxWidth: 1300, margin: "0 auto", padding: isMobile ? "16px" : "28px" }}>
+        <button style={S.backBtn} onClick={() => setPage("directory")}><ArrowLeft /> Back to directory</button>
+
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={S.heroEyebrow}>Comparison Matrix</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#e8edf5", letterSpacing: "-0.3px" }}>{selectedCategory}</div>
+            <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>{categoryVendors.length} vendors · side-by-side comparison</div>
+          </div>
+          <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find vendors for my project →</button>
+        </div>
+
+        {/* Category switcher */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+          {categories.map(c => (
+            <button key={c} onClick={() => setSelectedCategory(c)}
+              style={{ padding: "5px 12px", borderRadius: 20, border: `1px solid ${selectedCategory === c ? "#f59e0b" : "rgba(255,255,255,0.1)"}`, background: selectedCategory === c ? "rgba(245,158,11,0.1)" : "transparent", color: selectedCategory === c ? "#f59e0b" : "#64748b", fontSize: 11, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+              {c} ({vendors.filter(v => v.category === c).length})
+            </button>
+          ))}
+        </div>
+
+        {/* Matrix table */}
+        <div style={{ overflowX: "auto", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 700 }}>
+            <thead>
+              <tr style={{ background: "#0d1526" }}>
+                <th style={{ padding: "12px 16px", textAlign: "left", color: "#475569", fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em", minWidth: 160, position: "sticky", left: 0, background: "#0d1526", borderRight: "1px solid rgba(255,255,255,0.07)" }}>Vendor</th>
+                {columns.map(col => (
+                  <th key={col.key} style={{ padding: "12px 14px", textAlign: "left", color: "#475569", fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap", borderLeft: "1px solid rgba(255,255,255,0.04)" }}>{col.label}</th>
+                ))}
+                <th style={{ padding: "12px 14px", color: "#475569", fontWeight: 600, fontSize: 11, textTransform: "uppercase", borderLeft: "1px solid rgba(255,255,255,0.04)" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categoryVendors.map((v, idx) => (
+                <tr key={v.id} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e" }}
+                  onClick={() => openDetail(v, "matrix", "matrix")} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e", cursor: "pointer" }}>
+                  <td style={{ padding: "12px 16px", position: "sticky", left: 0, background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e", borderRight: "1px solid rgba(255,255,255,0.07)", zIndex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 9, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5" }}>{v.name}</div>
+                        {v.featured && <span style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700 }}>FEATURED</span>}
+                      </div>
+                    </div>
+                  </td>
+                  {columns.map(col => {
+                    const val = getCellValue(v, col);
+                    return (
+                      <td key={col.key} style={{ padding: "12px 14px", borderLeft: "1px solid rgba(255,255,255,0.04)", verticalAlign: "top", maxWidth: 220 }}>
+                        {col.key === "price_range" || col.key === "price_tier" ? (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: priceTierColor[val] || "#94a3b8" }}>{val}</span>
+                        ) : col.key === "vendor_type" ? (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: typeColor[val] || "#94a3b8" }}>{val}</span>
+                        ) : col.key === "best_for_short" ? (
+                          <span style={{ fontSize: 11, color: "#64748b", lineHeight: 1.5 }}>{val}</span>
+                        ) : col.key === "not_for_short" ? (
+                          <span style={{ fontSize: 11, color: "#ef4444", opacity: 0.8, lineHeight: 1.5 }}>{val}</span>
+                        ) : (
+                          <span style={{ fontSize: 12, color: val === "—" ? "#334155" : "#94a3b8" }}>{val}</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                  <td style={{ padding: "12px 14px", borderLeft: "1px solid rgba(255,255,255,0.04)" }}>
+                    <button
+                      onClick={e => { e.stopPropagation(); openDetail(v, "matrix", `${selectedCategory} matrix`); }}
+                      style={{ padding: "5px 10px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, color: "#f59e0b", fontSize: 11, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
+                      Full profile →
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Explanation */}
+        <div style={{ marginTop: 16, padding: "12px 16px", background: "#0d1526", borderRadius: 8, fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
+          <strong style={{ color: "#64748b" }}>How to use this matrix:</strong> Click any vendor row to open their full profile. Use the category buttons above to switch categories. Pricing tiers, implementation timelines, and best-fit notes are based on industry research — validate specific numbers with vendor proposals. <button onClick={() => setPage("methodology")} style={{ background: "none", border: "none", color: "#f59e0b", cursor: "pointer", fontSize: 12, padding: 0, fontFamily: "inherit" }}>Methodology →</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -2823,64 +2991,180 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
 
   // ── BUSINESS CASE EXPORT ──────────────────────────────────────────────────
   const exportBusinessCase = () => {
-    const lines = [
-      `AUTOMATION EVALUATION — BUSINESS CASE`,
-      `Project: ${ws.projectName}`,
-      `Generated: ${new Date().toLocaleDateString()}`,
-      ``,
-      `── PROJECT CONTEXT ───────────────────────────────────`,
-      `Facility: ${ws.facilityType} · ${ws.facilitySqft ? ws.facilitySqft + " sqft" : "Size TBD"}`,
-      `Throughput target: ${ws.throughputTarget || "TBD"}`,
-      `Current WMS/ERP: ${ws.currentWMS || "TBD"}`,
-      `Project type: ${ws.projectType}`,
-      `Budget range: ${ws.budgetRange}`,
-      `Timeline: ${ws.timeline}`,
-      ``,
-      `Problem statement:`,
-      ws.problemStatement || "(not entered)",
-      ``,
-      `Success criteria:`,
-      ws.successCriteria || "(not entered)",
-      ``,
-      `── VENDORS EVALUATED ────────────────────────────────`,
-      ...wsVendors.map(v => `• ${v.name} (${v.category}) — ${v.price_range || "pricing TBD"}`),
-      ``,
-      `── SCORECARD RANKINGS ───────────────────────────────`,
-      ...vendorScores.map((vs, i) => `#${i + 1} ${vs.vendor.name} — ${vs.total}% weighted score`),
-      ``,
-      `── ROI ANALYSIS ─────────────────────────────────────`,
-      `Annual labor cost (current): $${Math.round(annualLaborCost).toLocaleString()}`,
-      `Automation capture rate: ${r.automationCapturePercent || 70}%`,
-      `Estimated annual savings: $${Math.round(annualSavings).toLocaleString()}`,
-      `Estimated investment: $${budgetMid.toLocaleString()} (midpoint of ${ws.budgetRange})`,
-      paybackMonths ? `Payback period: ~${paybackMonths} months` : `Payback: enter labor data to calculate`,
-      npv3yr ? `3-year NPV: $${npv3yr.toLocaleString()}` : "",
-      ``,
-      `── RFI STATUS ───────────────────────────────────────`,
-      ...wsVendors.map(v => {
-        const rfi = ws.rfis[v.id] || {};
-        return `• ${v.name}: ${rfi.responseStatus || "Not contacted"} ${rfi.demoScheduled ? "| Demo: " + (rfi.demoDate || "scheduled") : ""}`;
-      }),
-      ``,
-      `── TOP RECOMMENDATION ───────────────────────────────`,
-      vendorScores[0] ? `Based on weighted scorecard: ${vendorScores[0].vendor.name} (${vendorScores[0].total}% score)` : "Complete scorecard to generate recommendation",
-      ``,
-      `── NEXT STEPS ───────────────────────────────────────`,
-      `1. Schedule demos with top 2-3 vendors`,
-      `2. Request formal proposals with scope and pricing`,
-      `3. Conduct site visits or reference calls`,
-      `4. Present shortlist to leadership for approval`,
-      ``,
-      `Generated by OpEx Scout — opexscout.com`,
-    ];
-    const text = lines.join("\n");
-    const blob = new Blob([text], { type: "text/plain" });
+    const scoreRows = vendorScores.filter(vs => vs.total > 0).map((vs, i) => `
+      <tr style="border-bottom:1px solid #e5e7eb;">
+        <td style="padding:8px 12px;font-weight:600;">#${i+1} ${vs.vendor.name}</td>
+        <td style="padding:8px 12px;">${vs.vendor.category}</td>
+        <td style="padding:8px 12px;">${vs.vendor.price_range || '—'}</td>
+        <td style="padding:8px 12px;">${vs.vendor.vendor_type || '—'}</td>
+        <td style="padding:8px 12px;font-weight:700;color:${vs.total >= 70 ? '#16a34a' : vs.total >= 50 ? '#d97706' : '#6b7280'};">${vs.total}%</td>
+        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${(ws.scorecard[vs.vendor.id]?.notes || '—').slice(0,60)}</td>
+      </tr>`).join('');
+
+    const rfiRows = wsVendors.map(v => {
+      const rfi = ws.rfis[v.id] || {};
+      return `<tr style="border-bottom:1px solid #e5e7eb;">
+        <td style="padding:8px 12px;font-weight:600;">${v.name}</td>
+        <td style="padding:8px 12px;">${rfi.contactName || '—'}</td>
+        <td style="padding:8px 12px;">${rfi.contactEmail || '—'}</td>
+        <td style="padding:8px 12px;">${rfi.responseStatus || 'Not contacted'}</td>
+        <td style="padding:8px 12px;">${rfi.demoDate || '—'}</td>
+        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${(rfi.notes || '—').slice(0,80)}</td>
+      </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${ws.projectName} — Automation Evaluation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #111; background: #fff; font-size: 13px; line-height: 1.5; }
+  .page { max-width: 900px; margin: 0 auto; padding: 48px 48px; }
+  .header { border-bottom: 3px solid #f59e0b; padding-bottom: 20px; margin-bottom: 28px; }
+  .logo { font-size: 13px; font-weight: 700; color: #f59e0b; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .meta { font-size: 12px; color: #6b7280; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid #f3f4f6; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
+  .box-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .box-value { font-size: 14px; font-weight: 600; color: #111; }
+  .prose { font-size: 13px; color: #374151; line-height: 1.7; background: #f9fafb; border-left: 3px solid #f59e0b; padding: 12px 16px; border-radius: 0 6px 6px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { padding: 8px 12px; background: #f3f4f6; text-align: left; font-weight: 600; font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+  .highlight { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 14px 16px; margin-bottom: 16px; }
+  .highlight-title { font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .roi-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+  .roi-label { color: #6b7280; }
+  .roi-value { font-weight: 700; color: #111; }
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; display: flex; justify-content: space-between; }
+  .tag { display: inline-block; background: #f3f4f6; border-radius: 4px; padding: 2px 8px; font-size: 11px; color: #6b7280; margin: 2px; }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo">OpEx Scout — Automation Evaluation</div>
+    <h1>${ws.projectName || 'Automation Evaluation'}</h1>
+    <div class="meta">Generated ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})} · Confidential</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Project Context</div>
+    <div class="grid">
+      <div class="box"><div class="box-label">Facility Type</div><div class="box-value">${ws.facilityType}</div></div>
+      <div class="box"><div class="box-label">Facility Size</div><div class="box-value">${ws.facilitySqft ? ws.facilitySqft + ' sqft' : 'TBD'}</div></div>
+      <div class="box"><div class="box-label">Project Type</div><div class="box-value">${ws.projectType}</div></div>
+      <div class="box"><div class="box-label">Budget Range</div><div class="box-value">${ws.budgetRange}</div></div>
+      <div class="box"><div class="box-label">Timeline</div><div class="box-value">${ws.timeline}</div></div>
+      <div class="box"><div class="box-label">Current Systems</div><div class="box-value">${ws.currentWMS || 'TBD'}</div></div>
+    </div>
+    ${ws.problemStatement ? `<div class="box-label" style="margin-bottom:6px">Problem Statement</div><div class="prose">${ws.problemStatement}</div>` : ''}
+    ${ws.successCriteria ? `<div class="box-label" style="margin-top:12px;margin-bottom:6px">Success Criteria</div><div class="prose">${ws.successCriteria}</div>` : ''}
+  </div>
+
+  ${annualSavings > 0 ? `
+  <div class="section">
+    <div class="section-title">ROI Analysis</div>
+    <div class="highlight">
+      <div class="highlight-title">Financial Summary</div>
+      <div class="roi-row"><span class="roi-label">Annual labor cost (current)</span><span class="roi-value">$${Math.round(annualLaborCost).toLocaleString()}</span></div>
+      <div class="roi-row"><span class="roi-label">Automation capture rate</span><span class="roi-value">${r.automationCapturePercent || 70}%</span></div>
+      <div class="roi-row"><span class="roi-label">Estimated annual savings</span><span class="roi-value">$${Math.round(annualSavings).toLocaleString()}</span></div>
+      <div class="roi-row"><span class="roi-label">Estimated investment (${ws.budgetRange})</span><span class="roi-value">$${budgetMid.toLocaleString()}</span></div>
+      ${paybackMonths ? `<div class="roi-row"><span class="roi-label">Payback period</span><span class="roi-value" style="color:#16a34a;">~${paybackMonths} months</span></div>` : ''}
+      ${npv3yr ? `<div class="roi-row"><span class="roi-label">3-year net savings</span><span class="roi-value" style="color:#16a34a;">$${npv3yr.toLocaleString()}</span></div>` : ''}
+    </div>
+    <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Note: ROI estimates are directional and based on labor displacement only. Implementation costs, training, maintenance, and throughput improvement value should be validated with vendor proposals before capital approval.</p>
+  </div>` : ''}
+
+  ${wsVendors.length > 0 ? `
+  <div class="section">
+    <div class="section-title">Vendors Evaluated (${wsVendors.length})</div>
+    <table>
+      <thead><tr>
+        <th>Vendor</th><th>Category</th><th>Type</th><th>Price Tier</th><th>Implementation</th>
+      </tr></thead>
+      <tbody>
+        ${wsVendors.map(v => `<tr style="border-bottom:1px solid #e5e7eb;">
+          <td style="padding:8px 12px;font-weight:600;">${v.name}</td>
+          <td style="padding:8px 12px;">${v.category}</td>
+          <td style="padding:8px 12px;">${v.vendor_type || '—'}</td>
+          <td style="padding:8px 12px;">${v.price_range || '—'}</td>
+          <td style="padding:8px 12px;font-size:11px;">${v.implementation_pilot || '—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>` : ''}
+
+  ${vendorScores.some(vs => vs.total > 0) ? `
+  <div class="section">
+    <div class="section-title">Scorecard Rankings</div>
+    <table>
+      <thead><tr><th>Rank</th><th>Category</th><th>Price</th><th>Type</th><th>Score</th><th>Notes</th></tr></thead>
+      <tbody>${scoreRows}</tbody>
+    </table>
+    <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Weighted scoring: Use case fit ×3, Implementation risk ×2, Vendor support ×2, Integration ease ×2, Cost/value ×1</p>
+  </div>` : ''}
+
+  ${wsVendors.length > 0 && Object.keys(ws.rfis).length > 0 ? `
+  <div class="section">
+    <div class="section-title">RFI & Outreach Status</div>
+    <table>
+      <thead><tr><th>Vendor</th><th>Contact</th><th>Email</th><th>Status</th><th>Demo Date</th><th>Notes</th></tr></thead>
+      <tbody>${rfiRows}</tbody>
+    </table>
+  </div>` : ''}
+
+  ${vendorScores[0]?.total > 0 ? `
+  <div class="section">
+    <div class="section-title">Recommendation</div>
+    <div class="highlight">
+      <div class="highlight-title">Top Recommendation (Based on Scorecard)</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;">${vendorScores[0].vendor.name}</div>
+      <div style="font-size:13px;color:#374151;">${vendorScores[0].vendor.best_for || vendorScores[0].vendor.tagline || ''}</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:6px;">Weighted score: ${vendorScores[0].total}% · ${vendorScores[0].vendor.vendor_type || ''} · ${vendorScores[0].vendor.price_range || ''}</div>
+    </div>
+  </div>` : ''}
+
+  <div class="section">
+    <div class="section-title">Recommended Next Steps</div>
+    <ol style="padding-left:20px;color:#374151;line-height:2;">
+      <li>Schedule demos with top 2–3 vendors based on scorecard rankings</li>
+      <li>Request formal proposals including full scope, integration cost, and implementation timeline</li>
+      <li>Conduct reference calls with existing customers at comparable operations</li>
+      <li>Validate ROI assumptions with vendor-provided throughput and uptime data</li>
+      <li>Present final shortlist and business case to leadership for capital approval</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <span>Generated by OpEx Scout — opexscout.com</span>
+    <span>${ws.projectName} · ${new Date().toLocaleDateString()}</span>
+  </div>
+</div>
+<script>window.onload = () => window.print();</script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${ws.projectName.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "evaluation"}-business-case.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const win = window.open(url, '_blank');
+    if (!win) {
+      // Fallback if popup blocked
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${ws.projectName.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "evaluation"}-business-case.html`;
+      a.click();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   };
 
   const tabs = [
@@ -2915,7 +3199,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>⬇ Export business case</button>
+            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export PDF</button>
           </div>
         </div>
 
@@ -3259,8 +3543,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
                   Auto-generated from your project context, scorecard, and ROI inputs. Export as a text file to paste into a PowerPoint or email.
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>⬇ Export .txt</button>
-                <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => window.print()}>🖨 Print</button>
+                <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export PDF</button>
               </div>
               </div>
 
@@ -3830,6 +4113,7 @@ export default function App() {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [initialSearch, setInitialSearch] = useState("");
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(null);
+  const [matrixCategory, setMatrixCategory] = useState("AMR / Mobile Robots");
 
   const pageTitles = {
     home: "OpEx Scout — Automation Vendor Intelligence",
@@ -3839,6 +4123,7 @@ export default function App() {
     compare: "Compare Vendors — OpEx Scout",
     "product-compare": "Compare Products — OpEx Scout",
     reviews: "Submit a Review — OpEx Scout",
+    matrix: "Compare Matrix — OpEx Scout",
     shortlists: "My Shortlists — OpEx Scout",
     workspace: "Evaluation Workspace — OpEx Scout",
     list: "List Your Company — OpEx Scout",
@@ -3912,8 +4197,8 @@ export default function App() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <NavBar page={page} setPage={navigate} />
       {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} setInitialSearch={setInitialSearch} />}
-      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} activeWorkspaceId={activeWorkspaceId} onAddToWorkspace={activeWorkspaceId ? (ids) => { const ws = getWorkspace(activeWorkspaceId); updateWorkspace(activeWorkspaceId, { vendorIds: [...new Set([...(ws?.vendorIds || []), ...ids])] }); setSelected([]); } : null} />}
-      {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
+      {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} activeWorkspaceId={activeWorkspaceId} onAddToWorkspace={activeWorkspaceId ? (ids) => { const ws = getWorkspace(activeWorkspaceId); updateWorkspace(activeWorkspaceId, { vendorIds: [...new Set([...(ws?.vendorIds || []), ...ids])] }); setSelected([]); } : null} setMatrixCategory={setMatrixCategory} />}
+      {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} setMatrixCategory={setMatrixCategory} />}
       {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
       {page === "detail" && <DetailPage vendor={detailVendor} setPage={navigate} selected={selected} setSelected={setSelected} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} detailBackPage={detailBack.page} detailBackLabel={detailBack.label} openDetail={openDetail} />}
       {page === "compare" && <ComparePage selected={selected} setPage={navigate} openDetail={openDetail} />}
@@ -3922,6 +4207,7 @@ export default function App() {
       {page === "shortlists" && <ShortlistsPage setPage={navigate} setSelected={setSelected} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} openDetail={openDetail} setActiveWorkspaceId={setActiveWorkspaceId} />}
       {page === "workspace" && <WorkspacePage setPage={navigate} openDetail={openDetail} wsId={activeWorkspaceId} />}
       {page === "vendors" && <VendorsPage setPage={navigate} />}
+      {page === "matrix" && <CategoryMatrixPage setPage={navigate} openDetail={openDetail} initialCategory={matrixCategory} />}
       {page === "methodology" && <MethodologyPage setPage={navigate} />}
       {page === "about" && <AboutPage setPage={navigate} />}
       {page === "reviews" && <ReviewPage setPage={navigate} />}
