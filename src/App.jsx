@@ -1,5 +1,5 @@
 //v2
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { vendors, categories, industries } from "./data/vendors";
 import { products as allProducts } from "./data/products";
 
@@ -869,6 +869,8 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
   const [integrationFilter, setIntegrationFilter] = useState("");
   const [view, setView] = useState("grid");
   const [sortBy, setSortBy] = useState("featured");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
 
   // Consume initialSearch once on mount
   useEffect(() => {
@@ -877,6 +879,43 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
       setInitialSearch("");
     }
   }, []);
+
+  // When user types a search query, clear category filter so results aren't double-filtered
+  const handleSearchChange = (val) => {
+    setSearch(val);
+    if (val.length > 0 && catFilter) {
+      // Only clear catFilter if the search term doesn't match the current category
+      const catMatchesSearch = catFilter.toLowerCase().includes(val.toLowerCase());
+      if (!catMatchesSearch) setCatFilter("");
+    }
+    setShowSuggestions(val.length >= 2);
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowSuggestions(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Build suggestions: vendor names + categories that match the query
+  const suggestions = useMemo(() => {
+    if (!search || search.length < 2) return [];
+    const q = search.toLowerCase();
+    const vendorMatches = vendors
+      .filter(v => v.name.toLowerCase().includes(q))
+      .slice(0, 5)
+      .map(v => ({ type: "vendor", label: v.name, sub: v.category, vendor: v }));
+    const categoryMatches = categories
+      .filter(c => c.toLowerCase().includes(q) && !vendorMatches.find(v => v.sub === c))
+      .slice(0, 3)
+      .map(c => ({ type: "category", label: c, sub: `${vendors.filter(v => v.category === c).length} vendors` }));
+    const tagMatches = [...new Set(vendors.flatMap(v => v.tags || []))]
+      .filter(t => t.toLowerCase().includes(q))
+      .slice(0, 2)
+      .map(t => ({ type: "tag", label: t, sub: "Technology tag" }));
+    return [...vendorMatches, ...categoryMatches, ...tagMatches].slice(0, 8);
+  }, [search]);
 
   // Build a searchable text blob per vendor including product names and descriptions
   const vendorSearchIndex = useMemo(() => {
@@ -928,9 +967,63 @@ function DirectoryPage({ setPage, openDetail, selected, setSelected, categoryFil
     <div>
       <div style={{ padding: "20px 28px 0", background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ display: "flex", gap: 12, marginBottom: 16, alignItems: "center" }}>
-          <div style={{ flex: 1, display: "flex", background: "#0b1220", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden" }}>
-            <div style={{ padding: "0 14px", display: "flex", alignItems: "center", color: "#475569" }}><SearchIcon /></div>
-            <input style={{ flex: 1, background: "transparent", border: "none", padding: "11px 0", fontSize: 13, color: "#e8edf5", outline: "none" }} placeholder="Search vendors, technologies, applications..." value={search} onChange={e => setSearch(e.target.value)} />
+          <div ref={searchRef} style={{ flex: 1, position: "relative" }}>
+            <div style={{ display: "flex", background: "#0b1220", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden" }}>
+              <div style={{ padding: "0 14px", display: "flex", alignItems: "center", color: "#475569" }}><SearchIcon /></div>
+              <input
+                style={{ flex: 1, background: "transparent", border: "none", padding: "11px 0", fontSize: 13, color: "#e8edf5", outline: "none" }}
+                placeholder="Search vendors, technologies, applications..."
+                value={search}
+                onChange={e => handleSearchChange(e.target.value)}
+                onFocus={() => search.length >= 2 && setShowSuggestions(true)}
+                onKeyDown={e => { if (e.key === "Escape") setShowSuggestions(false); }}
+              />
+              {search && (
+                <button onClick={() => { setSearch(""); setShowSuggestions(false); }} style={{ padding: "0 12px", background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 16 }}>×</button>
+              )}
+            </div>
+
+            {/* Autocomplete suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 300, background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, marginTop: 4, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+                {suggestions.map((s, i) => (
+                  <div key={i}
+                    style={{ padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, borderBottom: i < suggestions.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      if (s.type === "vendor") {
+                        openDetail(s.vendor, "directory", "directory");
+                        setShowSuggestions(false);
+                      } else if (s.type === "category") {
+                        setCatFilter(s.label);
+                        setSearch("");
+                        setShowSuggestions(false);
+                      } else {
+                        setSearch(s.label);
+                        setShowSuggestions(false);
+                      }
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <div style={{ width: 28, height: 28, borderRadius: 6, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12,
+                      background: s.type === "vendor" ? (s.vendor?.color || "#1a2a45") : s.type === "category" ? "rgba(245,158,11,0.15)" : "rgba(99,102,241,0.15)",
+                      color: s.type === "vendor" ? "#fff" : s.type === "category" ? "#f59e0b" : "#818cf8",
+                      fontWeight: 700,
+                    }}>
+                      {s.type === "vendor" ? (s.vendor?.logo || s.label[0]) : s.type === "category" ? "⊞" : "#"}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, color: "#e8edf5", fontWeight: s.type === "vendor" ? 600 : 400 }}>{s.label}</div>
+                      <div style={{ fontSize: 11, color: "#475569" }}>{s.sub}</div>
+                    </div>
+                    <div style={{ fontSize: 10, color: "#334155", flexShrink: 0 }}>
+                      {s.type === "vendor" ? "View profile" : s.type === "category" ? "Filter category" : "Search"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <select style={{ ...S.rfiInput, marginBottom: 0, width: "auto", padding: "11px 14px" }} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
             <option value="">All categories</option>
