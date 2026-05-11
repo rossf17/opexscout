@@ -595,10 +595,7 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
             <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>{vendor.hq} · Est. {vendor.founded}</div>
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end", flexShrink: 0 }}>
-          {vendor.featured && <span style={{ fontSize: 9, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em" }}>FEATURED</span>}
-          <ProfileScoreBadge vendor={vendor} />
-        </div>
+        {vendor.featured && <span style={{ fontSize: 9, fontWeight: 800, color: "#f59e0b", letterSpacing: "0.08em", flexShrink: 0 }}>FEATURED</span>}
       </div>
 
       {/* Type + Category badges */}
@@ -723,16 +720,12 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
     <div>
       <div style={S.hero}>
         <div style={{ maxWidth: 920, margin: "0 auto" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "8px 14px", marginBottom: 18, fontSize: 12, color: "#f8c56a", fontWeight: 600 }}>
-            Early-access buyer platform · profiles are expanding weekly
-          </div>
           <div style={S.heroEyebrow}>Independent automation vendor intelligence</div>
           <h1 style={S.heroH1}>Compare automation vendors like a buyer, not a booth visitor</h1>
-          <p style={S.heroSub}>75 vendor profiles with pricing context, implementation timelines, strengths, watch-outs, and practitioner-grade evaluation tools. Built by IEs, for IEs.</p>
+          <p style={S.heroSub}>75 vendor profiles with pricing tiers, implementation timelines, strengths and watch-outs — built for IEs and ops teams who need to make real decisions.</p>
           <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20, flexWrap: "wrap", padding: "0 16px" }}>
-            <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find a solution</button>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse directory</button>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("list")}>List your company</button>
+            <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find vendors for my project</button>
+            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse all vendors</button>
           </div>
           {(() => {
             const [heroSearch, setHeroSearch] = useState("");
@@ -774,15 +767,14 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
       </div>
 
       <div style={S.section}>
-        <div style={S.sectionTitle}>How OpEx Scout helps buyers</div>
-        <div style={S.sectionSub}>Built to help engineering and operations teams screen vendors faster before engaging a sales cycle.</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 14 }}>
           {[
-            ["Browse by category", "Filter vendors by technology, industry, and use case."],
-            ["Review products", "See product pages, videos, specs, and practical fit notes."],
-            ["Generate a shortlist", "Use the solution wizard to build a buyer-ready shortlist."],
-          ].map(([title, desc]) => (
+            ["75 vendors profiled", "Every major AMR, AS/RS, WMS, conveyor, robotics, and SI vendor from MODEX 2026 — with pricing tiers, implementation timelines, and buyer watch-outs.", "🏭"],
+            ["Built for IEs, not marketers", "Strengths and weaknesses written from an operator's perspective. What the sales rep won't tell you is what we cover first.", "🔧"],
+            ["Free to use, no sales calls", "Research vendors, build shortlists, and run ROI calculations without triggering a vendor sales cycle. Submit an RFI only when you're ready.", "🛡️"],
+          ].map(([title, desc, icon]) => (
             <div key={title} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20 }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{icon}</div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>{title}</div>
               <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{desc}</div>
             </div>
@@ -1567,28 +1559,30 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
             )}
 
             <div style={{ ...S.sideCard }} id="rfi-form">
-              <div style={S.sideCardTitle}>Submit RFI to {vendor.name}</div>
+              <div style={S.sideCardTitle}>Get info from {vendor.name}</div>
+              <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12, lineHeight: 1.5 }}>Your info goes directly to {vendor.name}. OpEx Scout does not sell your data.</div>
               {rfiSent ? (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: '#f59e0b' }}><div style={{ fontSize: 28, marginBottom: 8 }}>✓</div><div style={{ fontSize: 14, fontWeight: 600 }}>RFI submitted</div><div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>Formspree and lead log captured this inquiry.</div></div>
+                <div style={{ textAlign: 'center', padding: '20px 0', color: '#f59e0b' }}><div style={{ fontSize: 28, marginBottom: 8 }}>✓</div><div style={{ fontSize: 14, fontWeight: 600 }}>Request sent</div><div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>Expect to hear from {vendor.name} within 2–3 business days.</div></div>
               ) : (
                 <>
                   <label style={S.rfiLabel}>Name *</label>
                   <input style={S.rfiInput} placeholder="Jane Smith" value={rfiData.name} onChange={e => setRfiData(d => ({ ...d, name: e.target.value }))} />
+                  <label style={S.rfiLabel}>Work email *</label>
+                  <input style={S.rfiInput} placeholder="jane@company.com" type="email" value={rfiData.email} onChange={e => setRfiData(d => ({ ...d, email: e.target.value }))} />
                   <label style={S.rfiLabel}>Company *</label>
-                  <input style={S.rfiInput} placeholder="Acme Logistics" value={rfiData.company} onChange={e => setRfiData(d => ({ ...d, company: e.target.value }))} />
-                  <label style={S.rfiLabel}>Email *</label>
-                  <input style={S.rfiInput} placeholder="jane@acme.com" type="email" value={rfiData.email} onChange={e => setRfiData(d => ({ ...d, email: e.target.value }))} />
-                  <label style={S.rfiLabel}>Phone</label>
-                  <input style={S.rfiInput} placeholder="Optional" value={rfiData.phone} onChange={e => setRfiData(d => ({ ...d, phone: e.target.value }))} />
-                  <label style={S.rfiLabel}>Budget range</label>
-                  <select style={S.rfiInput} value={rfiData.budget} onChange={e => setRfiData(d => ({ ...d, budget: e.target.value }))}><option>Exploring</option><option>Under $100k</option><option>$100k–$250k</option><option>$250k–$500k</option><option>$500k+</option></select>
-                  <label style={S.rfiLabel}>Timeline</label>
-                  <select style={S.rfiInput} value={rfiData.timeline} onChange={e => setRfiData(d => ({ ...d, timeline: e.target.value }))}><option>0–3 months</option><option>3–6 months</option><option>6–12 months</option><option>12+ months</option></select>
-                  <label style={S.rfiLabel}>Project type</label>
-                  <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}><option>New DC / greenfield build</option><option>Brownfield retrofit</option><option>Capacity expansion</option><option>Vendor replacement</option><option>Feasibility study</option><option>Manufacturing automation</option></select>
-                  <label style={S.rfiLabel}>Brief description</label>
-                  <textarea style={{ ...S.rfiInput, minHeight: 90, resize: 'vertical' }} placeholder="Describe your application, throughput needs, systems, and goals..." value={rfiData.description} onChange={e => setRfiData(d => ({ ...d, description: e.target.value }))} />
-                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>{rfiLoading ? 'Submitting...' : 'Submit RFI'}</button>
+                  <input style={S.rfiInput} placeholder="Company name" value={rfiData.company} onChange={e => setRfiData(d => ({ ...d, company: e.target.value }))} />
+                  <label style={S.rfiLabel}>What do you want to know?</label>
+                  <textarea style={{ ...S.rfiInput, minHeight: 80, resize: 'vertical' }} placeholder="e.g. Pricing for 3 dock doors, brownfield retrofit, 200k sqft DC..." value={rfiData.description} onChange={e => setRfiData(d => ({ ...d, description: e.target.value }))} />
+                  <details style={{ marginBottom: 8 }}>
+                    <summary style={{ fontSize: 12, color: "#475569", cursor: "pointer", marginBottom: 8 }}>Add project details (optional)</summary>
+                    <label style={S.rfiLabel}>Budget range</label>
+                    <select style={S.rfiInput} value={rfiData.budget} onChange={e => setRfiData(d => ({ ...d, budget: e.target.value }))}><option>Exploring</option><option>Under $100k</option><option>$100k–$250k</option><option>$250k–$500k</option><option>$500k+</option></select>
+                    <label style={S.rfiLabel}>Timeline</label>
+                    <select style={S.rfiInput} value={rfiData.timeline} onChange={e => setRfiData(d => ({ ...d, timeline: e.target.value }))}><option>0–3 months</option><option>3–6 months</option><option>6–12 months</option><option>12+ months</option></select>
+                    <label style={S.rfiLabel}>Project type</label>
+                    <select style={S.rfiInput} value={rfiData.project} onChange={e => setRfiData(d => ({ ...d, project: e.target.value }))}><option>New DC / greenfield build</option><option>Brownfield retrofit</option><option>Capacity expansion</option><option>Vendor replacement</option><option>Feasibility study</option><option>Manufacturing automation</option></select>
+                  </details>
+                  <button style={{ ...S.btnPrimary, opacity: rfiLoading ? 0.7 : 1 }} onClick={submitRfi} disabled={rfiLoading}>{rfiLoading ? 'Sending...' : `Contact ${vendor.name}`}</button>
                 </>
               )}
             </div>
@@ -1623,13 +1617,74 @@ function ComparePage({ selected, setPage, openDetail }) {
   };
 
   if (sel.length < 2) return (
-    <div style={{ textAlign: "center", padding: "80px 32px", color: "#475569" }}>
-      <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
-      <div style={{ fontSize: 16, marginBottom: 8, color: "#94a3b8" }}>Select at least 2 vendors to compare</div>
-      <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16 }}>
-        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("directory")}>Browse directory</button>
-        <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("shortlists")}>My shortlists</button>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>⚖️</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>Compare vendors side by side</div>
+        <div style={{ fontSize: 14, color: "#64748b" }}>Search and select 2–4 vendors below to start comparing</div>
       </div>
+      {(() => {
+        const [q, setQ] = useState("");
+        const results = q.length > 1 ? vendors.filter(v =>
+          v.name.toLowerCase().includes(q.toLowerCase()) ||
+          v.category.toLowerCase().includes(q.toLowerCase()) ||
+          (v.tags || []).some(t => t.toLowerCase().includes(q.toLowerCase()))
+        ).slice(0, 8) : vendors.filter(v => v.featured).slice(0, 6);
+        return (
+          <div>
+            <div style={{ position: "relative", marginBottom: 16 }}>
+              <div style={{ display: "flex", background: "#131f35", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden" }}>
+                <div style={{ padding: "0 14px", display: "flex", alignItems: "center", color: "#475569" }}><SearchIcon /></div>
+                <input
+                  autoFocus
+                  style={{ flex: 1, background: "transparent", border: "none", padding: "13px 0", fontSize: 14, color: "#e8edf5", outline: "none" }}
+                  placeholder="Search vendors by name, category, or technology..."
+                  value={q}
+                  onChange={e => setQ(e.target.value)}
+                />
+              </div>
+            </div>
+            {sel.length > 0 && (
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, padding: "10px 14px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10 }}>
+                <span style={{ fontSize: 12, color: "#f59e0b", fontWeight: 600, alignSelf: "center" }}>Selected ({sel.length}/4):</span>
+                {sel.map(id => {
+                  const v = vendors.find(x => x.id === id);
+                  return v ? (
+                    <span key={id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0d1526", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#e8edf5" }}>
+                      {v.name}
+                      <button onClick={() => setSelected(s => s.filter(x => x !== id))} style={{ background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+              {!q && <div style={{ fontSize: 11, color: "#475569", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>Featured vendors — or search above</div>}
+              {results.map(v => {
+                const isSelected = sel.includes(v.id);
+                return (
+                  <div key={v.id} onClick={() => !isSelected && sel.length < 4 ? setSelected(s => [...s, v.id]) : isSelected ? setSelected(s => s.filter(x => x !== v.id)) : null}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: isSelected ? "rgba(245,158,11,0.06)" : "#0f1c30", border: `1px solid ${isSelected ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, cursor: sel.length >= 4 && !isSelected ? "not-allowed" : "pointer", opacity: sel.length >= 4 && !isSelected ? 0.5 : 1 }}>
+                    <div style={{ ...S.logoCircle, background: v.color, width: 32, height: 32, fontSize: 10, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#e8edf5" }}>{v.name}</div>
+                      <div style={{ fontSize: 11, color: "#475569" }}>{v.category} · {v.vendor_type || ""} · {v.price_range || "Pricing varies"}</div>
+                    </div>
+                    <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${isSelected ? "#f59e0b" : "rgba(255,255,255,0.2)"}`, background: isSelected ? "#f59e0b" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {isSelected && <span style={{ color: "#0b1220", fontSize: 13, fontWeight: 800 }}>✓</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {sel.length >= 2 && (
+              <button style={{ ...S.navCta, width: "100%", fontFamily: "inherit", padding: "14px", fontSize: 15 }} onClick={() => window.scrollTo(0,0)}>
+                Compare {sel.length} vendors →
+              </button>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 
@@ -2133,9 +2188,9 @@ function SolutionPage({ setPage, openDetail, setCategoryFilter, addProductToComp
 
           {/* Lead capture */}
           <div style={S.sideCard}>
-            <div style={S.sideCardTitle}>Get this shortlist emailed to you</div>
+            <div style={S.sideCardTitle}>Save and share this shortlist</div>
             <div style={{ fontSize: 12, color: "#64748b", marginBottom: 12, lineHeight: 1.6 }}>
-              We'll send you the matched vendors, fit notes, and suggested next steps for your evaluation.
+              Enter your email to get this vendor shortlist sent to you — useful for sharing with a manager or coming back to later. No sales calls.
             </div>
             {sent ? (
               <div style={{ textAlign: "center", padding: 20, color: "#f59e0b" }}>
@@ -2409,7 +2464,7 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
     <div style={{ maxWidth: 960, margin: "0 auto", padding: isMobile ? "24px 16px" : "40px 28px" }}>
       <button style={S.backBtn} onClick={() => setPage("home")}><ArrowLeft /> Back</button>
       <div style={S.heroEyebrow}>Workspace</div>
-      <div style={S.listTitle}>Evaluations & shortlists</div>
+      <div style={S.listTitle}>Your evaluation workspace</div>
       <p style={{ fontSize: 14, color: "#64748b", marginBottom: 24, lineHeight: 1.7 }}>
         Build a structured evaluation with scorecard, ROI calculator, and business case — or save a quick vendor shortlist to share with your team.
       </p>
