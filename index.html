@@ -26,9 +26,12 @@
       gtag('js', new Date());
       gtag('config', 'G-Y0JQQYPNZQ');
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #0b1220; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      body { background: #0b1220; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: 'DM Sans', system-ui, sans-serif; }
       html { scroll-behavior: smooth; }
       input:focus, select:focus, textarea:focus { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.08); outline: none; }
       button { transition: all 0.15s ease; }
@@ -37,18 +40,16 @@
       a { transition: opacity 0.15s ease; }
       a:hover { opacity: 0.85; }
       ::selection { background: rgba(245,158,11,0.3); color: #fff; }
-      [data-vendor-card]:hover { transform: translateY(-2px); border-color: rgba(245,158,11,0.25) !important; }
-      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      [data-vendor-card] { transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+      [data-vendor-card]:hover { transform: translateY(-3px); border-color: rgba(245,158,11,0.3) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important; }
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
       ::-webkit-scrollbar-track { background: #0b1220; }
       ::-webkit-scrollbar-thumb { background: #1a2a45; border-radius: 6px; }
-      ::-webkit-scrollbar-thumb:hover { background: #2a3a55; }
-      @media (max-width: 900px) {
-        h1 { font-size: 32px !important; }
-      }
+      ::-webkit-scrollbar-thumb:hover { background: #243550; }
+      @media (max-width: 900px) { h1 { font-size: 32px !important; } }
       @media print {
         body { background: #fff !important; color: #000 !important; }
-        nav, .email-capture, footer, button, [data-vendor-card]:hover { display: none !important; }
-        pre, code { white-space: pre-wrap; font-size: 11px; background: #f5f5f5; padding: 12px; border-radius: 4px; }
+        nav, footer, button { display: none !important; }
         h1, h2, h3 { color: #000 !important; }
         a { color: #000 !important; }
       }

@@ -62,7 +62,8 @@ const S = {
   app: { fontFamily: "'DM Sans', system-ui, sans-serif", minHeight: "100vh", background: "#0b1220", color: "#e8edf5" },
   // Nav
   nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 60, background: "#0d1526", borderBottom: "1px solid rgba(255,255,255,0.06)", position: "sticky", top: 0, zIndex: 100 },
-  logo: { fontSize: 18, fontWeight: 700, letterSpacing: "-0.3px", cursor: "pointer" },
+  logo: { fontSize: 17, fontWeight: 800, letterSpacing: "-0.5px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 },
+  logoMark: { width: 28, height: 28, background: "#f59e0b", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#0b1220" },
   logoAccent: { color: "#f59e0b" },
   navLinks: { display: "flex", gap: 28, fontSize: 13, color: "#94a3b8" },
   navLink: { cursor: "pointer", transition: "color 0.15s" },
@@ -582,8 +583,8 @@ function VendorCard({ vendor, selected, onSelect, onClick, compareCount }) {
 
   return (
     <div
-      data-vendor-card
-      style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}), boxShadow: selected ? "0 0 0 2px #f59e0b" : "none", transition: "all 0.18s ease" }}
+      data-vendor-card="true"
+      style={{ ...S.card, ...(vendor.featured ? S.cardFeatured : {}), ...(selected ? S.cardSelected : {}) }}
       onClick={onClick}
     >
       {/* Header row */}
@@ -659,7 +660,7 @@ function NavBar({ page, setPage }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = [
     ["directory", "Directory"],
-    ["matrix", "Compare Matrix"],
+    ["matrix", "Compare"],
     ["categories", "Categories"],
     ["solution", "Find Solution"],
     ["shortlists", "Workspace"],
@@ -667,6 +668,7 @@ function NavBar({ page, setPage }) {
   return (
     <nav style={S.nav}>
       <div style={S.logo} onClick={() => { setPage("home"); setMenuOpen(false); }}>
+        <div style={S.logoMark}>O</div>
         OpEx<span style={S.logoAccent}>Scout</span>
       </div>
       {!isMobile && (
@@ -835,7 +837,7 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
       </div>
 
       <div style={S.statsBar}>
-        {[[`${vendors.length}+`, "Vendors listed"], [`${categories.length}`, "Categories"], [`${industries.length}`, "Industries"], ["Live", "RFI routing"]].map(([n, l]) => (
+        {[[`${vendors.length}`, "Vendors profiled"], [`${categories.length}`, "Categories"], ["20+", "With practitioner notes"], ["Free", "No account required"]].map(([n, l]) => (
           <div key={l} style={S.statItem}><div style={S.statN}>{n}</div><div style={S.statL}>{l}</div></div>
         ))}
       </div>
@@ -895,8 +897,13 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
 
       <div style={{ background: "#0d1526", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={S.section}>
-          <div style={S.sectionTitle}>Featured vendor profiles</div>
-          <div style={S.sectionSub}>Profiles include buyer-fit notes, product pages, videos, and direct RFI routing.</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 10 }}>
+            <div>
+              <div style={S.sectionTitle}>Featured vendor profiles</div>
+              <div style={S.sectionSub}>Practitioner notes, product specs, pricing tiers, and implementation timelines.</div>
+            </div>
+            <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("directory")}>Browse all 75 vendors →</button>
+          </div>
           <div style={S.grid}>
             {featured.map(v => (
               <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "home", "home")} compareCount={0} />
@@ -905,31 +912,22 @@ function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDet
         </div>
       </div>
 
-      <div style={S.section}>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.1fr 0.9fr", gap: 28, alignItems: "start" }}>
-          <div>
-            <div style={S.heroEyebrow}>For vendors</div>
-            <div style={S.sectionTitle}>Sponsor visibility and capture qualified buyer intent</div>
-            <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.8, marginBottom: 18 }}>
-              Vendors can claim listings, enrich product pages, route RFIs, and participate in featured category placements. OpEx Scout is designed to help buyers research first — then convert that research into qualified introductions.
-            </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={() => setPage("list")}>Claim your listing</button>
-              <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("vendors")}>Vendor program</button>
+      <div style={{ ...S.section, paddingTop: 32, paddingBottom: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
+          {[
+            { icon: "⚖️", label: "Compare vendors", desc: "Side-by-side comparison across price, timeline, payload, WMS compatibility, and fit.", action: () => setPage("matrix") },
+            { icon: "🔍", label: "Find your solution", desc: "Answer 5 questions about your project and get a scored vendor shortlist in 60 seconds.", action: () => setPage("solution") },
+            { icon: "📋", label: "Build a business case", desc: "ROI calculator with NPV, IRR, and payback. Export a PDF for your director.", action: () => setPage("shortlists") },
+          ].map(({ icon, label, desc, action }) => (
+            <div key={label} onClick={action} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20, cursor: "pointer" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
+              <div style={{ fontSize: 28, marginBottom: 12 }}>{icon}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 6 }}>{label}</div>
+              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6, marginBottom: 12 }}>{desc}</div>
+              <div style={{ fontSize: 12, color: "#f59e0b", fontWeight: 600 }}>Get started →</div>
             </div>
-          </div>
-          <div style={{ display: "grid", gap: 12 }}>
-            {[
-              ["Free profile", "Basic company page, category listing, website link, and contact routing."],
-              ["Verified plan", "Enhanced profile, product pages, videos, case studies, and better conversion."],
-              ["Featured visibility", "Category placement, shortlist visibility, and higher-intent lead flow."],
-            ].map(([title, desc]) => (
-              <div key={title} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 18 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#e8edf5", marginBottom: 6 }}>{title}</div>
-                <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{desc}</div>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>
