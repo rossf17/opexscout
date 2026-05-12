@@ -2115,8 +2115,6 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
           </div>
         )}
 
-        )}
-
         <div>
           <div style={{ ...S.sideCard, marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 20, alignItems: "flex-start" }}>
@@ -2691,8 +2689,8 @@ function CategoryMatrixPage({ setPage, openDetail, initialCategory }) {
             </thead>
             <tbody>
               {categoryVendors.map((v, idx) => (
-                <tr key={v.id} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e" }}
-                  onClick={() => openDetail(v, "matrix", "matrix")} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e", cursor: "pointer" }}>
+                <tr key={v.id} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e", cursor: "pointer" }}
+                  onClick={e => { e.stopPropagation(); openDetail(v, "matrix", "matrix"); }}>
                   <td style={{ padding: "12px 16px", position: "sticky", left: 0, background: idx % 2 === 0 ? "#0f1c30" : "#0d1a2e", borderRight: "1px solid rgba(255,255,255,0.07)", zIndex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 9, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
