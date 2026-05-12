@@ -1647,17 +1647,60 @@ function DetailPage({ vendor, setPage, selected, setSelected, addProductToCompar
               )}
               {tab === 'reviews' && (
                 <>
-                  <div style={{ background: '#0d1526', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: 32, textAlign: 'center' }}>
-                    <div style={{ fontSize: 32, marginBottom: 12 }}>📝</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: '#e8edf5', marginBottom: 8 }}>Be the first to review {vendor.name}</div>
-                    <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 16, maxWidth: 460, margin: '0 auto 20px' }}>
-                      OpEx Scout publishes practitioner reviews from operations professionals who have actually deployed and worked with vendor solutions. We don't fabricate ratings — every review is from a verified practitioner with relevant experience.
+                  {vendor.practitioner_notes ? (
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, padding: '10px 14px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 10 }}>
+                        <span style={{ fontSize: 18 }}>🔧</span>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>OpEx Scout Practitioner Analysis</div>
+                          <div style={{ fontSize: 11, color: '#64748b' }}>Based on industry research, MODEX observations, and practitioner conversations. Not vendor-supplied.</div>
+                        </div>
+                      </div>
+
+                      {[
+                        { icon: '📋', title: 'Deployment reality', key: 'deployment_reality', color: '#38bdf8' },
+                        { icon: '🔍', title: "What the vendor won't tell you", key: 'what_vendors_wont_tell_you', color: '#f97316' },
+                        { icon: '✅', title: 'Best environments', key: 'best_environments', color: '#22c55e' },
+                        { icon: '⚠️', title: 'Watch-outs', key: 'watch_outs', color: '#ef4444' },
+                      ].map(({ icon, title, key, color }) => (
+                        <div key={key} style={{ marginBottom: 16, background: '#0d1526', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '16px 18px', borderLeft: `3px solid ${color}` }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span>{icon}</span> {title.toUpperCase()}
+                          </div>
+                          <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>{vendor.practitioner_notes[key]}</div>
+                        </div>
+                      ))}
+
+                      <div style={{ background: '#0d1526', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 12, padding: '16px 18px' }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>❓</span> QUESTIONS TO ASK IN YOUR RFP / DEMO
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {vendor.practitioner_notes.questions_to_ask.map((q, i) => (
+                            <div key={i} style={{ display: 'flex', gap: 10, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+                              <span style={{ color: '#f59e0b', fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
+                              <span>{q}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: 16, padding: '12px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, fontSize: 11, color: '#475569', lineHeight: 1.6 }}>
+                        Have you deployed {vendor.name}? Help other operators with your experience. <button onClick={() => setPage('reviews')} style={{ background: 'none', border: 'none', color: '#f59e0b', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'inherit' }}>Submit a practitioner note →</button>
+                      </div>
                     </div>
-                    <button style={{ ...S.btnPrimary, width: 'auto', padding: '10px 22px' }} onClick={() => setPage('reviews')}>Submit a review</button>
-                  </div>
-                  <div style={{ marginTop: 20, padding: 14, background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.12)', borderRadius: 10, fontSize: 12, color: '#94a3b8', lineHeight: 1.7 }}>
-                    <strong style={{ color: '#f59e0b' }}>Why no reviews yet?</strong> OpEx Scout is in early access. Rather than synthesize fake reviews, we're building a verified practitioner review program. If you've deployed a {vendor.name} solution, sharing your experience helps other operators make better decisions.
-                  </div>
+                  ) : (
+                    <>
+                      <div style={{ background: '#0d1526', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: 32, textAlign: 'center' }}>
+                        <div style={{ fontSize: 32, marginBottom: 12 }}>📝</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: '#e8edf5', marginBottom: 8 }}>Practitioner analysis coming soon</div>
+                        <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 16, maxWidth: 460, margin: '0 auto 20px' }}>
+                          OpEx Scout publishes independent practitioner analysis for every vendor — deployment reality, what the vendor won't tell you, and questions to ask. This vendor's analysis is in progress.
+                        </div>
+                        <button style={{ ...S.btnPrimary, width: 'auto', padding: '10px 22px' }} onClick={() => setPage('reviews')}>Share your experience</button>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
               {tab === 'cases' && (
@@ -3146,12 +3189,60 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
   const npv3yr = annualSavings > 0 ? Math.round(annualSavings * 3 - budgetMid) : null;
 
   // ── SCORECARD ──────────────────────────────────────────────────────────────
-  const CRITERIA = [
-    { key: "fit", label: "Use case fit", weight: 3 },
-    { key: "implementation", label: "Implementation risk", weight: 2 },
-    { key: "support", label: "Vendor support", weight: 2 },
-    { key: "integration", label: "Integration ease", weight: 2 },
-    { key: "cost", label: "Cost / value", weight: 1 },
+  // Category-specific scorecard criteria
+  const primaryCategory = wsVendors.length > 0
+    ? wsVendors[0].category
+    : ws.projectType?.toLowerCase().includes('amr') ? 'AMR / Mobile Robots' : null;
+
+  const CRITERIA_BY_CATEGORY = {
+    "AMR / Mobile Robots": [
+      { key: "throughput_fit", label: "Throughput / payload fit", weight: 3, hint: "Does the robot's payload, speed, and throughput match your requirement?" },
+      { key: "nav_reliability", label: "Navigation reliability", weight: 3, hint: "How well does the navigation handle your facility's dynamics — forklifts, pedestrians, layout changes?" },
+      { key: "wms_integration", label: "WMS integration depth", weight: 2, hint: "Quality of pre-built connector or integration path with your WMS" },
+      { key: "implementation_risk", label: "Implementation risk", weight: 2, hint: "Track record in brownfield deployments at your scale. Timeline reliability." },
+      { key: "support_model", label: "Support & uptime SLA", weight: 2, hint: "Local service response time, uptime SLA, and escalation path" },
+      { key: "tco", label: "Total cost of ownership", weight: 1, hint: "All-in cost vs. alternatives: capex + software + maintenance vs. RaaS" },
+    ],
+    "WMS Platforms": [
+      { key: "functional_fit", label: "Functional fit", weight: 3, hint: "Does the WMS handle your specific processes without heavy customization?" },
+      { key: "automation_integration", label: "Automation integration", weight: 3, hint: "Depth of pre-built connectors for AMR, AS/RS, conveyor, voice systems" },
+      { key: "implementation_risk", label: "Implementation risk", weight: 2, hint: "Track record at your scale. Timeline reliability. SI partner quality." },
+      { key: "support_model", label: "Ongoing support quality", weight: 2, hint: "P1 response time, support org size, post-go-live customer satisfaction" },
+      { key: "scalability", label: "Scalability", weight: 2, hint: "Can the platform grow to 2x-5x your current volume without re-platforming?" },
+      { key: "tco", label: "Total cost of ownership", weight: 1, hint: "Software + implementation + ongoing support vs. alternatives" },
+    ],
+    "AS/RS": [
+      { key: "density_fit", label: "Storage density fit", weight: 3, hint: "Does the system achieve the density improvement you need in your footprint?" },
+      { key: "throughput_fit", label: "Throughput capacity", weight: 3, hint: "Can the system handle your peak throughput with adequate headroom?" },
+      { key: "reliability_uptime", label: "Reliability & uptime", weight: 3, hint: "Vendor's uptime record at comparable installations. Redundancy model." },
+      { key: "implementation_risk", label: "Implementation complexity", weight: 2, hint: "Civil scope, controls integration risk, WCS quality, go-live history" },
+      { key: "service_support", label: "Service & parts", weight: 2, hint: "Local service org, spare parts availability, escalation response time" },
+      { key: "tco", label: "Total cost of ownership", weight: 1, hint: "Capital cost per unit of throughput vs. alternatives" },
+    ],
+    "Conveyor & Sortation": [
+      { key: "throughput_fit", label: "Throughput capacity", weight: 3, hint: "Can the system handle your peak sort rate with adequate headroom?" },
+      { key: "sort_accuracy", label: "Sort accuracy / reliability", weight: 3, hint: "Sort error rate at peak throughput. Downtime record at comparable sites." },
+      { key: "integration_risk", label: "Integration & controls", weight: 2, hint: "WCS quality, integration with your WMS, controls engineering depth" },
+      { key: "implementation_risk", label: "Implementation risk", weight: 2, hint: "Track record for on-time, on-budget delivery. Brownfield experience." },
+      { key: "service_support", label: "Service & maintenance", weight: 2, hint: "24/7 support availability, local tech response, planned maintenance program" },
+      { key: "tco", label: "Total cost of ownership", weight: 1, hint: "Capital + 10-year maintenance vs. alternatives" },
+    ],
+    "Systems Integration": [
+      { key: "relevant_experience", label: "Relevant experience", weight: 3, hint: "Number of comparable projects (scale, complexity, industry). Reference quality." },
+      { key: "controls_capability", label: "Controls & WCS capability", weight: 3, hint: "In-house controls team depth. WCS platform quality and integration track record." },
+      { key: "project_management", label: "Project management", weight: 2, hint: "On-time, on-budget track record. Specific PM and controls lead assigned to your project." },
+      { key: "brownfield_exp", label: "Brownfield experience", weight: 2, hint: "Active-DC retrofit track record. Safety record during construction." },
+      { key: "vendor_relationships", label: "Vendor relationships", weight: 2, hint: "Access to best-fit equipment. Not locked to proprietary hardware." },
+      { key: "tco", label: "Cost competitiveness", weight: 1, hint: "Project cost vs. comparable SI bids. Change order history." },
+    ],
+  };
+
+  const CRITERIA = CRITERIA_BY_CATEGORY[primaryCategory] || [
+    { key: "fit", label: "Use case fit", weight: 3, hint: "How well does this vendor address your specific application?" },
+    { key: "implementation", label: "Implementation risk", weight: 2, hint: "Timeline reliability, brownfield track record, project management quality" },
+    { key: "support", label: "Vendor support", weight: 2, hint: "Service response time, uptime SLA, local support capability" },
+    { key: "integration", label: "Integration ease", weight: 2, hint: "WMS/ERP integration depth and pre-built connector quality" },
+    { key: "cost", label: "Cost / value", weight: 1, hint: "Total cost of ownership vs. alternatives at your scale" },
   ];
   const totalWeight = CRITERIA.reduce((s, c) => s + c.weight, 0);
   const vendorScores = wsVendors.map(v => {
@@ -3499,9 +3590,14 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
           {/* ── TAB: SCORECARD ── */}
           {tab === "scorecard" && (
             <div>
-              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
-                Score each vendor 1–5 on each criterion. Weighted total score is used to rank vendors in your business case. Criteria weights: Fit ×3, Implementation ×2, Support ×2, Integration ×2, Cost ×1.
+              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 12, lineHeight: 1.6 }}>
+                Score each vendor 1–5 on each criterion (1 = poor, 3 = acceptable, 5 = excellent). Hover criteria names for scoring guidance. Weighted total drives your business case ranking.
               </div>
+              {primaryCategory && CRITERIA_BY_CATEGORY[primaryCategory] && (
+                <div style={{ marginBottom: 16, padding: "8px 12px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.12)", borderRadius: 8, fontSize: 11, color: "#f59e0b" }}>
+                  Using <strong>{primaryCategory}</strong> scorecard criteria — criteria and weights are optimized for this vendor category.
+                </div>
+              )}
               {wsVendors.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>Add vendors first to score them.</div>
               ) : (
@@ -3524,7 +3620,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
                       <thead>
                         <tr>
                           <th style={{ ...S.compareTh, width: 160 }}>Vendor</th>
-                          {CRITERIA.map(c => <th key={c.key} style={{ ...S.compareTh, textAlign: "center" }}>{c.label}<br /><span style={{ color: "#475569", fontWeight: 400 }}>weight ×{c.weight}</span></th>)}
+                          {CRITERIA.map(c => <th key={c.key} style={{ ...S.compareTh, textAlign: "center", minWidth: 100 }} title={c.hint}>{c.label}<br /><span style={{ color: "#475569", fontWeight: 400 }}>×{c.weight}</span></th>)}
                           <th style={{ ...S.compareTh, textAlign: "center" }}>Score</th>
                           <th style={{ ...S.compareTh }}>Notes</th>
                         </tr>
@@ -3579,63 +3675,162 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
 
           {/* ── TAB: ROI CALCULATOR ── */}
           {tab === "roi" && (
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>Labor inputs</div>
-                <label style={labelStyle}>Headcount to automate (FTEs)</label>
-                <input style={inputStyle} type="number" placeholder="e.g. 8" value={r.laborHeadcount} onChange={e => setRoiField("laborHeadcount", e.target.value)} />
-                <label style={labelStyle}>Hourly fully-loaded labor rate ($/hr)</label>
-                <input style={inputStyle} type="number" placeholder="e.g. 22" value={r.laborRate} onChange={e => setRoiField("laborRate", e.target.value)} />
-                <label style={labelStyle}>Shifts per day</label>
-                <select style={inputStyle} value={r.shiftsPerDay} onChange={e => setRoiField("shiftsPerDay", e.target.value)}>
-                  {["1", "2", "3"].map(x => <option key={x}>{x}</option>)}
-                </select>
-                <label style={labelStyle}>Operating days per year</label>
-                <input style={inputStyle} type="number" placeholder="250" value={r.daysPerYear} onChange={e => setRoiField("daysPerYear", e.target.value)} />
-                <label style={labelStyle}>Estimated automation capture rate (%)</label>
-                <input style={inputStyle} type="number" placeholder="70" value={r.automationCapturePercent} onChange={e => setRoiField("automationCapturePercent", e.target.value)} />
-                <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.6, marginTop: 4 }}>
-                  Capture rate = % of current labor cost displaced. 70% is typical for brownfield AMR deployments. 90%+ for fully automated dock/conveyor.
+            <div>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
+                {/* LEFT: Inputs */}
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Labor savings</div>
+                  <label style={labelStyle}>Headcount to automate (FTEs)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 8" value={r.laborHeadcount} onChange={e => setRoiField("laborHeadcount", e.target.value)} />
+                  <label style={labelStyle}>Fully-loaded hourly rate ($/hr incl. benefits)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 28" value={r.laborRate} onChange={e => setRoiField("laborRate", e.target.value)} />
+                  <label style={labelStyle}>Shifts per day</label>
+                  <select style={inputStyle} value={r.shiftsPerDay} onChange={e => setRoiField("shiftsPerDay", e.target.value)}>
+                    {["1", "2", "3"].map(x => <option key={x}>{x}</option>)}
+                  </select>
+                  <label style={labelStyle}>Operating days per year</label>
+                  <input style={inputStyle} type="number" placeholder="250" value={r.daysPerYear} onChange={e => setRoiField("daysPerYear", e.target.value)} />
+                  <label style={labelStyle}>Automation capture rate (%)</label>
+                  <input style={inputStyle} type="number" placeholder="70" value={r.automationCapturePercent} onChange={e => setRoiField("automationCapturePercent", e.target.value)} />
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Capture rate = % of labor hours displaced. Typical: AMR pick-assist 40–60%, goods-to-person 70–85%, full dock automation 85–95%.</div>
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Total cost of ownership</div>
+                  <label style={labelStyle}>System / equipment cost ($)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 500000" value={r.equipmentCost || ""} onChange={e => setRoiField("equipmentCost", e.target.value)} />
+                  <label style={labelStyle}>Implementation / integration cost ($)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 150000" value={r.implementationCost || ""} onChange={e => setRoiField("implementationCost", e.target.value)} />
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, lineHeight: 1.6 }}>Typically 20–50% of equipment cost. Covers SI labor, controls, WMS integration, training, and commissioning.</div>
+                  <label style={labelStyle}>Annual software / licensing cost ($)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 36000" value={r.softwareCost || ""} onChange={e => setRoiField("softwareCost", e.target.value)} />
+                  <label style={labelStyle}>Annual maintenance / service cost ($)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 25000" value={r.maintenanceCost || ""} onChange={e => setRoiField("maintenanceCost", e.target.value)} />
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Typically 5–10% of equipment cost per year for robotics; 15–20% for complex conveyor/sortation.</div>
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Financial assumptions</div>
+                  <label style={labelStyle}>Discount rate / hurdle rate (%)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 10" value={r.discountRate || ""} onChange={e => setRoiField("discountRate", e.target.value)} />
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, lineHeight: 1.6 }}>Your company's required rate of return for capital projects. Typical range: 8–15%.</div>
+                  <label style={labelStyle}>Analysis period (years)</label>
+                  <select style={inputStyle} value={r.analysisPeriod || "5"} onChange={e => setRoiField("analysisPeriod", e.target.value)}>
+                    {["3", "5", "7", "10"].map(x => <option key={x}>{x}</option>)}
+                  </select>
                 </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", marginBottom: 16 }}>ROI summary</div>
-                {[
-                  ["Annual labor cost (current)", `$${Math.round(annualLaborCost).toLocaleString()}`, annualLaborCost > 0],
-                  ["Estimated annual savings", `$${Math.round(annualSavings).toLocaleString()}`, annualSavings > 0],
-                  ["Estimated investment (budget midpoint)", `$${budgetMid.toLocaleString()}`, true],
-                  ["Payback period", paybackMonths ? `~${paybackMonths} months` : "—", paybackMonths !== null],
-                  ["3-year net savings (NPV)", npv3yr ? `$${npv3yr.toLocaleString()}` : "—", npv3yr !== null && npv3yr > 0],
-                ].map(([label, value, highlight]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <span style={{ fontSize: 13, color: "#64748b" }}>{label}</span>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: highlight ? "#f59e0b" : "#334155" }}>{value}</span>
-                  </div>
-                ))}
-                <div style={{ marginTop: 16, padding: 14, background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10, fontSize: 12, color: "#94a3b8", lineHeight: 1.7 }}>
-                  <strong style={{ color: "#f59e0b" }}>Methodology note:</strong> This calculator uses fully-loaded labor cost × capture rate as a proxy for savings. It does not include throughput improvements, error reduction, or quality gains. Use as a directional estimate — not for board approval without vendor-validated assumptions.
-                </div>
-                {annualSavings > 0 && wsVendors.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>By vendor price tier</div>
-                    {wsVendors.filter(v => v.price_range).map(v => {
-                      const tierCost = { "$": 40000, "$$": 125000, "$$$": 350000, "$$$$": 750000, "RaaS": 0 }[v.price_range] || budgetMid;
-                      const pb = tierCost > 0 && annualSavings > 0 ? Math.round((tierCost / annualSavings) * 12) : null;
-                      return (
-                        <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
-                            <span style={{ color: "#94a3b8" }}>{v.name}</span>
-                            <PriceBadge tier={v.price_range} />
+
+                {/* RIGHT: Results */}
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Financial summary</div>
+
+                  {/* Key metrics cards */}
+                  {(() => {
+                    const headcount = parseFloat(r.laborHeadcount) || 0;
+                    const rate = parseFloat(r.laborRate) || 0;
+                    const shifts = parseFloat(r.shiftsPerDay) || 2;
+                    const days = parseFloat(r.daysPerYear) || 250;
+                    const capture = (parseFloat(r.automationCapturePercent) || 70) / 100;
+                    const annualLabor = headcount * rate * shifts * days * 8;
+                    const annualSavingsCalc = annualLabor * capture;
+
+                    const equipment = parseFloat(r.equipmentCost) || budgetMid;
+                    const implementation = parseFloat(r.implementationCost) || 0;
+                    const software = parseFloat(r.softwareCost) || 0;
+                    const maintenance = parseFloat(r.maintenanceCost) || 0;
+                    const totalCapex = equipment + implementation;
+                    const annualOpex = software + maintenance;
+                    const netAnnualBenefit = annualSavingsCalc - annualOpex;
+
+                    const discountRate = (parseFloat(r.discountRate) || 10) / 100;
+                    const period = parseInt(r.analysisPeriod) || 5;
+                    const payback = netAnnualBenefit > 0 ? (totalCapex / netAnnualBenefit) * 12 : null;
+
+                    // NPV calculation
+                    let npv = -totalCapex;
+                    for (let yr = 1; yr <= period; yr++) {
+                      npv += netAnnualBenefit / Math.pow(1 + discountRate, yr);
+                    }
+
+                    // IRR approximation
+                    let irr = null;
+                    if (netAnnualBenefit > 0 && totalCapex > 0) {
+                      let lo = 0, hi = 5;
+                      for (let i = 0; i < 50; i++) {
+                        const mid = (lo + hi) / 2;
+                        let npvTest = -totalCapex;
+                        for (let yr = 1; yr <= period; yr++) npvTest += netAnnualBenefit / Math.pow(1 + mid, yr);
+                        if (npvTest > 0) lo = mid; else hi = mid;
+                      }
+                      irr = Math.round(lo * 100);
+                    }
+
+                    const metrics = [
+                      ["Annual labor cost (current)", annualLabor > 0 ? `$${Math.round(annualLabor).toLocaleString()}` : "—", false],
+                      ["Annual labor savings", annualSavingsCalc > 0 ? `$${Math.round(annualSavingsCalc).toLocaleString()}` : "—", annualSavingsCalc > 0],
+                      ["Annual operating cost (software + maintenance)", annualOpex > 0 ? `$${Math.round(annualOpex).toLocaleString()}` : "—", false],
+                      ["Net annual benefit", netAnnualBenefit > 0 ? `$${Math.round(netAnnualBenefit).toLocaleString()}` : "—", netAnnualBenefit > 0],
+                      ["Total capital investment", totalCapex > 0 ? `$${Math.round(totalCapex).toLocaleString()}` : "—", false],
+                      ["Simple payback period", payback ? `${payback < 1 ? "<1" : Math.round(payback)} months` : "—", payback !== null && payback <= 36],
+                      [`NPV (${period}-yr @ ${r.discountRate || 10}% discount)`, npv && netAnnualBenefit > 0 ? `$${Math.round(npv).toLocaleString()}` : "—", npv > 0],
+                      ["IRR", irr !== null ? `${irr}%` : "—", irr !== null && irr > 15],
+                    ];
+
+                    return (
+                      <div>
+                        {metrics.map(([label, value, isGood]) => (
+                          <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                            <span style={{ fontSize: 12, color: "#64748b", maxWidth: "60%" }}>{label}</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: value === "—" ? "#334155" : isGood ? "#22c55e" : "#94a3b8" }}>{value}</span>
                           </div>
-                          <span style={{ color: pb && pb <= 24 ? "#22c55e" : pb && pb <= 36 ? "#f59e0b" : "#ef4444", fontWeight: 600 }}>
-                            {v.price_range === "RaaS" ? "RaaS — compare to ongoing labor" : pb ? `~${pb}mo payback` : "—"}
-                          </span>
+                        ))}
+
+                        {npv > 0 && netAnnualBenefit > 0 && (
+                          <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 10 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e", marginBottom: 6 }}>✓ Positive NPV — project meets hurdle rate</div>
+                            <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
+                              At a {r.discountRate || 10}% discount rate, this project generates ${Math.round(npv).toLocaleString()} of net present value over {period} years. IRR of {irr}% {irr > 20 ? "comfortably exceeds" : "meets"} typical capital hurdle rates.
+                            </div>
+                          </div>
+                        )}
+
+                        {npv < 0 && netAnnualBenefit > 0 && (
+                          <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#ef4444", marginBottom: 6 }}>⚠ Negative NPV at current assumptions</div>
+                            <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
+                              Try reducing implementation cost, increasing capture rate, or extending the analysis period. Or check if throughput improvements (not modeled here) close the gap.
+                            </div>
+                          </div>
+                        )}
+
+                        <div style={{ marginTop: 16, padding: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8, fontSize: 11, color: "#475569", lineHeight: 1.7 }}>
+                          <strong style={{ color: "#64748b" }}>Note:</strong> This model captures labor cost displacement only. Throughput improvement, error reduction, space savings, and safety benefits are not included — these often add 15–40% to the business case. Use vendor-provided throughput data to model these separately.
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+
+                        {/* Per-vendor payback comparison */}
+                        {wsVendors.filter(v => v.price_range).length > 0 && netAnnualBenefit > 0 && (
+                          <div style={{ marginTop: 20 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Payback by vendor price tier</div>
+                            {wsVendors.filter(v => v.price_range).map(v => {
+                              const tierEquip = { "$": 40000, "$$": 125000, "$$$": 350000, "$$$$": 900000, "RaaS": 0 }[v.price_range] || equipment;
+                              const tierImpl = tierEquip * 0.3;
+                              const tierTotal = tierEquip + tierImpl;
+                              const pb = tierTotal > 0 && netAnnualBenefit > 0 ? Math.round((tierTotal / netAnnualBenefit) * 12) : null;
+                              return (
+                                <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
+                                    <span style={{ color: "#94a3b8" }}>{v.name}</span>
+                                    <PriceBadge tier={v.price_range} />
+                                  </div>
+                                  <span style={{ color: pb && pb <= 24 ? "#22c55e" : pb && pb <= 36 ? "#f59e0b" : "#ef4444", fontWeight: 600 }}>
+                                    {v.price_range === "RaaS" ? "Compare vs labor $/pick" : pb ? `~${pb}mo payback` : "—"}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           )}

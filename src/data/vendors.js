@@ -30,6 +30,13 @@ export const industries = [
 export const vendors = [
   {
     id: 1, name: "Geek+", slug: "geekplus",
+    practitioner_notes: {
+      deployment_reality: "Geek+ deployments typically run 6\u201310 months from PO to go-live for a full goods-to-person implementation. Their project management is stronger than average for a Chinese AMR vendor \u2014 they staff US-based implementation engineers and have done enough North American deployments to have real brownfield playbooks. Expect 3\u20134 months of software integration work with your WMS vendor; Geek+ has pre-built connectors for Manhattan, SAP EWM, and Blue Yonder but the integration still requires configuration and testing.",
+      what_vendors_wont_tell_you: "Robot fleet utilization at go-live is typically 60\u201370% of what was promised. The AI optimization that gets you to 90%+ takes 4\u20138 weeks of operational tuning after go-live. Budget for dedicated ops staff during that tuning period \u2014 this isn't hands-off from day one. Also: Wi-Fi infrastructure is almost always underspecified by the buyer. Geek+ will tell you their bandwidth requirements; double them and add redundant access points in the picking zones.",
+      best_environments: "High-SKU e-commerce and 3PL environments with stable inventory profiles. The goods-to-person model works best when your pick density is high (many SKUs per order) and your SKU velocity is predictable. Seasonal spikes are manageable with their fleet expansion model.",
+      watch_outs: "Not ideal for operations with very large, heavy, or irregular items \u2014 their bins are sized for parcel-class goods. If more than 20% of your SKUs don't fit in a standard Geek+ bin, evaluate AutoStore or a hybrid solution instead. Also evaluate their local service capability in your region \u2014 Houston, Dallas, and Chicago are well-covered; smaller markets may have slower response times.",
+      questions_to_ask: ["What is your uptime SLA and how do you measure it? (Push for 99.5%+ and ask what 'uptime' means — robot uptime vs system uptime vs fulfillment uptime are different numbers)", "Can you connect us with a reference customer at a 3PL of similar scale?", "What does your escalation path look like if we lose more than 10% of the fleet simultaneously?", "Walk me through your WMS integration process — who owns the middleware, and what has caused go-live delays at other sites?"],
+    },,
     implementation_pilot: "8–12 weeks pilot",
     implementation_rollout: "4–8 months full rollout",
     implementation_risks: "WMS integration, Wi-Fi infrastructure, change management",
@@ -54,6 +61,13 @@ export const vendors = [
   },
   {
     id: 2, name: "Slip Robotics", slug: "slip-robotics",
+    practitioner_notes: {
+      deployment_reality: "Slip Robotics is the most credible autonomous trailer loading/unloading solution for standard 53-foot trailers. Their SLIP Bot deploys per dock door \u2014 plan 4\u20138 weeks per door for installation and commissioning. Houston-based, which matters for service response time in the South-Central US.",
+      what_vendors_wont_tell_you: "The ROI case is strongest at high-volume inbound dock doors (15+ trailers/day per door). At lower volume, the per-door capital cost is hard to justify vs. labor. Trailer condition matters more than the vendor will acknowledge \u2014 damaged trailers, non-standard loads, and floor-level freight all require intervention. Quantify your trailer mix before signing.",
+      best_environments: "High-volume inbound receiving at food, beverage, and retail DCs where trailer unloading is a labor-intensive bottleneck. Particularly strong for operations where dock injury risk is a safety priority.",
+      watch_outs: "Not suited for LTL freight, floor-loaded trailers with mixed freight, or operations where trailer availability is inconsistent. Evaluate dock door infrastructure carefully \u2014 floor condition and leveler compatibility must be validated before deployment.",
+      questions_to_ask: ["What percentage of trailers in our mix would require manual intervention?", "Walk me through a failure scenario — trailer arrives damaged, what happens?", "What is your service response time SLA for this region?"],
+    },,
     implementation_pilot: "4–6 weeks per door",
     implementation_rollout: "3–6 months site-wide",
     implementation_risks: "Dock readiness, trailer mix, conveyor integration",
@@ -78,6 +92,13 @@ export const vendors = [
   },
   {
     id: 3, name: "FANUC", slug: "fanuc",
+    practitioner_notes: {
+      deployment_reality: "FANUC industrial robots are the reliability benchmark in the category \u2014 99.9%+ uptime is achievable and common at mature deployments. The M-410iC palletizing robot in particular has a track record of 10+ year operational life with minimal downtime at high-throughput food and beverage sites. Implementation is typically 12\u201320 weeks from PO for a full palletizing cell including tooling, guarding, and controls integration.",
+      what_vendors_wont_tell_you: "FANUC's hardware is excellent but their software and user interface is dated compared to UR and newer entrants. Programming requires trained robotics engineers \u2014 the skills cost is real and should be included in your TCO. Their support network is the largest in the industry but response time varies significantly by region and integrator. The integrator you choose matters as much as the FANUC hardware itself.",
+      best_environments: "High-throughput, stable palletizing applications at food, beverage, and consumer goods manufacturers. Any application requiring maximum uptime over a 10+ year horizon.",
+      watch_outs: "Overkill for flexible, frequently-changing applications. If your SKU mix changes frequently or you need to repurpose the robot for different applications, a collaborative robot with easier reprogramming may be a better fit.",
+      questions_to_ask: ["Which integrators do you recommend for palletizing applications in our industry and region?", "What is the expected MTBF for this model and what does a typical maintenance schedule look like?", "What is spare parts availability for a 10-year operational horizon?"],
+    },,
     implementation_pilot: "8–16 weeks",
     implementation_rollout: "4–8 months",
     implementation_risks: "End-of-arm tooling, controls integration, guarding, safety validation",
@@ -102,6 +123,13 @@ export const vendors = [
   },
   {
     id: 4, name: "Locus Robotics", slug: "locus-robotics",
+    practitioner_notes: {
+      deployment_reality: "Locus has the most mature North American 3PL deployment record of any AMR vendor \u2014 they have live sites with major 3PLs including DHL, Geodis, and Whiplash. Implementation timelines for a standard pick-assist deployment are 8\u201312 weeks. Their LocusOne software includes labor analytics that most 3PLs find genuinely useful for reporting to customers.",
+      what_vendors_wont_tell_you: "Locus is going through financial restructuring as of 2024 \u2014 verify their current ownership and support commitments before signing a multi-year contract. The RaaS model means your per-pick cost goes up if your throughput drops (seasonal off-peak periods are expensive). Model your full-year average throughput carefully before committing to a per-pick rate.",
+      best_environments: "3PL unit-pick environments with high labor turnover \u2014 the bot-following model requires minimal training and works well with temp labor. Best ROI when you're replacing walking time in large facilities (300k sqft+) where picker travel is 40%+ of shift time.",
+      watch_outs: "The collaborative pick model has a ceiling \u2014 at very high throughputs, the human becomes the bottleneck, not the robot. If you're targeting more than 250 units/hour per picker, evaluate goods-to-person instead.",
+      questions_to_ask: ["What is your current company ownership structure and who is backing ongoing R&D?", "What is the per-pick rate structure and how does it adjust for volume changes above and below forecast?", "What happens to our operation if Locus is acquired or goes through further restructuring?"],
+    },,
     implementation_pilot: "6–10 weeks",
     implementation_rollout: "3–5 months",
     implementation_risks: "Pick path redesign, operator training, WMS integration",
@@ -126,6 +154,13 @@ export const vendors = [
   },
   {
     id: 5, name: "Honeywell Intelligrated", slug: "honeywell-intelligrated",
+    practitioner_notes: {
+      deployment_reality: "Honeywell Intelligrated is one of the largest conveyor and sortation system integrators in North America. Their Momentum WCS is mature and widely deployed. Large-scale sorter installations (100k+ units/day) are their strongest application \u2014 they have more of these than any North American competitor.",
+      what_vendors_wont_tell_you: "Honeywell is a very large company and your project is a line item in a large revenue base. Project team quality and attention varies \u2014 the senior engineers who design the system are often not the engineers who install it. Get specific commitments on who will be on-site during critical commissioning phases. Also: post-warranty service contracts are expensive \u2014 understand the long-term maintenance cost model before signing.",
+      best_environments: "Large-scale sortation and conveyor systems at e-commerce, parcel, and retail DC environments where throughput volume justifies tier-1 SI pricing.",
+      watch_outs: "For projects under $5M, evaluate Bastian, Conveyco, or DMW&H \u2014 you'll get better project team attention. Honeywell is optimized for $15M+ projects.",
+      questions_to_ask: ["Who will be the on-site project manager and lead controls engineer during commissioning?", "What is your service and parts availability model for after-warranty maintenance?", "Can we see your safety incident record for projects of this scope?"],
+    },,
     implementation_pilot: "12–24 months",
     implementation_rollout: "18–36 months",
     implementation_risks: "Civil, controls, WCS integration, go-live timing vs peak",
@@ -150,6 +185,13 @@ export const vendors = [
   },
   {
     id: 6, name: "Boston Dynamics", slug: "boston-dynamics",
+    practitioner_notes: {
+      deployment_reality: "Stretch, their depalletizing robot, is genuinely capable of handling the range of case types that trip up simpler pick robots \u2014 mixed-weight cases, polywrapped goods, and non-uniform stacking. Real-world deployments at DHL and other early customers are showing throughput in the 500\u2013800 cases/hour range for mixed caseloads. Implementation is complex \u2014 plan 4\u20136 months for a full depalletizing cell integration.",
+      what_vendors_wont_tell_you: "Boston Dynamics is still in early commercial deployment for Stretch \u2014 you are buying into a maturing product, not a proven one with thousands of hours of operational data. Pricing is premium. The vision system struggles with highly reflective packaging and inconsistent lighting \u2014 your facility lighting spec matters. Their support model is evolving \u2014 make sure you have clear SLAs and escalation paths in your contract.",
+      best_environments: "High-volume inbound depalletizing at DC receiving where case variety is high and labor is the primary constraint. Best fit for operations willing to be early adopters in exchange for competitive advantage.",
+      watch_outs: "Not a fit for operations that need proven technology with low implementation risk. If your director's primary question is 'has anyone else done this,' the answer for Stretch at scale is still limited.",
+      questions_to_ask: ["How many Stretch units are currently in commercial production operation (not pilot)?", "What is your throughput guarantee and how do you define it for mixed caseloads?", "What is your support model for after-hours failures at a 24/7 DC?"],
+    },,
     implementation_pilot: "8–16 weeks",
     implementation_rollout: "4–8 months",
     implementation_risks: "Cell integration, end-effector validation, safety guarding",
@@ -174,6 +216,13 @@ export const vendors = [
   },
   {
     id: 7, name: "Blue Yonder", slug: "blue-yonder",
+    practitioner_notes: {
+      deployment_reality: "Blue Yonder Luminate WM is the strongest WMS choice for large omnichannel retailers with complex store replenishment and DTC fulfillment from the same DC. Their AI-driven labor and slotting optimization is real and measurable \u2014 implementations at tier-1 retailers have shown 8\u201312% labor productivity improvement from slotting optimization alone. Implementation timelines are similar to Manhattan: 12\u201318 months for a complex site.",
+      what_vendors_wont_tell_you: "Blue Yonder's acquisition by Panasonic has introduced some organizational uncertainty \u2014 the product roadmap is intact but verify the current support structure and account team stability. Their professional services organization is smaller than Manhattan's, which means more reliance on SI partners. The AI features require good data \u2014 if your item master and historical order data are messy, the AI optimization underperforms.",
+      best_environments: "Large omnichannel retailers and grocery distributors where AI-driven slotting and labor optimization are primary value drivers.",
+      watch_outs: "Evaluate carefully if your primary need is 3PL multi-client \u2014 Blue Yonder is weaker here than K\u00f6rber or Softeon. Also: the Panasonic acquisition integration is still playing out \u2014 get clarity on your account team and support structure before signing.",
+      questions_to_ask: ["What is the current organizational structure post-Panasonic acquisition and who owns our account?", "Can you demonstrate the slotting optimization with data from an operation similar to ours?", "What SI partners do you recommend for a retailer of our scale?"],
+    },,
     implementation_pilot: "3–6 months (single site)",
     implementation_rollout: "12–24 months (network)",
     implementation_risks: "Data migration, process re-engineering, change management",
@@ -198,6 +247,13 @@ export const vendors = [
   },
   {
     id: 8, name: "Dematic", slug: "dematic",
+    practitioner_notes: {
+      deployment_reality: "Dematic is the largest material handling systems integrator in North America by revenue. Their strength is large, complex multi-technology projects where you need a single accountable partner for conveyor, sortation, AS/RS, and controls. Implementation timelines for full system projects are 18\u201336 months \u2014 these are not fast deployments. Their WCS (iQ Software) is mature and deeply integrated with their hardware.",
+      what_vendors_wont_tell_you: "Dematic's size is both their strength and weakness \u2014 you will be a medium-sized account to them unless your project exceeds $20M. Project management quality varies significantly by regional team and project manager assignment. Get references from similar-scale projects with the specific team that will run your project. Their hardware is proprietary to a significant degree \u2014 switching costs are high after installation.",
+      best_environments: "Large ($10M+) DC automation programs at major retailers, e-commerce, and food & beverage companies where a single-vendor accountability model is worth the premium.",
+      watch_outs: "Not a fit for mid-market projects under $5M \u2014 you'll get junior project teams and commodity attention. Also evaluate carefully if you value flexibility \u2014 Dematic deployments tend to create long-term vendor dependency.",
+      questions_to_ask: ["Who specifically will be the project manager and controls lead on our project, and can we meet them before signing?", "What is your subcontractor model for this project — what percentage of installation is self-performed vs. subcontracted?", "Walk me through your WCS roadmap — what does the upgrade path look like in 5 years?"],
+    },,
     implementation_pilot: "12–24 months",
     implementation_rollout: "18–36 months full system",
     implementation_risks: "Civil work, controls integration, WMS cutover, peak timing",
@@ -222,6 +278,13 @@ export const vendors = [
   },
   {
     id: 9, name: "Manhattan Associates", slug: "manhattan-associates",
+    practitioner_notes: {
+      deployment_reality: "Manhattan Active WM is the most capable WMS on the market for large, complex operations. The cloud-native architecture is genuinely different from legacy WMS \u2014 no upgrade projects, continuous deployment. Real implementations at large retailers and 3PLs consistently show 12\u201318 months from kick-off to go-live for a single complex site. The implementation services market for Manhattan is mature \u2014 dozens of qualified SIs can run a Manhattan implementation.",
+      what_vendors_wont_tell_you: "Manhattan is expensive \u2014 $500k\u2013$2M+ annually in software costs before implementation. Implementation services typically run 1.5\u20132x the first-year software cost. The platform's depth means configuration decisions made early are expensive to change \u2014 invest in a thorough process design phase before configuration begins. Their sales team will quote you the best-case timeline; get the implementation partner's estimate independently.",
+      best_environments: "Large (200k sqft+) retail DC or 3PL operations with complex omnichannel requirements, high automation density, and dedicated IT resources to manage a tier-1 WMS long-term.",
+      watch_outs: "Manhattan requires a committed internal team \u2014 a WMS manager, at least one power user per functional area, and ongoing IT support. If you don't have that, the platform's sophistication becomes a liability. Also: mid-market operations (1\u20133 DCs, $50M\u2013$200M revenue) often over-buy with Manhattan and find the ongoing cost hard to justify.",
+      questions_to_ask: ["Who are your preferred implementation partners for a 3PL of our scale?", "What does the P1 support SLA look like and what is your average response time for production-impacting issues?", "Show us the Active WM roadmap for automation integration — specifically AMR and AS/RS connectivity."],
+    },,
     implementation_pilot: "4–8 months (single site)",
     implementation_rollout: "12–24 months",
     implementation_risks: "Configuration depth, integration complexity, operator training",
@@ -246,6 +309,13 @@ export const vendors = [
   },
   {
     id: 10, name: "Zebra Technologies", slug: "zebra-technologies",
+    practitioner_notes: {
+      deployment_reality: "Zebra is the standard for enterprise mobile computing in DC environments for a reason \u2014 their Android devices with enterprise DNA are significantly more reliable in 24/7 operations than consumer hardware. The TC52/TC57 series is the most deployed mobile computer in North American warehousing. Battery management and fleet management through Zebra's tools reduce IT burden significantly vs. consumer device management.",
+      what_vendors_wont_tell_you: "Zebra's pricing is premium vs. consumer alternatives \u2014 but the TCO calculation usually favors Zebra when you include breakage rates, battery replacement, and MDM complexity. Get your integrator or IT team to run the 3-year TCO comparison honestly. Their Link-OS platform for printer management is genuinely valuable but requires investment in setup \u2014 budget time for proper deployment.",
+      best_environments: "Any DC running 24/7 operations with more than 20 mobile devices. The enterprise management features pay off fastest at scale.",
+      watch_outs: "Zebra has a wide product range and not all products are best-in-class. Their tablets and wearables are less dominant than their handhelds \u2014 evaluate alternatives in those categories.",
+      questions_to_ask: ["What is the current generation for this model and when is the next refresh cycle?", "What is your break/fix warranty and advance replacement SLA?", "Walk us through the Zebra DNA enterprise features — what requires additional licensing?"],
+    },,
     vendor_type: "Manufacturer",
     tagline: "Barcode, RFID, and vision-based sensing for warehouse operations",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "3PL"],
@@ -309,6 +379,13 @@ export const vendors = [
   },
   {
     id: 13, name: "6 River Systems", slug: "6-river-systems",
+    practitioner_notes: {
+      deployment_reality: "Chuck is the most operator-friendly collaborative robot in the category \u2014 the onboarding time for new pickers to work productively with Chuck is measured in hours, not days. Ocado's acquisition has brought meaningful software investment. 3PL deployments are their strongest vertical \u2014 Chuck's flexibility handles SKU profile changes well.",
+      what_vendors_wont_tell_you: "Chuck's ROI is primarily labor productivity improvement, not labor elimination \u2014 you still need the same number of pickers, they just walk less. If your CFO is expecting headcount reduction, align expectations before deployment. The subscription model means your cost is fixed even during seasonal low-volume periods.",
+      best_environments: "3PL unit-pick operations with high pick density, frequent SKU changes, and a workforce that benefits from guided pick workflows.",
+      watch_outs: "Ceiling on throughput per picker is lower than goods-to-person \u2014 evaluate carefully if your throughput target requires >200 units/hour per picker.",
+      questions_to_ask: ["What is the fully-loaded subscription cost per robot per month including all support?", "What happens to the subscription cost during our seasonal low-volume period?", "Can you share labor productivity improvement data from a 3PL operation similar to ours?"],
+    },,
     implementation_pilot: "4–8 weeks",
     implementation_rollout: "2–4 months",
     implementation_risks: "Operator adoption, layout optimization, WMS cutover",
@@ -381,6 +458,13 @@ export const vendors = [
   },
   {
     id: 16, name: "AutoStore", slug: "autostore",
+    practitioner_notes: {
+      deployment_reality: "AutoStore has the highest storage density of any goods-to-person system and the most installations worldwide (1,100+). The aluminum grid technology is proven and reliable. Critically: AutoStore sells exclusively through certified integrators \u2014 you are buying from Bastian, Swisslog, Kardex, or another partner, not from AutoStore directly. The integrator relationship matters enormously.",
+      what_vendors_wont_tell_you: "The quoted uptime of 99.7%+ is for the robots, not the system. System uptime (your ability to fulfill orders) depends on your robot density relative to throughput requirements \u2014 if you're running at 80%+ capacity, a robot failure has a much bigger operational impact than if you're at 50%. Design your robot count for peak throughput, not average. Grid expansion is straightforward but requires planning \u2014 factor in future growth lanes from day one.",
+      best_environments: "E-commerce and omnichannel retail operations with high SKU count (10,000+), relatively uniform item sizes, and throughput requirements that justify the capital investment ($5M+).",
+      watch_outs: "Bin size constraints are real \u2014 items must fit in a 600x400mm bin. If more than 15% of your SKUs are oversized, AutoStore is not your primary solution. Evaluate a hybrid with floor-level pick for oversized items.",
+      questions_to_ask: ["Which integrator do you recommend for our application, and why?", "What is the actual bin mix we should spec given our SKU profile?", "What does the escalation path look like if the integrator and AutoStore point fingers at each other during a system outage?"],
+    },,
     implementation_pilot: "6–12 months",
     implementation_rollout: "12–24 months",
     implementation_risks: "Grid design freeze, WCS integration, bin loading process",
@@ -429,6 +513,13 @@ export const vendors = [
   },
   {
     id: 18, name: "Seegrid", slug: "seegrid",
+    practitioner_notes: {
+      deployment_reality: "Seegrid has the longest commercial AMR track record in North American manufacturing \u2014 they were doing autonomous pallet movement before AMR was a mainstream category. Their vision-based navigation (vs. laser SLAM) has advantages in environments with tall racking and infrastructure that confuses lidar. Deployments at automotive and heavy manufacturing sites are mature.",
+      what_vendors_wont_tell_you: "Seegrid's vision navigation requires a map-training process that takes time and needs to be repeated if infrastructure changes significantly. If your facility layout changes frequently, factor in the re-mapping cost. Their throughput per robot is lower than some competitors \u2014 model your fleet size requirement carefully.",
+      best_environments: "Automotive, aerospace, and heavy manufacturing internal logistics where proven uptime and obstacle detection in complex environments matter more than top-end speed.",
+      watch_outs: "Evaluate their current competitive position carefully \u2014 the AMR market has moved fast and some newer competitors have closed the technology gap.",
+      questions_to_ask: ["How does your vision navigation handle infrastructure changes — what is the re-mapping process and how long does it take?", "What is your uptime record at our target throughput level at a comparable site?", "How does your obstacle detection perform around forklifts and pedestrians simultaneously?"],
+    },,
     implementation_pilot: "6–10 weeks",
     implementation_rollout: "3–6 months",
     implementation_risks: "Vision map training, route design, mixed-traffic management",
@@ -453,6 +544,13 @@ export const vendors = [
   },
   {
     id: 19, name: "Mobile Industrial Robots (MiR)", slug: "mir-robotics",
+    practitioner_notes: {
+      deployment_reality: "MiR has the largest installed base of autonomous mobile robots for internal logistics in manufacturing environments. The SLAM navigation is genuinely robust \u2014 MiR robots handle dynamic manufacturing environments with changing equipment and traffic better than most competitors. Fleet management through MiR Fleet is straightforward for operations with up to 50 robots.",
+      what_vendors_wont_tell_you: "MiR's strength is the robot hardware and navigation \u2014 the top modules (shelves, hooks, forks) are where you'll find variance in quality. Evaluate third-party top modules for pallet applications \u2014 some are better than MiR's own options. Also: MiR's WMS/MES integration requires middleware in most cases; factor in integration development time.",
+      best_environments: "Manufacturing and DC internal logistics where payloads are under 1,500kg and routes are relatively defined. Particularly strong for line feeding and kit delivery in manufacturing.",
+      watch_outs: "Not the right choice for heavy manufacturing where payloads exceed 1,500kg \u2014 evaluate OTTO 1500 or Vecna instead.",
+      questions_to_ask: ["What top module do you recommend for our specific use case, and is it yours or a third-party?", "Walk us through the MES integration — what does the middleware layer look like?", "What is your support model and spare parts availability in our region?"],
+    },,
     implementation_pilot: "4–8 weeks",
     implementation_rollout: "2–6 months",
     implementation_risks: "Traffic management, map stability, payload fixture design",
@@ -522,6 +620,13 @@ export const vendors = [
   },
   {
     id: 22, name: "Bastian Solutions", slug: "bastian-solutions",
+    practitioner_notes: {
+      deployment_reality: "Bastian is one of the best systems integrators in North America for brownfield DC automation \u2014 they have genuine experience managing active-DC retrofits where shutting down operations is not an option. Toyota's acquisition has added financial stability and global reach without meaningfully changing the project delivery model. Their Exacta WCS is mature and integrates well with major WMS platforms.",
+      what_vendors_wont_tell_you: "Bastian's best project teams are in high demand \u2014 the team you meet during the sales process may not be the team running your project. Ask specifically about project manager and controls lead assignment and get commitments in the contract. Their strength is brownfield complexity; for greenfield projects without complications, you may get better value from a smaller SI with more focused attention.",
+      best_environments: "Mid-to-large ($3M\u2013$30M) brownfield automation projects at retailers, e-commerce, and 3PLs where the DC must stay operational during construction.",
+      watch_outs: "Project cost overruns are an industry-wide SI problem \u2014 Bastian is not immune. Build a 15% contingency into your project budget and get clear change order terms in the contract.",
+      questions_to_ask: ["Who specifically will be assigned as project manager and controls lead — can we meet them before contract?", "What percentage of your projects come in on time and on budget? What are the most common causes of overruns?", "Show us a reference brownfield project at a DC that stayed operational throughout construction."],
+    },,
     implementation_pilot: "8–18 months",
     implementation_rollout: "12–30 months",
     implementation_risks: "Project complexity drives timeline — brownfield harder than greenfield",
@@ -591,6 +696,13 @@ export const vendors = [
   },
   {
     id: 25, name: "Kardex Remstar", slug: "kardex-remstar",
+    practitioner_notes: {
+      deployment_reality: "Kardex Shuttle XP is one of the most reliable vertical carousel systems available \u2014 relatively simple technology with a strong track record. Installation is straightforward (2\u20134 weeks per unit) and ROI is fast in the right application. Their software integration with WMS is well-developed \u2014 they have pre-built connectors for most major WMS platforms.",
+      what_vendors_wont_tell_you: "The Shuttle XP is a vertical carousel, not a vertical lift module \u2014 there's a meaningful throughput ceiling per unit. If your throughput requirement exceeds 80\u2013100 picks/hour from a single unit, you'll need multiple units or a different solution. Also: floor load capacity at your facility must be validated before installation \u2014 these units are heavy.",
+      best_environments: "Parts distribution, MRO storage, manufacturing kitting, and pharmacy applications where high-density storage of medium-to-small items is the primary need.",
+      watch_outs: "Not suited for heavy items or high-throughput applications requiring more than 100 picks/hour per unit.",
+      questions_to_ask: ["What is the throughput rate for our specific SKU profile and tray configuration?", "What floor load capacity is required and what does the structural assessment process look like?", "What does your WMS integration look like for our specific WMS?"],
+    },,
     implementation_pilot: "2–6 weeks per unit",
     implementation_rollout: "1–3 months site-wide",
     implementation_risks: "WMS integration, bin loading, operator training",
@@ -768,6 +880,13 @@ export const vendors = [
   },
   {
     id: 33, name: "Körber Supply Chain", slug: "korber",
+    practitioner_notes: {
+      deployment_reality: "K\u00f6rber WMS hits the sweet spot between mid-market simplicity and enterprise depth. Their 3PL multi-client module is genuinely strong \u2014 it handles the billing complexity and client segregation that simpler WMS platforms struggle with. Implementation timelines of 4\u20136 months for a single-site 3PL are realistic.",
+      what_vendors_wont_tell_you: "K\u00f6rber has grown through acquisition and the product portfolio has some overlap and inconsistency as a result \u2014 make sure you're evaluating the right K\u00f6rber product for your use case (warehouse management vs. supply chain). Their support organization has faced some criticism for responsiveness post-implementation \u2014 get reference checks from customers 12+ months post-go-live, not just at implementation.",
+      best_environments: "Mid-market 3PL operations (2\u201310 sites) with multi-client complexity that needs more than Deposco but doesn't need Manhattan.",
+      watch_outs: "Scrutinize support quality carefully in reference calls. Also: their automation integration roadmap is less mature than Manhattan or Blue Yonder for AMR and AS/RS connectivity.",
+      questions_to_ask: ["Can you give us references from 3PL customers 18+ months post-go-live — specifically on support quality?", "What is your roadmap for AMR and AS/RS integration — what systems do you have live connectors for today?", "Walk us through how multi-client billing works for a 3PL with 8 clients on different contract structures."],
+    },,
     implementation_pilot: "3–6 months",
     implementation_rollout: "8–18 months",
     implementation_risks: "Faster than tier-1 peers, still complex for large operations",
@@ -882,6 +1001,13 @@ export const vendors = [
   },
   {
     id: 38, name: "Exotec", slug: "exotec",
+    practitioner_notes: {
+      deployment_reality: "Exotec's Skypod system is the most space-efficient goods-to-person solution for environments with ceiling heights above 8m \u2014 the robots climb the racking, eliminating the need for a separate high-bay structure. European deployments are extensive; North American presence is growing. Implementation is complex (10\u201316 months) but the system performance at go-live is consistently strong.",
+      what_vendors_wont_tell_you: "Exotec is still building out their North American service organization \u2014 verify local service capability in your region before committing. The Skypod system has a floor area premium vs. AutoStore because the racking structure takes space that AutoStore's grid doesn't. Model the true footprint carefully. Also: their bin size constraints are similar to AutoStore \u2014 evaluate your oversized SKU percentage.",
+      best_environments: "Fashion, beauty, and high-SKU retail DC operations with ceiling heights above 8m and significant land cost pressure.",
+      watch_outs: "North American service organization is less mature than AutoStore's or Dematic's \u2014 get specific SLA commitments for your region.",
+      questions_to_ask: ["What is your service organization in our region — how many field engineers, and what is your average on-site response time?", "How does your ceiling height requirement compare to AutoStore for the same storage capacity and throughput?", "Can we visit a North American reference site at comparable scale?"],
+    },,
     implementation_pilot: "6–12 months",
     implementation_rollout: "12–18 months",
     implementation_risks: "Grid civil work, WCS integration, workstation ergonomics",
@@ -1244,6 +1370,13 @@ export const vendors = [
   },
   {
     id: 55, name: "Softeon", slug: "softeon",
+    practitioner_notes: {
+      deployment_reality: "Softeon is genuinely underrated in the mid-market WMS category. Their implementation timelines (3\u20135 months) are realistic \u2014 not aspirational like some vendors. The 3PL module handles multi-client complexity well. Their REST API layer is well-documented, which matters when you're integrating with automation systems.",
+      what_vendors_wont_tell_you: "Softeon is a smaller company than their tier-1 competitors \u2014 verify their financial stability and support organization size before signing a multi-year contract. Their brand recognition is lower than K\u00f6rber or Manhattan, which can be a factor when presenting to leadership who want 'proven' names.",
+      best_environments: "Mid-market 3PL (1\u20135 sites) and omnichannel retail operations where implementation speed and total cost are more important than brand name.",
+      watch_outs: "Limited reference base compared to Manhattan or Blue Yonder \u2014 do thorough reference checks with customers at your scale.",
+      questions_to_ask: ["How many customers do you have at our scale (operations, revenue, SKU count)?", "What is your customer retention rate — how many customers have left in the last 3 years and why?", "Walk me through your support org — how many support engineers do you have and what is your SLA for P1 issues?"],
+    },,
     implementation_pilot: "3–5 months",
     implementation_rollout: "6–12 months",
     implementation_risks: "Faster implementation than tier-1 — key competitive advantage",
@@ -1267,6 +1400,13 @@ export const vendors = [
   },
   {
     id: 56, name: "Deposco", slug: "deposco",
+    practitioner_notes: {
+      deployment_reality: "Deposco is one of the fastest WMS implementations available \u2014 60\u201390 day go-lives are not marketing claims, they're achieved by constraining scope. The Shopify and NetSuite integrations are pre-built and production-hardened. Genuinely good fit for DTC brands scaling from 10k to 500k orders/month.",
+      what_vendors_wont_tell_you: "Deposco's speed comes from standardization \u2014 if your operation has complex exceptions or unusual workflows, you'll hit the limits of their configuration quickly. They are not the right choice for a 3PL with 10 clients on different billing structures. Evaluate K\u00f6rber or Softeon instead if your 3PL operations are multi-client complex.",
+      best_environments: "DTC e-commerce brands and omnichannel retailers with relatively standard processes who need to go live fast.",
+      watch_outs: "Not a fit for complex 3PL multi-client operations or operations with highly customized workflows.",
+      questions_to_ask: ["Show me a configuration that matches our most complex exception workflow — can the system handle it without custom code?", "What is your typical go-live scope vs. what gets deferred to phase 2?", "What percentage of your customers are DTC vs. 3PL vs. retail DC?"],
+    },,
     implementation_pilot: "2–4 months",
     implementation_rollout: "4–8 months",
     implementation_risks: "One of fastest WMS implementations — 60–90 day go-lives common",
