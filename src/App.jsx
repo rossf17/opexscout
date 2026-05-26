@@ -808,127 +808,172 @@ function HeroSearch({ setPage, setCategoryFilter, setInitialSearch, openDetail }
   );
 }
 
-function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch }) {
+function OnboardingTour({ onDismiss }) {
+  const [step, setStep] = useState(0);
+  const steps = [
+    {
+      icon: "🏭",
+      title: "121 vendors, fully profiled",
+      body: "Every major automation vendor — AMR, AS/RS, WMS, conveyor, robotics, forklifts, controls — with pricing tiers, implementation timelines, strengths, and watch-outs. Written from an operator's perspective, not vendor marketing.",
+    },
+    {
+      icon: "🔍",
+      title: "Find vendors for your project",
+      body: "Use the search bar to look up any vendor by name, or use Find Solution to answer 5 questions and get a scored shortlist. The Compare Matrix shows all vendors in a category side by side.",
+    },
+    {
+      icon: "🔧",
+      title: "Practitioner notes on every vendor",
+      body: "Open any vendor profile and click the Practitioner Notes tab. You'll see deployment reality, what the vendor won't tell you, best environments, watch-outs, and specific questions to ask in your RFP.",
+    },
+    {
+      icon: "📋",
+      title: "Build and export a business case",
+      body: "Create an Evaluation Workspace to track vendors, run ROI calculations with NPV and IRR, score vendors on category-specific criteria, and export a formatted PDF for your director.",
+    },
+  ];
+  const s = steps[step];
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }} onClick={onDismiss} />
+      <div style={{ position: "relative", background: "#0f1c30", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 16, padding: "32px 36px", maxWidth: 480, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
+        <div style={{ fontSize: 44, marginBottom: 16, textAlign: "center" }}>{s.icon}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: "#e8edf5", marginBottom: 12, textAlign: "center", letterSpacing: "-0.3px" }}>{s.title}</div>
+        <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.75, textAlign: "center", marginBottom: 28 }}>{s.body}</div>
+
+        {/* Progress dots */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
+          {steps.map((_, i) => (
+            <div key={i} onClick={() => setStep(i)} style={{ width: 8, height: 8, borderRadius: "50%", background: i === step ? "#f59e0b" : "rgba(255,255,255,0.15)", cursor: "pointer", transition: "background 0.2s" }} />
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          {step < steps.length - 1 ? (
+            <>
+              <button onClick={onDismiss} style={{ flex: 1, padding: "10px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#475569", cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>Skip</button>
+              <button onClick={() => setStep(s => s + 1)} style={{ flex: 2, padding: "10px", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0b1220", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>Next →</button>
+            </>
+          ) : (
+            <button onClick={onDismiss} style={{ flex: 1, padding: "12px", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0b1220", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 14 }}>Start researching →</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HomePage({ setPage, setCategoryFilter, setCategoryPageCategory, openDetail, setInitialSearch, setMatrixCategory }) {
   const isMobile = useIsMobile();
   const recentIds = getRecentlyViewed();
   const recentVendors = recentIds.map(id => vendors.find(v => v.id === id)).filter(Boolean);
-  const catCounts = categories.map(c => ({ name: c, count: vendors.filter(v => v.category === c).length }));
-  const featured = vendors.filter(v => v.featured).slice(0, 3);
-  const catIcons = ["🤖", "📦", "🔄", "🚛", "💻", "📡", "👷", "🏗️", "⚙️", "🏭", "🚚", "📊", "👁️", "🧩"];
+  const catIcons = { "AMR / Mobile Robots": "🤖", "AS/RS & Storage": "📦", "Conveyor & Sortation": "🔄", "AGV Systems": "🚛", "WMS Platforms": "💻", "Controls & Sensing": "📡", "Labor Management": "👷", "Systems Integration": "🏗️", "Industrial Robotics": "⚙️", "Manufacturing Automation": "🏭", "Depalletizing & Palletizing": "🦾", "Simulation & Digital Twin": "📊", "Vision & AI": "👁️", "Dock Automation": "🚚" };
+
+  // Show tour for first-time visitors
+  const [showTour, setShowTour] = useState(() => {
+    try { return !localStorage.getItem("opexscout_toured"); } catch { return false; }
+  });
+  const dismissTour = () => {
+    try { localStorage.setItem("opexscout_toured", "1"); } catch {}
+    setShowTour(false);
+  };
 
   return (
     <div>
-      <div style={S.hero}>
-        <div style={{ maxWidth: 920, margin: "0 auto" }}>
+      {showTour && <OnboardingTour onDismiss={dismissTour} />}
+
+      {/* ── HERO: search-first, minimal copy ── */}
+      <div style={{ ...S.hero, paddingBottom: 28 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <div style={S.heroEyebrow}>Independent automation vendor intelligence</div>
-          <h1 style={S.heroH1}>Compare automation vendors like a buyer, not a booth visitor</h1>
-          <p style={S.heroSub}>75 vendor profiles with pricing tiers, implementation timelines, strengths and watch-outs — built for IEs and ops teams who need to make real decisions.</p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20, flexWrap: "wrap", padding: "0 16px" }}>
-            <button style={{ ...S.navCta, padding: "12px 22px", fontFamily: "inherit" }} onClick={() => setPage("solution")}>Find vendors for my project</button>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "12px 22px" }} onClick={() => setPage("directory")}>Browse all vendors</button>
-          </div>
+          <h1 style={{ ...S.heroH1, fontSize: isMobile ? 26 : 36, marginBottom: 10 }}>
+            Research automation vendors without the sales cycle
+          </h1>
+          <p style={{ ...S.heroSub, marginBottom: 20, fontSize: 14 }}>
+            121 vendors profiled. Practitioner notes, pricing tiers, implementation timelines. Free.
+          </p>
           <HeroSearch setPage={setPage} setCategoryFilter={setCategoryFilter} setInitialSearch={setInitialSearch} openDetail={openDetail} />
-          <div style={S.chips}>
-            {['AMR / Mobile Robots', 'Depalletizing & Palletizing', 'WMS Platforms', 'Conveyor & Sortation', 'Industrial Robotics'].map(c => (
-              <div key={c} style={S.chip} onClick={() => { setCategoryFilter(c); setPage("directory"); }}>{c}</div>
-            ))}
-          </div>
         </div>
       </div>
 
-      <div style={S.statsBar}>
-        {[[`${vendors.length}`, "Vendors profiled"], [`${categories.length}`, "Categories"], ["20+", "With practitioner notes"], ["Free", "No account required"]].map(([n, l]) => (
-          <div key={l} style={S.statItem}><div style={S.statN}>{n}</div><div style={S.statL}>{l}</div></div>
-        ))}
-      </div>
-
-      <div style={S.section}>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 14 }}>
+      {/* ── QUICK-ACCESS: four tools, no fluff ── */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: isMobile ? "16px" : "24px 28px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 28 }}>
           {[
-            ["75 vendors profiled", "Every major AMR, AS/RS, WMS, conveyor, robotics, and SI vendor from MODEX 2026 — with pricing tiers, implementation timelines, and buyer watch-outs.", "🏭"],
-            ["Built for IEs, not marketers", "Strengths and weaknesses written from an operator's perspective. What the sales rep won't tell you is what we cover first.", "🔧"],
-            ["Free to use, no sales calls", "Research vendors, build shortlists, and run ROI calculations without triggering a vendor sales cycle. Submit an RFI only when you're ready.", "🛡️"],
-          ].map(([title, desc, icon]) => (
-            <div key={title} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20 }}>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{icon}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 8 }}>{title}</div>
-              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7 }}>{desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={S.section}>
-        <div style={S.sectionTitle}>Browse by category</div>
-        <div style={{ ...S.sectionSub }}>Research the solutions most relevant to your operation.</div>
-        <div style={S.catGrid}>
-          {catCounts.map((c, i) => (
-            <div key={c.name} style={S.catCard} onClick={() => { setCategoryPageCategory(c.name); setCategoryFilter(c.name); setPage("categories"); }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; e.currentTarget.style.background = "#131f35"; }}
+            { icon: "🗂️", label: "Directory", sub: `${vendors.length} vendors`, action: () => setPage("directory") },
+            { icon: "⚖️", label: "Compare", sub: "Side by side", action: () => setPage("matrix") },
+            { icon: "🔍", label: "Find Solution", sub: "Guided match", action: () => setPage("solution") },
+            { icon: "📋", label: "Workspace", sub: "ROI + business case", action: () => setPage("shortlists") },
+          ].map(({ icon, label, sub, action }) => (
+            <div key={label} onClick={action}
+              style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: isMobile ? "14px 12px" : "16px 18px", cursor: "pointer", textAlign: "center" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.35)"; e.currentTarget.style.background = "#131f35"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.background = "#0f1c30"; }}>
-              <div style={{ fontSize: 28 }}>{catIcons[i] || '⚙️'}</div>
-              <div style={S.catName}>{c.name}</div>
-              <div style={S.catCount}>{c.count} vendor{c.count !== 1 ? "s" : ""}</div>
+              <div style={{ fontSize: isMobile ? 22 : 26, marginBottom: 6 }}>{icon}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5", marginBottom: 2 }}>{label}</div>
+              <div style={{ fontSize: 11, color: "#475569" }}>{sub}</div>
             </div>
           ))}
         </div>
-      </div>
 
-      {recentVendors.length > 0 && (
-        <div style={S.section}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={S.sectionTitle}>Recently viewed</div>
-            <button style={{ ...S.btnSecondary, width: "auto", padding: "5px 12px", fontSize: 12 }} onClick={() => setPage("directory")}>View all →</button>
+        {/* ── RECENTLY VIEWED (only if they have history) ── */}
+        {recentVendors.length > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em" }}>Recently viewed</span>
+              <button style={{ ...S.btnSecondary, width: "auto", padding: "4px 10px", fontSize: 11 }} onClick={() => setPage("directory")}>All vendors →</button>
+            </div>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {recentVendors.map(v => (
+                <div key={v.id} onClick={() => openDetail(v, "home", "home")}
+                  style={{ flexShrink: 0, background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "8px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, minWidth: 160 }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"}>
+                  <div style={{ ...S.logoCircle, background: v.color, width: 24, height: 24, fontSize: 8, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#e8edf5", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
+                    <div style={{ fontSize: 10, color: "#475569" }}>{v.category}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
-            {recentVendors.map(v => (
-              <div key={v.id} onClick={() => openDetail(v, "home", "home")}
-                style={{ flexShrink: 0, background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, minWidth: 180, maxWidth: 220 }}>
-                <div style={{ ...S.logoCircle, background: v.color, width: 28, height: 28, fontSize: 9, marginBottom: 0, flexShrink: 0 }}>{v.logo}</div>
+        )}
+
+        {/* ── CATEGORIES: compact grid, goes straight to directory ── */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Browse by category</div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 8 }}>
+            {categories.map(c => (
+              <div key={c}
+                onClick={() => { setCategoryFilter(c); setPage("directory"); }}
+                style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; e.currentTarget.style.background = "#131f35"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.background = "#0f1c30"; }}>
+                <span style={{ fontSize: 16 }}>{catIcons[c] || "⚙️"}</span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#e8edf5", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
-                  <div style={{ fontSize: 10, color: "#475569", marginTop: 2 }}>{v.category}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c}</div>
+                  <div style={{ fontSize: 10, color: "#475569" }}>{vendors.filter(v => v.category === c).length} vendors</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      )}
 
-      <div style={{ background: "#0d1526", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div style={S.section}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 10 }}>
-            <div>
-              <div style={S.sectionTitle}>Featured vendor profiles</div>
-              <div style={S.sectionSub}>Practitioner notes, product specs, pricing tiers, and implementation timelines.</div>
+        {/* ── FIRST-TIME NUDGE (only if no history) ── */}
+        {recentVendors.length === 0 && (
+          <div style={{ marginTop: 28, padding: "16px 18px", background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.12)", borderRadius: 12, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 3 }}>New here?</div>
+              <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6 }}>Take a 60-second tour or jump straight to searching vendors.</div>
             </div>
-            <button style={{ ...S.btnSecondary, width: "auto" }} onClick={() => setPage("directory")}>Browse all 75 vendors →</button>
-          </div>
-          <div style={S.grid}>
-            {featured.map(v => (
-              <VendorCard key={v.id} vendor={v} selected={false} onSelect={() => {}} onClick={() => openDetail(v, "home", "home")} compareCount={0} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ ...S.section, paddingTop: 32, paddingBottom: 48 }}>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 12 }}>
-          {[
-            { icon: "⚖️", label: "Compare vendors", desc: "Side-by-side comparison across price, timeline, payload, WMS compatibility, and fit.", action: () => setPage("matrix") },
-            { icon: "🔍", label: "Find your solution", desc: "Answer 5 questions about your project and get a scored vendor shortlist in 60 seconds.", action: () => setPage("solution") },
-            { icon: "📋", label: "Build a business case", desc: "ROI calculator with NPV, IRR, and payback. Export a PDF for your director.", action: () => setPage("shortlists") },
-          ].map(({ icon, label, desc, action }) => (
-            <div key={label} onClick={action} style={{ background: "#0f1c30", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20, cursor: "pointer" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,158,11,0.3)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{icon}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#e8edf5", marginBottom: 6 }}>{label}</div>
-              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6, marginBottom: 12 }}>{desc}</div>
-              <div style={{ fontSize: 12, color: "#f59e0b", fontWeight: 600 }}>Get started →</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => setShowTour(true)} style={{ padding: "8px 14px", background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, color: "#f59e0b", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Take the tour</button>
+              <button onClick={() => setPage("directory")} style={{ ...S.navCta, fontFamily: "inherit", padding: "8px 14px", fontSize: 12 }}>Browse vendors →</button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -4559,7 +4604,7 @@ export default function App() {
     <div style={S.app}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <NavBar page={page} setPage={navigate} />
-      {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} setInitialSearch={setInitialSearch} />}
+      {page === "home" && <HomePage setPage={navigate} setCategoryFilter={setCategoryFilter} setCategoryPageCategory={setCategoryPageCategory} openDetail={openDetail} setInitialSearch={setInitialSearch} setMatrixCategory={setMatrixCategory} />}
       {page === "directory" && <DirectoryPage setPage={navigate} openDetail={openDetail} selected={selected} setSelected={setSelected} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} initialSearch={initialSearch} setInitialSearch={setInitialSearch} activeWorkspaceId={activeWorkspaceId} onAddToWorkspace={activeWorkspaceId ? (ids) => { const ws = getWorkspace(activeWorkspaceId); updateWorkspace(activeWorkspaceId, { vendorIds: [...new Set([...(ws?.vendorIds || []), ...ids])] }); setSelected([]); } : null} setMatrixCategory={setMatrixCategory} />}
       {page === "categories" && <CategoryHubPage setPage={navigate} setCategoryFilter={setCategoryFilter} openDetail={openDetail} categoryPageCategory={categoryPageCategory} setCategoryPageCategory={setCategoryPageCategory} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} setMatrixCategory={setMatrixCategory} />}
       {page === "solution" && <SolutionPage setPage={navigate} openDetail={openDetail} setCategoryFilter={setCategoryFilter} addProductToCompare={addProductToCompare} selectedProducts={selectedProducts} />}
