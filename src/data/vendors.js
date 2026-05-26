@@ -337,6 +337,17 @@ export const vendors = [
   },
   {
     id: 11, name: "Rockwell Automation", slug: "rockwell-automation",
+    practitioner_notes: {
+      deployment_reality: "Rockwell Automation is the North American leader in industrial controls and automation \u2014 ControlLogix PLCs, Allen-Bradley I/O, FactoryTalk software. Most North American manufacturing is built on Rockwell. Implementation is through integrator network \u2014 Rockwell sells through automation distributors and SI partners.",
+      what_vendors_wont_tell_you: "Rockwell's North American dominance creates lock-in over time \u2014 once your facility is built on Rockwell controls, switching is expensive. Pricing is premium vs. Siemens and Schneider in many applications. The Emulate3D acquisition has strengthened their simulation/virtual commissioning story. Cybersecurity in Rockwell environments is increasingly a focus.",
+      best_environments: "North American manufacturing and DC operations where Rockwell is the established controls standard and integrator ecosystem is mature.",
+      watch_outs: "Premium pricing vs. Siemens and Schneider. Verify long-term controls strategy before deeper commitment.",
+      questions_to_ask: [
+        "What is the cost differential vs. Siemens for equivalent controls and how is that evolving?",
+        "What is your cybersecurity roadmap for industrial controls?",
+        "Which integrators do you recommend for our specific industry and application?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial automation, controls, and information software",
     category: "Manufacturing Automation", industry: ["Manufacturing", "Food & Beverage", "Automotive", "Pharma & Healthcare"],
@@ -358,6 +369,17 @@ export const vendors = [
   },
   {
     id: 12, name: "Siemens Digital Industries", slug: "siemens-digital",
+    practitioner_notes: {
+      deployment_reality: "Siemens Digital Industries is the European leader in industrial automation and controls \u2014 SIMATIC PLCs, TIA Portal, and Siemens Industrial Edge. Stronger in European manufacturing than North American. North American presence has grown but Rockwell still dominates North American factory floors.",
+      what_vendors_wont_tell_you: "In North America, Siemens controls are more common in European-headquartered manufacturers, food & beverage, and process industries (chemical, pharma). For pure DC automation in North America, Rockwell may be the more established standard. TIA Portal is technically more modern than RSLogix but the ecosystem comparison favors Rockwell in North America.",
+      best_environments: "European manufacturing operations, process industries, food & beverage, and pharma where Siemens is the global controls standard.",
+      watch_outs: "Verify integrator support in your region \u2014 Siemens integrator network is less dense than Rockwell in some North American markets.",
+      questions_to_ask: [
+        "Which integrators do you recommend in our specific region for our industry?",
+        "What is the integrator certification depth and how does that compare to Rockwell's PartnerNetwork?",
+        "What is the cost differential vs. Rockwell for equivalent controls?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Automation, drives, and digitalization for manufacturing",
     category: "Manufacturing Automation", industry: ["Manufacturing", "Automotive", "Pharma & Healthcare", "Food & Beverage"],
@@ -410,6 +432,17 @@ export const vendors = [
   },
   {
     id: 14, name: "Universal Robots", slug: "universal-robots",
+    practitioner_notes: {
+      deployment_reality: "Universal Robots (Teradyne subsidiary) is the leader in collaborative robotics \u2014 small payload arms (3\u201330kg) that don't require safety guarding in most applications. UR's value is fast deployment (4\u20138 weeks for typical applications) and the ability to redeploy the same arm for different tasks. The UR+ ecosystem (500+ certified accessories) accelerates integration vs. traditional robotics.",
+      what_vendors_wont_tell_you: "Cobots are slower than caged industrial robots \u2014 productivity per cell is typically 30\u201350% lower. The flexibility advantage is real but the throughput tradeoff is sometimes glossed over. Also: the no-guarding claim depends on risk assessment \u2014 many applications still require some safeguarding, fencing, or limited-speed operation. UR's training is good but you still need engineering capacity to deploy effectively.",
+      best_environments: "Low-to-medium payload applications (under 30kg) where deployment flexibility, low setup cost, and operator interaction matter more than maximum throughput. Machine tending, light assembly, packaging.",
+      watch_outs: "Don't expect industrial robot throughput. Verify risk assessment for true cobot deployment vs. guarded.",
+      questions_to_ask: [
+        "For our specific application, what is the cycle time and how does it compare to a caged FANUC or ABB?",
+        "What is the typical engineering effort for a first deployment \u2014 internal vs. integrator?",
+        "Show me the safety risk assessment process \u2014 what's truly cobot vs. what needs some guarding?"
+      ],
+    },
     implementation_pilot: "4–8 weeks",
     implementation_rollout: "2–5 months",
     implementation_risks: "Lower than traditional robots — no guarding required for most apps",
@@ -434,6 +467,17 @@ export const vendors = [
   },
   {
     id: 15, name: "Swisslog", slug: "swisslog",
+    practitioner_notes: {
+      deployment_reality: "Swisslog (KUKA Group subsidiary) is a top-tier integrator of AutoStore, CarryPick, and other goods-to-person systems. As one of AutoStore's largest integration partners globally, Swisslog has implementation depth that smaller integrators can't match. Their SynQ WCS provides operational orchestration across multiple automation types.",
+      what_vendors_wont_tell_you: "Swisslog implementations are typically multi-year programs ($10M+) \u2014 they're not competitive on smaller projects. Post-KUKA acquisition by Midea, organizational changes have affected some customer relationships \u2014 verify your specific account team stability. Implementation timelines are similar to other tier-1 SIs (18\u201336 months).",
+      best_environments: "Large pharma, retail, and grocery DC automation programs ($10M+) requiring AutoStore at scale with integrated WCS across multiple automation types.",
+      watch_outs: "Verify organizational stability post-KUKA/Midea acquisition. Not competitive for smaller projects.",
+      questions_to_ask: [
+        "Post-KUKA Midea acquisition, what is the organizational structure and account team continuity for our project?",
+        "Show me three AutoStore deployments at our scale completed in the last 24 months \u2014 actual cost and timeline.",
+        "What is the SynQ WCS roadmap and how does it integrate with non-Swisslog equipment?"
+      ],
+    },
     implementation_pilot: "10–20 months",
     implementation_rollout: "18–36 months",
     implementation_risks: "Civil, controls, WCS, multi-vendor coordination",
@@ -489,6 +533,17 @@ export const vendors = [
   },
   {
     id: 17, name: "Daifuku", slug: "daifuku",
+    practitioner_notes: {
+      deployment_reality: "Daifuku is the global leader in material handling by revenue \u2014 extensive AS/RS, conveyor, and sortation deployments worldwide. The Wynright acquisition gave them North American systems integration capability. Large-scale projects ($20M+) are their strongest case. Implementation timelines are industry-standard 18\u201336 months.",
+      what_vendors_wont_tell_you: "Daifuku's size means smaller projects ($5M-$15M) may get less senior attention. The Wynright integration has been ongoing \u2014 verify which Daifuku entity is contracting and which team is executing. Product line breadth is genuine but quality of project team is the key variable.",
+      best_environments: "Very large ($20M+) automotive, retail, e-commerce, and pharma DC programs requiring full-stack material handling integration from a single accountable partner.",
+      watch_outs: "Verify project team assignment and Wynright/Daifuku organizational structure for your specific project.",
+      questions_to_ask: [
+        "Which Daifuku entity (corporate, Wynright, etc.) is contracting our project and how is the team structured?",
+        "Show me three projects at our exact scale completed in the last 24 months.",
+        "What is the senior team capacity and assignment for our project specifically?"
+      ],
+    },
     implementation_pilot: "12–24 months",
     implementation_rollout: "18–36+ months",
     implementation_risks: "Civil scope, controls integration, FAT/SAT process",
@@ -575,6 +630,17 @@ export const vendors = [
   },
   {
     id: 20, name: "Berkshire Grey", slug: "berkshire-grey",
+    practitioner_notes: {
+      deployment_reality: "Berkshire Grey makes robotic picking systems for e-commerce fulfillment, sortation, and store replenishment. Major customers include FedEx, T.J. Maxx, and Target. Post-2023 acquisition by SoftBank-funded entity, the company structure has shifted. Their differentiation is end-to-end robotic systems (not just robot arms).",
+      what_vendors_wont_tell_you: "Berkshire Grey has had significant organizational and financial challenges \u2014 verify current company stability, leadership, and reference operations. The technology is genuinely capable but commercial execution has been mixed. Customers should verify long-term support commitment.",
+      best_environments: "Large e-commerce and retail fulfillment operations willing to invest in robotic picking with the understanding that Berkshire Grey is in commercial transition.",
+      watch_outs: "Verify current company status and long-term support commitment. Higher commercial risk than established vendors.",
+      questions_to_ask: [
+        "What is the current company status, ownership, and financial position?",
+        "What is the customer base currently operating systems and what is the support model?",
+        "What happens to existing deployments if there is further corporate restructuring?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "AI-powered robotic picking and sortation for e-commerce",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "Retail", "3PL"],
@@ -596,6 +662,17 @@ export const vendors = [
   },
   {
     id: 21, name: "KNAPP", slug: "knapp",
+    practitioner_notes: {
+      deployment_reality: "KNAPP is a top-tier European systems integrator with particular strength in pharmaceutical distribution \u2014 their reference base in pharma is among the deepest in the industry. The OSR Shuttle Evo is competitive with AutoStore and Multishuttle for goods-to-person. North American presence has grown through both direct operations and partner network.",
+      what_vendors_wont_tell_you: "KNAPP's strength in pharma can mean less expertise in retail/e-commerce DC vs. Dematic or Vanderlande. European-centric organization can create time zone challenges for US support. Premium pricing reflects the engineering depth.",
+      best_environments: "Pharmaceutical distribution, cosmetics, and complex multi-temperature retail DC where KNAPP's vertical expertise and engineering depth justify the premium.",
+      watch_outs: "Verify US support coverage and project team experience in your specific industry.",
+      questions_to_ask: [
+        "What is your specific reference base in our industry \u2014 pharma, retail, e-commerce?",
+        "What is your US implementation team size and how do projects get staffed?",
+        "What is the cost differential vs. AutoStore + Swisslog for equivalent goods-to-person capacity?"
+      ],
+    },
     implementation_pilot: "12–20 months",
     implementation_rollout: "18–36 months",
     implementation_risks: "Complex system integration, controls, WCS, SAP/WMS cutover",
@@ -651,6 +728,17 @@ export const vendors = [
   },
   {
     id: 23, name: "Fortna", slug: "fortna",
+    practitioner_notes: {
+      deployment_reality: "Fortna differentiates from pure equipment integrators by leading with strategy and design \u2014 their typical engagement starts with a network or DC strategy study before any equipment specification. Their WFM (Workforce Management) software extends the relationship post-go-live. Large-scale projects ($10M+) are their sweet spot. The MHS Global merger created a larger company but the strategic consulting culture has remained.",
+      what_vendors_wont_tell_you: "Fortna's strategic engagements are excellent but expensive \u2014 strategy studies run $200k-$500k+. The transition from strategy to integration can have organizational handoffs that affect project quality \u2014 verify who specifically will lead the implementation phase. As Fortna has grown, project team quality varies more by region and assigned team. The DMW&H merger has created some product line overlap.",
+      best_environments: "Multi-DC retail and e-commerce operations needing network strategy plus implementation, where a single accountable partner across strategy-design-build-operate is strategically valuable.",
+      watch_outs: "Overkill for single-site mid-market projects. Strategy engagements should produce concrete value beyond Fortna's recommendation to do more Fortna work.",
+      questions_to_ask: [
+        "Will the same Fortna team that runs strategy carry through to implementation, and what are the specific handoff points?",
+        "Show me three references where Fortna delivered strategy AND implementation, and what was the actual integration cost vs. strategy recommendation.",
+        "What is your WFM software's customer retention rate and what alternatives do customers consider at renewal?"
+      ],
+    },
     implementation_pilot: "10–20 months",
     implementation_rollout: "16–36 months",
     implementation_risks: "Strategy + design + integration — longer but more comprehensive",
@@ -675,6 +763,17 @@ export const vendors = [
   },
   {
     id: 24, name: "GreyOrange", slug: "greyorange",
+    practitioner_notes: {
+      deployment_reality: "GreyOrange offers AI-driven warehouse orchestration software combined with their Ranger robot fleet. The differentiation is the AI software layer \u2014 GreyMatter \u2014 that orchestrates across robots, humans, and inventory positioning. Deployments include major retail and e-commerce operations.",
+      what_vendors_wont_tell_you: "GreyOrange's value proposition depends on the AI orchestration delivering measurable productivity gains over basic robot fleet management. Verify with actual customer references. The company has been through leadership changes \u2014 verify organizational stability.",
+      best_environments: "Large retail and e-commerce DC operations where AI-driven inventory positioning and labor orchestration creates measurable productivity gains over traditional WMS-driven workflows.",
+      watch_outs: "Verify AI orchestration delivers measurable value vs. traditional approaches. Verify organizational stability.",
+      questions_to_ask: [
+        "What is the measurable productivity gain GreyMatter delivers vs. traditional WMS-driven AMR fleet management?",
+        "Show me three customers operating 12+ months with operational data on AI orchestration value.",
+        "What is the current company structure and leadership stability?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Ranger AMRs and Fulfilment AI for adaptive warehouse automation",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Warehouse & DC"],
@@ -727,6 +826,17 @@ export const vendors = [
   },
   {
     id: 26, name: "Hytrol", slug: "hytrol",
+    practitioner_notes: {
+      deployment_reality: "Hytrol is one of the largest North American conveyor manufacturers with strong dealer/integrator network. Their conveyor systems are workhorses in mid-market DC operations. Implementation is through Hytrol-authorized integrator partners \u2014 Hytrol manufactures and supports through partners.",
+      what_vendors_wont_tell_you: "Hytrol's quality is reliable but the integrator partner matters enormously for project execution \u2014 your project outcome depends heavily on which Hytrol dealer you work with. Same equipment, different dealers can produce dramatically different project results. Vet the integrator as carefully as the equipment.",
+      best_environments: "Mid-market DC and manufacturing conveyor projects where Hytrol's broad product line and integrator network deliver competitive value.",
+      watch_outs: "Integrator quality varies dramatically by dealer \u2014 vet the specific partner you'll work with.",
+      questions_to_ask: [
+        "Which Hytrol integrator partner do you recommend in our region, and what's their track record at our scale?",
+        "Show me three projects in our region completed in the last 24 months \u2014 actual cost and timeline vs. quote.",
+        "What is the dealer service network and parts availability?"
+      ],
+    },
     implementation_pilot: "4–12 months",
     implementation_rollout: "6–18 months",
     implementation_risks: "Integrator-dependent — Hytrol is equipment only",
@@ -751,6 +861,17 @@ export const vendors = [
   },
   {
     id: 27, name: "Interroll", slug: "interroll",
+    practitioner_notes: {
+      deployment_reality: "Interroll is a Swiss manufacturer of conveyor components \u2014 drum motors, MultiControl, roller-based conveyor modules. Their products are embedded in many DC conveyor systems globally. The Modular Conveyor Platform (MCP) and Modular Sortation Platform (MSP) are their integrated system offerings.",
+      what_vendors_wont_tell_you: "Interroll is primarily a component manufacturer \u2014 system integration requires an SI partner or significant in-house engineering. Their drum motors are excellent but the integrated MCP/MSP systems compete with conveyor SIs for full-system projects. Verify project structure.",
+      best_environments: "Operations buying conveyor components for in-house integration or specifying Interroll drum motors for SI-led projects.",
+      watch_outs: "For full conveyor system projects, the SI quality matters more than the Interroll components.",
+      questions_to_ask: [
+        "For our full conveyor system, what is the SI structure and Interroll's role vs. SI integration?",
+        "What is the typical project structure when buying MCP/MSP integrated platforms?",
+        "What is the spare parts availability and service for our region?"
+      ],
+    },
     implementation_pilot: "3–8 months",
     implementation_rollout: "6–12 months",
     implementation_risks: "Integrator-dependent — controls and WCS from SI",
@@ -775,6 +896,17 @@ export const vendors = [
   },
   {
     id: 28, name: "FlexSim Software", slug: "flexsim",
+    practitioner_notes: {
+      deployment_reality: "FlexSim is the warehouse and manufacturing simulation tool of choice for IEs running DC design validation and automation ROI modeling. The 3D visualization is the best in the category \u2014 extremely valuable for presenting simulation results to non-technical leadership. Learning curve is steeper than tools like Arena but manageable for IEs with simulation background. Licensing is annual subscription.",
+      what_vendors_wont_tell_you: "FlexSim's MHE library is strong but doesn't include every vendor's specific equipment \u2014 for AMR-specific simulation, you'll need to build custom models or use vendor-provided emulators. Customer support is generally responsive but the community is smaller than AnyLogic's. The Salt Lake City headquarters means EU customers face time zone challenges.",
+      best_environments: "DC design validation, throughput analysis, automation ROI modeling, and bottleneck analysis where 3D visualization is critical for communicating results to leadership.",
+      watch_outs: "Verify MHE library coverage for your specific vendors before committing. Custom model development can add significant time.",
+      questions_to_ask: [
+        "What is your pre-built model library for our specific MHE vendors (Dematic, AutoStore, AMR vendors)?",
+        "What is the typical learning curve for an IE with simulation background \u2014 hours to first useful model?",
+        "What is the licensing structure and how does it handle our team size?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "3D simulation software for warehouse and manufacturing planning",
     category: "Simulation & Digital Twin", industry: ["Warehouse & DC", "Manufacturing", "3PL", "E-commerce & Fulfillment"],
@@ -796,6 +928,17 @@ export const vendors = [
   },
   {
     id: 29, name: "Cognex", slug: "cognex",
+    practitioner_notes: {
+      deployment_reality: "Cognex is the global leader in industrial machine vision \u2014 fixed barcode readers, vision systems, deep learning. Their cameras and software are embedded in countless DC sortation, manufacturing inspection, and quality control applications. Implementation is typically straightforward for standard reading tasks but custom vision applications require engineering investment.",
+      what_vendors_wont_tell_you: "Cognex pricing is premium \u2014 for high-volume standard barcode reading, lower-cost alternatives (Datalogic, Keyence) may deliver equivalent performance at meaningfully lower cost. Cognex's value is greatest in complex vision applications (deep learning inspection, custom OCR) where their software ecosystem and engineering support justify the premium.",
+      best_environments: "High-volume sortation, complex inspection, OCR applications, and deep learning vision use cases where reliability and engineering support matter more than cost.",
+      watch_outs: "Evaluate cost vs. Datalogic and Keyence for standard barcode reading \u2014 Cognex premium isn't always justified.",
+      questions_to_ask: [
+        "For our specific application (e.g., parcel sortation barcode reading), what is the cost differential vs. Datalogic and how does performance compare?",
+        "What is your engineering support model for custom vision applications?",
+        "What is your deep learning vision roadmap and how does it compete with Mech-Mind or Photoneo?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Machine vision systems and barcode readers for industrial automation",
     category: "Vision & AI",industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Pharma & Healthcare"],
@@ -817,6 +960,17 @@ export const vendors = [
   },
   {
     id: 30, name: "Vecna Robotics", slug: "vecna-robotics",
+    practitioner_notes: {
+      deployment_reality: "Vecna Robotics is a US-based AMR company focused on industrial material transport \u2014 tuggers, pallet handlers, and case handlers for manufacturing and DC operations. Strong in automotive and heavy manufacturing. Implementation timelines are standard AMR (10\u201316 weeks).",
+      what_vendors_wont_tell_you: "Vecna is smaller than the top-tier AMR vendors (MiR, OTTO, Locus) \u2014 verify customer base, service capacity, and financial stability. Strong technology in specific applications but the company scale creates some commercial risk vs. larger vendors.",
+      best_environments: "Manufacturing and heavy industrial AMR applications where Vecna's specific reference base in automotive/heavy industry is differentiated.",
+      watch_outs: "Verify financial stability and customer base depth before large-scale commitment.",
+      questions_to_ask: [
+        "What is your current financial position and customer base size?",
+        "Show me production deployments at our scale in our specific industry.",
+        "What is your North American service team size and SLA?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Autonomous pallet handling AMRs for warehouse and manufacturing",
     category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage", "3PL"],
@@ -837,6 +991,17 @@ export const vendors = [
   },
   {
     id: 31, name: "Plus One Robotics", slug: "plus-one-robotics",
+    practitioner_notes: {
+      deployment_reality: "Plus One Robotics provides AI-powered induction robots for parcel and DC sortation \u2014 their robots use vision and AI to pick and place packages on conveyors. Real production deployments at FedEx, USPS, and major retailers. Implementation focuses on specific high-value use cases.",
+      what_vendors_wont_tell_you: "Plus One's value is application-specific \u2014 induction onto sortation conveyors. For broader DC picking applications, evaluate vs. Berkshire Grey or RightHand Robotics. The company is smaller than competitors \u2014 verify financial stability and customer base depth.",
+      best_environments: "Parcel sortation and DC induction applications where vision-guided robotic placement onto conveyors is the specific need.",
+      watch_outs: "Verify financial stability and reference base depth. Application-specific vendor.",
+      questions_to_ask: [
+        "What is your current financial position and customer base trajectory?",
+        "Show me production induction deployments at our scale with throughput data 12+ months post-go-live.",
+        "What is the service model and SLA for production deployments?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "AI-powered robotic piece picking and parcel handling",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -857,6 +1022,17 @@ export const vendors = [
   },
   {
     id: 32, name: "OTTO Motors", slug: "otto-motors",
+    practitioner_notes: {
+      deployment_reality: "OTTO Motors (now part of Rockwell Automation following 2023 acquisition) is one of the strongest heavy-duty AMR vendors \u2014 OTTO 100, 750, and 1500 cover light-to-very-heavy industrial AMR applications. Strong in automotive and heavy manufacturing. Post-Rockwell acquisition, the product is integrated with Rockwell's broader automation portfolio.",
+      what_vendors_wont_tell_you: "Post-Rockwell acquisition, the OTTO product is being increasingly aligned with Rockwell's controls and automation ecosystem. For Rockwell automation customers, this is a strong fit; for non-Rockwell environments, the value proposition is less clear. Verify integration roadmap with non-Rockwell systems.",
+      best_environments: "Heavy manufacturing AMR applications, particularly in automotive and aerospace, where Rockwell automation ecosystem integration is strategic.",
+      watch_outs: "Verify integration with non-Rockwell systems if you're not on Rockwell automation.",
+      questions_to_ask: [
+        "Post-Rockwell acquisition, what is the OTTO product roadmap for non-Rockwell environments?",
+        "What is the integration story with our specific WMS and PLC platforms?",
+        "Show me OTTO 1500 deployments at our exact application type and scale."
+      ],
+    },
     implementation_pilot: "6–10 weeks",
     implementation_rollout: "3–6 months",
     implementation_risks: "MES/ERP integration, manufacturing traffic complexity",
@@ -911,6 +1087,17 @@ export const vendors = [
   },
   {
     id: 34, name: "Infor WMS", slug: "infor-wms",
+    practitioner_notes: {
+      deployment_reality: "Infor WMS implementations typically run 6\u201312 months for single-site go-live, longer if you're also implementing Infor CloudSuite ERP. Infor's strongest case is in food & beverage, chemical, and industrial distribution where their industry-specific configurations reduce custom work. The platform is genuinely capable but the implementation experience varies significantly by SI partner \u2014 Infor's direct services team is smaller than Manhattan's or Blue Yonder's.",
+      what_vendors_wont_tell_you: "Infor's product portfolio is the result of years of acquisitions. WMS depth varies depending on which legacy product line your version traces back to (Infor LX vs. Infor M3 vs. Infor CloudSuite). Ask which underlying WMS engine your deployment will use. Also: Infor's commitment to standalone WMS (vs. ERP-embedded) has shifted over time \u2014 verify the long-term product roadmap before committing.",
+      best_environments: "Food & beverage, chemical, pharma, and industrial distribution where lot traceability, catch weight, and FSMA/cGMP compliance are critical and you're already on Infor CloudSuite or M3 ERP.",
+      watch_outs: "Not the right fit if you're not on Infor ERP \u2014 the integration advantage disappears and you're left with a WMS that's competitive but not differentiated. Also evaluate Infor's roadmap commitment to your specific product line.",
+      questions_to_ask: [
+        "Which underlying Infor WMS product is the basis for our deployment, and what is the 5-year roadmap commitment?",
+        "What is the implementation services capacity \u2014 Infor direct vs. SI partner, and who specifically will run our project?",
+        "Show me three customer references on the same Infor WMS product version live 18+ months."
+      ],
+    },
     implementation_pilot: "4–8 months",
     implementation_rollout: "10–18 months",
     implementation_risks: "ERP integration scope, industry-specific configuration",
@@ -935,6 +1122,17 @@ export const vendors = [
   },
   {
     id: 35, name: "Jungheinrich", slug: "jungheinrich",
+    practitioner_notes: {
+      deployment_reality: "Jungheinrich is a top-five global forklift manufacturer with extensive electric forklift portfolio and growing AGV/AMR line. European market leader competing with Linde Material Handling. North American presence has grown but smaller than Crown or Raymond.",
+      what_vendors_wont_tell_you: "Jungheinrich's North American service network is less mature than Crown, Raymond, or Hyster-Yale. AGV/AMR products are competent but less proven at scale vs. specialized AMR vendors. For pure forklift, evaluate vs. Crown/Raymond; for AGV/AMR, evaluate vs. specialized vendors.",
+      best_environments: "European or international operations where Jungheinrich's home market position is strong. North American operations primarily for specific product fit.",
+      watch_outs: "Verify North American service coverage for your specific sites. AGV/AMR less mature than specialized vendors.",
+      questions_to_ask: [
+        "What is your North American service team coverage and SLA?",
+        "How do your AGV/AMR products compare to specialized vendors like MiR or OTTO?",
+        "What is the typical cost differential vs. Crown or Raymond for equivalent forklift specs?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Forklifts, AGVs, and warehouse equipment from a global leader",
     category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage", "Cold Storage"],
@@ -956,6 +1154,17 @@ export const vendors = [
   },
   {
     id: 36, name: "Agility Robotics", slug: "agility-robotics",
+    practitioner_notes: {
+      deployment_reality: "Agility Robotics builds Digit \u2014 a bipedal humanoid robot for case-handling applications. This is genuinely cutting-edge robotics with limited production deployments to date. Amazon and GXO have piloted Digit. The technology is impressive but production scale is years away.",
+      what_vendors_wont_tell_you: "Humanoid robotics is at the pilot/early-commercial stage \u2014 operational economics, reliability, and serviceability are unproven at production scale. This is R&D-grade automation, not production-ready in 2025-2026 for general deployment. ROI cases require strong assumptions.",
+      best_environments: "Innovation programs at tier-1 retailers and 3PLs willing to invest in early humanoid robotics for competitive positioning, not for near-term production ROI.",
+      watch_outs: "Don't expect production-ready humanoid robotics economics. This is innovation investment, not standard automation procurement.",
+      questions_to_ask: [
+        "How many Digit units are in production deployment (not pilot) and what is the operational track record?",
+        "What is the realistic timeline for production-scale humanoid robotics economics?",
+        "What is the support model and what happens when robots need service?"
+      ],
+    },
     implementation_pilot: "12–24 weeks pilot",
     implementation_rollout: "6–12+ months",
     implementation_risks: "Early commercial stage — expect significant implementation complexity",
@@ -980,6 +1189,17 @@ export const vendors = [
   },
   {
     id: 37, name: "Covariant", slug: "covariant",
+    practitioner_notes: {
+      deployment_reality: "Covariant builds AI-powered robotic picking technology \u2014 primarily applied through their robot brain that powers third-party robotic arms (ABB, Yaskawa, others). Strong in mixed-SKU e-commerce picking. Acquired by Amazon in 2024, which has fundamentally changed their commercial strategy.",
+      what_vendors_wont_tell_you: "Post-Amazon acquisition (2024), Covariant's third-party commercial business has wound down \u2014 Amazon has effectively acquired the technology for internal use. Existing customers should verify support commitment and long-term roadmap. For new evaluations, Covariant is no longer a commercial option.",
+      best_environments: "Historical reference \u2014 Covariant is no longer commercially available outside Amazon following the 2024 acquisition.",
+      watch_outs: "Not a viable commercial vendor for new deployments post-Amazon acquisition.",
+      questions_to_ask: [
+        "For existing customers, what is the support and roadmap commitment post-Amazon acquisition?",
+        "What is the alternative if we were considering Covariant for new deployment?",
+        "What is the technology transition path if our existing deployment needs evolution?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "AI robotics platform for piece picking and depalletizing",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail", "Warehouse & DC"],
@@ -1032,6 +1252,17 @@ export const vendors = [
   },
   {
     id: 39, name: "Fetch Robotics", slug: "fetch-robotics",
+    practitioner_notes: {
+      deployment_reality: "Fetch Robotics was acquired by Zebra Technologies in 2021, bringing AMR capability into Zebra's broader DC automation portfolio. Their CartConnect and FreightShelf robots are deployed in 3PL, e-commerce, and manufacturing for goods transport. Post-acquisition, the product is increasingly integrated with Zebra's hardware and software ecosystem.",
+      what_vendors_wont_tell_you: "Post-Zebra acquisition, the Fetch product strategy has evolved \u2014 verify roadmap commitment and standalone product investment vs. Zebra integration priorities. Fleet management software (Fetch Cloud) is mature but smaller customer base than Locus or 6 River.",
+      best_environments: "3PL, e-commerce, and manufacturing operations needing AMR transport (not pick-assist) where integration with Zebra mobile computers and printers is strategic.",
+      watch_outs: "Verify post-Zebra roadmap and product investment commitment.",
+      questions_to_ask: [
+        "Post-Zebra acquisition, what is the Fetch product roadmap and is the company committed to standalone Fetch products?",
+        "What is your customer growth rate post-acquisition vs. pre-acquisition?",
+        "Show me deployments not already on Zebra hardware \u2014 how does the value proposition work?"
+      ],
+    },
     implementation_pilot: "4–8 weeks",
     implementation_rollout: "2–5 months",
     implementation_risks: "WMS integration, cart design, charging infrastructure",
@@ -1055,6 +1286,17 @@ export const vendors = [
   },
   {
     id: 40, name: "HAI Robotics", slug: "hai-robotics",
+    practitioner_notes: {
+      deployment_reality: "HAI Robotics is a Chinese AS/RS robot manufacturer specializing in case-handling robots (HaiPick) that climb racking to retrieve cases or totes. Growing rapidly globally with deployments at major e-commerce and 3PL operations. The technology is competitive with AutoStore and Exotec in specific use cases.",
+      what_vendors_wont_tell_you: "Chinese company origin creates procurement sensitivity in some North American contexts. The HaiPick system requires very specific facility design (high ceilings, specific rack configurations) \u2014 verify your facility fits the system rather than forcing the system into your facility. Service network in North America is growing but immature.",
+      best_environments: "E-commerce and 3PL operations with high ceiling heights (8m+) and the ability to design facility specifically for HaiPick deployment.",
+      watch_outs: "Procurement acceptance of Chinese technology. Facility design must fit the system. North American service immaturity.",
+      questions_to_ask: [
+        "What is your North American service team size and what is the typical service response time?",
+        "Show me three North American deployments at our scale with operational data 12+ months post-go-live.",
+        "What is the facility design requirement and how does it constrain our flexibility?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "HAIPICK autonomous case-handling robots for high-density storage",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "3PL", "Cold Storage"],
@@ -1075,6 +1317,17 @@ export const vendors = [
   },
   {
     id: 41, name: "Schaefer Systems International", slug: "schaefer-systems",
+    practitioner_notes: {
+      deployment_reality: "SSI Schaefer is one of Europe's largest material handling companies \u2014 comprehensive product line from shelving to AS/RS to conveyor. North American presence is significant but smaller than Dematic or Vanderlande. Strong in food & beverage, retail, and pharma. Implementation timelines are industry-standard.",
+      what_vendors_wont_tell_you: "Schaefer's product breadth means you can buy a full system from one vendor but the AS/RS and conveyor product lines are mature while goods-to-person (Cuby) is newer. Verify which products are production-validated at your scale. European HQ creates some time zone challenges for US support.",
+      best_environments: "Food & beverage, retail, and pharma DC projects requiring full-stack material handling integration with strong shelving and storage component options.",
+      watch_outs: "Verify product maturity for goods-to-person specifically. Confirm US project team capacity.",
+      questions_to_ask: [
+        "For goods-to-person specifically (Cuby), how many production deployments at our scale?",
+        "What is your US support team size and SLA?",
+        "Show me three full-stack projects (storage + conveyor + AS/RS) at our scale."
+      ],
+    },
     implementation_pilot: "14–24 months",
     implementation_rollout: "24–42 months",
     implementation_risks: "Complex full-system — one of longest implementation timelines",
@@ -1098,6 +1351,17 @@ export const vendors = [
   },
   {
     id: 42, name: "TGW Systems", slug: "tgw-systems",
+    practitioner_notes: {
+      deployment_reality: "TGW is an Austrian material handling integrator with particularly strong position in apparel and footwear DC automation \u2014 they've done major implementations for Zara, Adidas, Levi's. Their Stingray shuttle is competitive with Dematic Multishuttle. North American presence has grown but smaller than Dematic.",
+      what_vendors_wont_tell_you: "TGW's apparel/fashion DC expertise is genuine but vertical concentration means less reference base in food & beverage or e-commerce. European HQ creates time zone challenges. Verify regional service coverage.",
+      best_environments: "Apparel and footwear DC automation where TGW's reference base in fashion is the strongest differentiator.",
+      watch_outs: "Less reference base outside apparel/fashion. Verify US support coverage.",
+      questions_to_ask: [
+        "What is your reference base specifically in our industry vs. apparel/fashion?",
+        "Show me Stingray deployments at our scale in our industry.",
+        "What is your US service team size and regional coverage?"
+      ],
+    },
     implementation_pilot: "12–20 months",
     implementation_rollout: "18–36 months",
     implementation_risks: "Large project — civil, controls, commissioning, training",
@@ -1121,6 +1385,17 @@ export const vendors = [
   },
   {
     id: 43, name: "Vanderlande", slug: "vanderlande",
+    practitioner_notes: {
+      deployment_reality: "Vanderlande (Toyota Industries subsidiary) is one of the global top-tier material handling SIs alongside Dematic and Daifuku. Strong in airport baggage handling, parcel sortation, and large-scale warehouse automation. Implementation timelines are industry-standard for tier-1 SIs (18\u201336 months).",
+      what_vendors_wont_tell_you: "Vanderlande's strongest practice is airport and parcel \u2014 for warehouse DC automation, Dematic and Daifuku have more diverse references. Project team quality varies by region and assignment. The Toyota Industries connection brings stability but also bureaucracy on smaller projects.",
+      best_environments: "Large airport, parcel sorting hub, and major DC automation programs ($20M+) where Vanderlande's global engineering depth is valuable.",
+      watch_outs: "Not competitive on smaller projects. Verify project team assignment and warehouse vs. airport practice depth.",
+      questions_to_ask: [
+        "What is your warehouse DC reference base specifically (not airport/parcel)?",
+        "Show me three warehouse DC projects at our scale completed in the last 24 months.",
+        "What is the senior team capacity for our specific project and how is staffing structured?"
+      ],
+    },
     implementation_pilot: "14–24 months",
     implementation_rollout: "24–42 months",
     implementation_risks: "Airport/parcel complexity — large civil and controls scope",
@@ -1144,6 +1419,17 @@ export const vendors = [
   },
   {
     id: 44, name: "Witron", slug: "witron",
+    practitioner_notes: {
+      deployment_reality: "Witron is a German integrator with deep expertise in grocery DC automation \u2014 they've done major implementations for Kroger, Coles, Sobeys, Edeka. Their OPM (Order Picking Machinery) and DPS (Dynamic Picking System) are purpose-built for grocery's mixed-temperature, high-SKU, store-replenishment workflows. Implementations are multi-year programs.",
+      what_vendors_wont_tell_you: "Witron projects are major commitments \u2014 $50M-$300M+ multi-year programs that essentially partner you with Witron for a decade. The expertise is genuine but the lock-in is real. Witron's reference base outside grocery is limited.",
+      best_environments: "Major grocery DC automation programs at tier-1 retailers \u2014 Kroger, Albertsons, regional grocery chains \u2014 where store-ready pallet assembly is the value driver.",
+      watch_outs: "Don't engage Witron outside their core grocery DC strength. Multi-year program commitment.",
+      questions_to_ask: [
+        "Show me three grocery DC programs completed in the last 5 years \u2014 full cost and operational results vs. business case.",
+        "What is the typical project structure and Witron's role over the multi-year implementation?",
+        "What is the staffing transition from Witron to internal operations over the program?"
+      ],
+    },
     implementation_pilot: "18–36 months",
     implementation_rollout: "24–48 months",
     implementation_risks: "Design-build-operate model — longest timeline in category",
@@ -1167,6 +1453,17 @@ export const vendors = [
   },
   {
     id: 45, name: "Cimcorp", slug: "cimcorp",
+    practitioner_notes: {
+      deployment_reality: "Cimcorp is a Finnish material handling integrator specialized in tire and food distribution. Their gantry-style robotic order picking is differentiated for tire DCs (Bridgestone, Michelin) and bakery/dairy operations. Less common outside these specific verticals.",
+      what_vendors_wont_tell_you: "Cimcorp is a niche specialist \u2014 outside tire and bakery/dairy, they're rarely the right choice. The robotic gantry technology is mature for tire applications but operationally complex. North American presence is small.",
+      best_environments: "Tire distribution (truck and passenger tire DCs) and bakery/dairy operations where Cimcorp's specific gantry robotic picking is the right technology.",
+      watch_outs: "Verify North American support. Don't evaluate Cimcorp for general DC automation \u2014 it's a vertical specialist.",
+      questions_to_ask: [
+        "What is your North American reference base specifically in our vertical?",
+        "What is the US service team capacity and SLA?",
+        "What is the typical project timeline and capital cost at our specific tire/bakery volume?"
+      ],
+    },
     vendor_type: "Manufacturer + SI",
     tagline: "Robotic order fulfillment for tire, grocery, and e-commerce",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Food & Beverage", "E-commerce & Fulfillment"],
@@ -1187,6 +1484,17 @@ export const vendors = [
   },
   {
     id: 46, name: "Ambi Robotics", slug: "ambi-robotics",
+    practitioner_notes: {
+      deployment_reality: "Ambi Robotics builds AI-powered induction and sortation robots for parcel and e-commerce fulfillment. Their AmbiSort system is used at USPS sortation centers. Differentiated from Plus One and RightHand by specific application focus on parcel induction.",
+      what_vendors_wont_tell_you: "Ambi is application-specific to parcel/induction \u2014 not a general DC picking solution. Smaller company with concentrated customer base \u2014 verify long-term financial stability. Throughput claims should be validated against your specific package mix.",
+      best_environments: "Parcel induction and sortation operations where Ambi's specific AI vision and induction technology matches the application.",
+      watch_outs: "Application-specific vendor. Verify financial stability and customer base depth.",
+      questions_to_ask: [
+        "What is your customer base outside USPS and what is the typical deployment scale?",
+        "What is the realistic throughput at our specific package mix vs. published numbers?",
+        "What is your service and support model for production deployments?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "AI-powered robotic piece picking for e-commerce and 3PL",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -1207,6 +1515,17 @@ export const vendors = [
   },
   {
     id: 47, name: "AutoGuide Mobile Robots", slug: "autoguide",
+    practitioner_notes: {
+      deployment_reality: "AutoGuide Mobile Robots (acquired by Teradyne in 2019 and integrated with MiR) is focused on heavy-duty AMRs for manufacturing \u2014 tugger, pallet-handling, large payload AGV/AMR. Post-Teradyne acquisition, the product line is positioned as the heavy-duty complement to MiR's lighter AMR range.",
+      what_vendors_wont_tell_you: "Post-MiR consolidation, the AutoGuide brand is being absorbed into the broader Teradyne robotics portfolio \u2014 verify current product positioning, support, and roadmap. For heavy-duty manufacturing AGV applications, evaluate vs. JBT or specialized AGV vendors.",
+      best_environments: "Heavy-duty manufacturing AGV applications \u2014 automotive, aerospace, heavy industrial \u2014 where Teradyne/MiR ecosystem integration is valuable.",
+      watch_outs: "Verify product roadmap commitment post-MiR integration.",
+      questions_to_ask: [
+        "What is the AutoGuide product roadmap post-MiR integration and brand consolidation?",
+        "Show me heavy-duty manufacturing AGV reference deployments at our scale.",
+        "What is the service team and support model post-acquisition?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Heavy-payload autonomous forklifts and tuggers for manufacturing",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
@@ -1227,6 +1546,17 @@ export const vendors = [
   },
   {
     id: 48, name: "Avidbots", slug: "avidbots",
+    practitioner_notes: {
+      deployment_reality: "Avidbots makes Neo \u2014 an autonomous floor cleaning robot for commercial and industrial environments. Deployed at airports, retail, and increasingly DCs. Real production deployments include Walmart, airports, and major retailers. RaaS model is common.",
+      what_vendors_wont_tell_you: "Floor cleaning robotics is genuinely useful in large facilities but the ROI case requires significant floor area and current cleaning labor cost. Operations with under 100k sqft may not see the economics. Service and parts availability for autonomous floor robots is still maturing.",
+      best_environments: "Large facilities (100k+ sqft) \u2014 airports, big-box retail, large DCs \u2014 where cleaning labor cost and consistency justify the autonomous solution.",
+      watch_outs: "Verify ROI at your specific facility size and labor cost. Service infrastructure is still maturing.",
+      questions_to_ask: [
+        "What is the typical ROI period at our specific facility size?",
+        "What is your service team and SLA for autonomous floor robots?",
+        "Show me three references in our specific facility type operating 12+ months."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Neo autonomous floor scrubbers for commercial and industrial facilities",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "3PL"],
@@ -1247,6 +1577,17 @@ export const vendors = [
   },
   {
     id: 49, name: "Brain Corp", slug: "brain-corp",
+    practitioner_notes: {
+      deployment_reality: "Brain Corp provides the autonomous navigation software (BrainOS) that runs on multiple cleaning robot OEMs \u2014 including Tennant, Nilfisk, and others. Used in Walmart, Target, and major retail/commercial deployments. Different from Avidbots (full robot) \u2014 Brain Corp is the software platform.",
+      what_vendors_wont_tell_you: "Brain Corp's value depends on the OEM partner \u2014 the robot hardware quality and service comes from Tennant/Nilfisk. Brain Corp brings the autonomy software and fleet management. Cost is bundled into the OEM equipment lease typically.",
+      best_environments: "Operations wanting autonomous floor cleaning from established OEM equipment (Tennant, Nilfisk) with Brain Corp providing the autonomy intelligence layer.",
+      watch_outs: "Verify which OEM relationship is right for your service needs \u2014 Brain Corp is the software, not the equipment vendor.",
+      questions_to_ask: [
+        "Which OEM partner do you recommend for our specific equipment needs?",
+        "What is the service responsibility split \u2014 Brain Corp software vs. OEM hardware?",
+        "What is the typical contract structure and pricing?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "BrainOS autonomous navigation platform for commercial robots",
     category: "Controls & Sensing", industry: ["Retail", "Warehouse & DC", "Manufacturing"],
@@ -1267,6 +1608,17 @@ export const vendors = [
   },
   {
     id: 50, name: "Modula", slug: "modula",
+    practitioner_notes: {
+      deployment_reality: "Modula is the leading vertical lift module (VLM) manufacturer globally, with strong North American presence. Their VLMs are well-engineered, modular, and widely deployed in MRO, parts distribution, and manufacturing kitting applications. Implementation is fast (2\u20136 weeks per unit) and ROI is typically strong in space-constrained operations.",
+      what_vendors_wont_tell_you: "VLMs make sense in specific use cases \u2014 high SKU count, low-to-medium throughput, space-constrained operations. They don't scale to high-throughput goods-to-person applications. Modula's value proposition is strongest in MRO and parts distribution; e-commerce fulfillment is usually better served by AutoStore or shuttle systems.",
+      best_environments: "MRO/parts distribution, manufacturing kitting, e-commerce returns processing, and tool crib management where SKU count is high but throughput is moderate.",
+      watch_outs: "Don't expect VLM throughput to match shuttle AS/RS. Wrong category for high-volume e-commerce fulfillment.",
+      questions_to_ask: [
+        "What is the realistic peak throughput per unit and how does that scale with multiple units?",
+        "What is the typical ROI period in our specific use case and operation type?",
+        "What is the integration story with our WMS \u2014 pre-built or middleware?"
+      ],
+    },
     implementation_pilot: "2–4 weeks per unit",
     implementation_rollout: "1–2 months",
     implementation_risks: "WMS API, tray configuration, item master setup",
@@ -1290,6 +1642,17 @@ export const vendors = [
   },
   {
     id: 51, name: "Prime Robotics", slug: "prime-robotics",
+    practitioner_notes: {
+      deployment_reality: "Prime Robotics offers AMR solutions for warehouse automation with growing North American presence. Less established than Locus or 6 River but competitive in specific use cases. Implementation timelines are standard AMR (8\u201314 weeks).",
+      what_vendors_wont_tell_you: "Prime is a smaller, newer player in a category dominated by Locus, 6 River, Geek+, and MiR. Verify customer base, reference deployments at scale, and service capacity. The competitive differentiation vs. established AMR vendors needs to be specific to your use case.",
+      best_environments: "Operations where Prime has specific reference deployments and competitive pricing vs. larger AMR vendors.",
+      watch_outs: "Verify customer base depth and service capacity before committing.",
+      questions_to_ask: [
+        "What is your customer base at our scale and what is the typical fleet size in production?",
+        "What is your service team capacity and SLA in our region?",
+        "What is the differentiation vs. Locus, 6 River, Geek+ for our specific use case?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Autonomous pallet-level AMRs for DC inbound and outbound",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "3PL", "E-commerce & Fulfillment"],
@@ -1310,6 +1673,17 @@ export const vendors = [
   },
   {
     id: 52, name: "Waypoint Robotics", slug: "waypoint-robotics",
+    practitioner_notes: {
+      deployment_reality: "Waypoint Robotics is a US-based AMR company focused on industrial material transport with their Vector robots. Their differentiation is the cargo carry capacity and simpler deployment for industrial environments.",
+      what_vendors_wont_tell_you: "Waypoint is smaller than the top-tier AMR vendors \u2014 verify customer base, financial stability, and service capacity. Reference base is limited compared to Vecna, MiR, or OTTO.",
+      best_environments: "Smaller-scale industrial AMR deployments where Waypoint's specific value proposition matches your application.",
+      watch_outs: "Verify financial stability and customer reference base before significant commitment.",
+      questions_to_ask: [
+        "What is your current customer base size and financial position?",
+        "Show me production deployments at our scale with operational data 12+ months post-go-live.",
+        "What is the differentiation vs. MiR for similar payload class?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Heavy-duty AMRs for industrial and manufacturing material handling",
     category: "AGV Systems", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
@@ -1330,6 +1704,17 @@ export const vendors = [
   },
   {
     id: 53, name: "inVia Robotics", slug: "invia-robotics",
+    practitioner_notes: {
+      deployment_reality: "inVia Robotics deploys goods-to-person AMRs on a pure subscription (RaaS) model \u2014 no upfront capital, monthly per-robot pricing. Implementation is fast (8\u201312 weeks) and customers can scale fleet size up/down seasonally. Strong in 3PL and mid-market e-commerce.",
+      what_vendors_wont_tell_you: "RaaS pricing means total cost over 3-5 years often exceeds traditional purchase, but the cash flow profile is dramatically different. For seasonal operations or capital-constrained 3PLs, this is the right tradeoff; for stable high-volume operations, ownership may be more cost-effective long-term.",
+      best_environments: "Mid-market 3PL operations and e-commerce brands with seasonal volume variance where capital efficiency and operational flexibility matter more than long-term TCO.",
+      watch_outs: "Calculate 5-year TCO including subscription vs. ownership alternatives. RaaS isn't always cheaper.",
+      questions_to_ask: [
+        "What is the 5-year TCO at our specific volume vs. owned-system alternatives?",
+        "What is the contract structure \u2014 minimum commitment, seasonal flex, exit provisions?",
+        "Show me long-term customers (3+ years) and their experience with RaaS economics over time."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Goods-to-person AMR system with subscription pricing model",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -1350,6 +1735,17 @@ export const vendors = [
   },
   {
     id: 54, name: "Fox Robotics", slug: "fox-robotics",
+    practitioner_notes: {
+      deployment_reality: "Fox Robotics is one of the credible autonomous trailer unloading vendors \u2014 specifically for floor-loaded carton trailers. Their robots use vision and AI to autonomously unload cartons onto outbound conveyor. Implementations have been growing in retail and food & beverage. Each robot is significant capital investment ($500k-$1M+ per cell).",
+      what_vendors_wont_tell_you: "Autonomous trailer unloading is a young category \u2014 Fox is a leader but still scaling production deployments. The ROI case depends heavily on trailer load consistency (floor-loaded vs. palletized), throughput per dock, and labor cost structure. Operations with significant trailer load variability may not achieve expected throughput.",
+      best_environments: "High-volume retail and food & beverage receiving where floor-loaded carton trailers are common, labor cost and turnover are significant, and dock door capacity is constrained.",
+      watch_outs: "Verify the application fit specifically \u2014 Fox is for floor-loaded carton unloading, not palletized. Throughput in your specific load profile is the key variable.",
+      questions_to_ask: [
+        "What is the throughput at our specific load type \u2014 floor-loaded cartons, mixed loads, palletized? Provide ranges, not best case.",
+        "How many cells are in production deployment vs. pilot, and at what customers?",
+        "What is the per-dock-door capital cost and what is the typical labor displacement?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Autonomous forklift for trailer unloading at the dock",
     category: "Dock Automation", industry: ["Warehouse & DC", "Food & Beverage", "3PL", "Retail"],
@@ -1429,28 +1825,18 @@ export const vendors = [
     reviews_data: [{ author: "VP Ops — DTC Brand", rating: 4.2, text: "Went live in 10 weeks. Support team is genuinely excellent — they feel like an extension of our team." }, { author: "Dir. IT — Regional 3PL", rating: 4.0, text: "Best WMS for our size. Scales well and doesn't require a consultant to configure." }],
   },
   {
-    id: 57, name: "Lucas Systems", slug: "lucas-systems",
-    vendor_type: "Software",
-    tagline: "Voice-directed work and labor optimization for DC operations",
-    category: "Labor Management", industry: ["Warehouse & DC", "Food & Beverage", "3PL", "Retail"],
-    tags: ["Voice", "Labor optimization", "Directed work", "Picking"],
-    featured: false, rating: 4.3, reviews: 28,
-    hq: "Wexford, PA", website: "lucassystems.com", phone: "+1 (724) 940-7000",
-    founded: "1998", installs: "500+", employees: "200–500", logo: "LS", color: "#2c3e50",
-    desc: "Lucas Systems provides voice-directed work solutions and labor optimization software for DC operations. Their Jennifer voice platform guides associates through picking, receiving, and other tasks — proven to improve productivity 15-35% while reducing errors.",
-    specs: [{ l: "Platform", v: "Jennifer Voice" }, { l: "Productivity lift", v: "15–35%" }, { l: "Error reduction", v: "Up to 80%" }, { l: "Devices", v: "Multi-modal (voice, scan, AR)" }, { l: "Brownfield ready", v: "Yes" }, { l: "Integration", v: "WMS-agnostic" }],
-    integrations: ["All major WMS", "SAP EWM", "Manhattan", "Blue Yonder"],
-    apps: ["Order picking", "Receiving", "Putaway", "Cycle counting", "Replenishment"],
-    reviews_data: [{ author: "Dir. Operations — Food DC", rating: 4.4, text: "Jennifer voice picking improved our productivity by 28% in year one. ROI in under 12 months." }, { author: "IE — Grocery DC", rating: 4.2, text: "WMS-agnostic approach meant we could keep our existing WMS. Implementation was smooth." }],
-    strengths: ["WMS-agnostic approach protects existing WMS investment", "15–35% productivity improvement is proven and consistent", "Multi-modal platform supports voice, scan, and AR", "28 years of DC voice direction expertise"],
-    weaknesses: ["Higher cost than basic voice solutions like Vocollect", "Requires integration project to connect to WMS", "Voice-directed work culture change requires associate buy-in", "Limited analytics depth vs dedicated LMS platforms"],
-    best_for: "DCs wanting voice picking productivity gains without replacing existing WMS",
-    not_for: "Operations already using a WMS with strong built-in directed work capability",
-    ideal_operation: "Food DC or 3PL with 50+ pickers wanting 20%+ productivity improvement",
-    price_range: "$$",
-  },
-  {
     id: 58, name: "Easy Metrics", slug: "easy-metrics",
+    practitioner_notes: {
+      deployment_reality: "Easy Metrics is a focused labor management software specifically for warehouse and DC operations \u2014 engineered labor standards (ELS), real-time productivity tracking, and pay-for-performance configuration. Implementation runs 8\u201312 weeks and includes time studies to develop site-specific standards. Strong in 3PL and high-volume DC environments.",
+      what_vendors_wont_tell_you: "ELS-based labor management is most valuable in operations with significant manual labor and clear productivity differentials between workers. In highly automated DCs, the ROI case is weaker. Implementation requires industrial engineering capacity to develop and maintain standards \u2014 this is a real ongoing commitment, not a one-time setup.",
+      best_environments: "3PL operations with multi-client billing requirements where labor cost per client is critical, and high-volume manual-pick DCs where pay-for-performance can drive productivity.",
+      watch_outs: "Don't deploy ELS-based LMS without IE capacity to maintain standards. The system is only as good as the standards behind it.",
+      questions_to_ask: [
+        "What is your time study methodology and how do standards stay current as processes change?",
+        "Show me 3PL multi-client billing functionality \u2014 does it integrate with our existing billing system?",
+        "What is the typical ongoing IE time commitment to maintain the system?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Labor management and workforce intelligence for DCs",
     category: "Labor Management", industry: ["Warehouse & DC", "Manufacturing", "3PL"],
@@ -1471,6 +1857,17 @@ export const vendors = [
   },
   {
     id: 59, name: "Longbow Advantage", slug: "longbow-advantage",
+    practitioner_notes: {
+      deployment_reality: "Longbow's Rebus platform is the most-deployed operational analytics overlay for SAP EWM customers. The platform fills the operational visibility gap SAP EWM has \u2014 real-time dashboards, labor productivity, and analytics that SAP doesn't natively provide well. Implementation is fast (8\u201312 weeks) because Longbow has done dozens of SAP EWM integrations.",
+      what_vendors_wont_tell_you: "Rebus only makes sense if you're on SAP EWM. Outside that context, it's not differentiated. Longbow's value proposition is essentially \"SAP EWM is great at transactions but poor at operations \u2014 we fix that.\" Verify that SAP EWM isn't improving native analytics in a way that makes Rebus less differentiated over time.",
+      best_environments: "SAP EWM customers needing operational dashboards, labor management overlay, and real-time analytics that SAP EWM alone doesn't provide.",
+      watch_outs: "Not a fit if you're not on SAP EWM. Also verify Longbow's roadmap vs. SAP's improving native capabilities.",
+      questions_to_ask: [
+        "How does Rebus's value compare to SAP EWM's evolving native analytics in S/4HANA?",
+        "What is your customer base by SAP EWM version, and how do you support customers as SAP versions change?",
+        "What is the integration architecture and how does it handle SAP upgrades?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Warehouse analytics and labor management platform",
     category: "Labor Management", industry: ["Warehouse & DC", "3PL", "Manufacturing", "Retail"],
@@ -1491,6 +1888,17 @@ export const vendors = [
   },
   {
     id: 60, name: "Samsara", slug: "samsara",
+    practitioner_notes: {
+      deployment_reality: "Samsara's primary product is fleet telematics \u2014 GPS tracking, ELD compliance, dashcams, and fleet safety. In the warehouse/DC context, their value is in yard management and tractor/trailer tracking, not picker labor management. The platform is mature and widely deployed in trucking and field service. Implementation is fast for the hardware-and-cloud model.",
+      what_vendors_wont_tell_you: "Samsara is not a warehouse LMS \u2014 it's a fleet management platform with yard visibility features. Don't evaluate it against Lucas Systems or Easy Metrics. The hardware costs (cameras, devices) add up across a fleet, and the SaaS pricing scales meaningfully with vehicle count.",
+      best_environments: "Operations with significant fleet (private trucking, yard tractors, forklifts) where fleet telematics, ELD compliance, and safety/dashcam tooling create operational value.",
+      watch_outs: "Don't evaluate Samsara as warehouse labor management \u2014 wrong category.",
+      questions_to_ask: [
+        "What is the total 5-year cost including hardware refresh, SaaS, and ELD compliance services?",
+        "Show me the yard management and trailer tracking functionality \u2014 is it competitive with C3 Solutions or PowerFleet?",
+        "What is your integration with our existing TMS and YMS?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Connected operations platform for fleet and industrial IoT",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "3PL"],
@@ -1512,6 +1920,17 @@ export const vendors = [
   },
   {
     id: 61, name: "Yaskawa Motoman", slug: "yaskawa-motoman",
+    practitioner_notes: {
+      deployment_reality: "Yaskawa Motoman is one of the top-three global industrial robot manufacturers. Strong in arc welding, assembly, and material handling. The Motoman brand has been the North American market entry for Yaskawa robots since 1989. Implementation through integrator network \u2014 Yaskawa doesn't typically do direct integration.",
+      what_vendors_wont_tell_you: "Yaskawa's controller (YRC1000) is competitive but the user experience is dated compared to UR or newer entrants. Yaskawa's strategy on collaborative robotics has been slower than ABB and KUKA. Service network is solid in industrial Midwest but coverage thins in other regions.",
+      best_environments: "Welding-heavy manufacturing (arc, spot, MIG), material handling, and assembly applications in industrial Midwest where Yaskawa's service network is strongest.",
+      watch_outs: "Verify regional service coverage outside Midwest. Cobot product line is less mature than UR.",
+      questions_to_ask: [
+        "What is your service team coverage in our region and what is the SLA?",
+        "What is Yaskawa's collaborative robotics roadmap and how does it compete with UR?",
+        "Which integrators do you recommend for our specific application?"
+      ],
+    },
     implementation_pilot: "8–14 weeks",
     implementation_rollout: "4–8 months",
     implementation_risks: "Tooling, controls, and safety commissioning",
@@ -1536,6 +1955,17 @@ export const vendors = [
   },
   {
     id: 62, name: "ABB Robotics", slug: "abb-robotics",
+    practitioner_notes: {
+      deployment_reality: "ABB is one of the top-three global industrial robot manufacturers (alongside FANUC and Yaskawa). Strong in automotive painting, welding, and material handling. RobotStudio simulation is excellent for offline programming. Implementation timeline for a robotic cell is typically 12\u201324 weeks including integration, similar to FANUC.",
+      what_vendors_wont_tell_you: "ABB's reliability is excellent but service network varies by region \u2014 outside major manufacturing corridors, response time can be slower than FANUC. The IRC5 controller is mature but increasingly dated UI-wise vs. newer entrants. ABB's strategy around mobile robotics and AI vision is evolving \u2014 their position in goods-to-person and AMR is less clear than their industrial robotics position.",
+      best_environments: "Manufacturing applications requiring industrial-grade reliability and process expertise \u2014 automotive, metals, food & beverage processing. Particularly strong in painting and welding.",
+      watch_outs: "Verify regional service coverage. For new use cases like mobile robotics, evaluate ABB's commitment vs. specialized vendors.",
+      questions_to_ask: [
+        "What is the regional service team size and SLA in our specific location?",
+        "What is ABB's mobile robotics and AI vision strategy \u2014 internal development or acquisition?",
+        "Show me the integrator network \u2014 who do you recommend for our application type?"
+      ],
+    },
     implementation_pilot: "8–14 weeks",
     implementation_rollout: "4–8 months",
     implementation_risks: "Controls integration, tooling, commissioning",
@@ -1560,6 +1990,17 @@ export const vendors = [
   },
   {
     id: 63, name: "KUKA Robotics", slug: "kuka-robotics",
+    practitioner_notes: {
+      deployment_reality: "KUKA is the leading German industrial robot manufacturer with particularly strong position in automotive body shops (welding, handling). Their KR series industrial robots are highly capable. Implementation through KUKA Systems (their integration arm) or third-party integrators. Now owned by Midea Group (Chinese), which has affected some procurement decisions in defense and government contexts.",
+      what_vendors_wont_tell_you: "Chinese ownership creates procurement sensitivity in some North American contexts \u2014 verify your organization's policy. KUKA's customer support post-Midea acquisition has had ups and downs in the US \u2014 verify current support quality. Premium pricing vs. FANUC and ABB in many applications.",
+      best_environments: "Automotive manufacturing (body shop welding, painting, handling), aerospace, and applications where KUKA's process expertise and German engineering matter.",
+      watch_outs: "Procurement acceptance of Chinese ownership. US support quality verification.",
+      questions_to_ask: [
+        "What is your organization's policy on Chinese-owned suppliers, and does KUKA's Midea ownership affect procurement?",
+        "What is your current US service team size and how has it evolved post-Midea acquisition?",
+        "What is the cost differential vs. FANUC and ABB for equivalent applications?"
+      ],
+    },
     implementation_pilot: "8–16 weeks",
     implementation_rollout: "4–10 months",
     implementation_risks: "European-spec controls, integration complexity in US installs",
@@ -1584,6 +2025,17 @@ export const vendors = [
   },
   {
     id: 64, name: "Righthand Robotics", slug: "righthand-robotics",
+    practitioner_notes: {
+      deployment_reality: "RightHand Robotics deploys their RightPick robotic piece-picking system for e-commerce and 3PL fulfillment. The system handles mixed-SKU piece picking from totes or shelves. Strong reference base including Paltac (Japan), and growing North American deployments.",
+      what_vendors_wont_tell_you: "Piece-picking robotics is genuinely capable but operational performance depends heavily on SKU profile fit and integration quality. Verify throughput at your specific SKU mix vs. RightHand's published throughput numbers. Smaller company than Berkshire Grey \u2014 verify long-term commitment.",
+      best_environments: "E-commerce and 3PL operations with high-volume piece picking from totes or shelves where mixed-SKU picking automation creates labor displacement.",
+      watch_outs: "Verify SKU profile fit and operational throughput at your specific item mix.",
+      questions_to_ask: [
+        "What is the realistic throughput at our specific SKU profile and pick rate?",
+        "Show me three deployments at our scale with operational data 12+ months post-go-live.",
+        "What is the company's financial position and roadmap?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "RightPick — AI-powered robotic piece picking for e-commerce",
     category: "Depalletizing & Palletizing", industry: ["E-commerce & Fulfillment", "3PL", "Retail"],
@@ -1604,6 +2056,17 @@ export const vendors = [
   },
   {
     id: 65, name: "Soft Robotics", slug: "soft-robotics",
+    practitioner_notes: {
+      deployment_reality: "Soft Robotics specializes in compliant grippers for food, produce, and irregular item handling. Their mGrip product line uses soft pneumatic actuation for gentle handling of items that rigid grippers damage. Used in robotic picking and depalletizing for fresh produce, bakery, and irregular packaged goods.",
+      what_vendors_wont_tell_you: "Soft Robotics is a component vendor, not a complete robotic solution \u2014 you still need a robot, vision system, and integration. The grippers excel in specific applications (delicate items, mixed SKUs) but are not universal solutions. The company has had organizational changes \u2014 verify current status.",
+      best_environments: "Robotic picking applications for delicate or irregular items \u2014 fresh produce, bakery, mixed-SKU pick where rigid grippers cause damage.",
+      watch_outs: "Verify company stability. The gripper is part of a system \u2014 full integration cost is the relevant number.",
+      questions_to_ask: [
+        "What is your current company status and customer base?",
+        "Show me production deployments handling our specific item types with throughput data.",
+        "What is the full integration cost beyond just the gripper?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Soft gripper technology for food, e-commerce, and pharmaceutical handling",
     category: "Controls & Sensing", industry: ["Food & Beverage", "E-commerce & Fulfillment", "Pharma & Healthcare"],
@@ -1624,6 +2087,17 @@ export const vendors = [
   },
   {
     id: 66, name: "Photoneo", slug: "photoneo",
+    practitioner_notes: {
+      deployment_reality: "Photoneo is a Slovak company specialized in 3D vision technology for robotics \u2014 particularly bin picking and depalletizing applications. Their PhoXi 3D scanners are deployed by robotics integrators for vision-guided manipulation. Strong reputation in the depalletizing and bin picking robotics community.",
+      what_vendors_wont_tell_you: "Photoneo is a component vendor, not a complete solution \u2014 you need a robot, gripper, and software stack to make their cameras useful. Their software platform (Bin Picking Studio) has improved but most integrators use Photoneo cameras with their own software. Smaller company than Cognex or Keyence with smaller support footprint.",
+      best_environments: "3D vision applications in robotic manipulation \u2014 depalletizing, bin picking, and automated piece picking \u2014 where high-quality structured light 3D scanning is critical.",
+      watch_outs: "Evaluate full system cost (camera + robot + gripper + software + integration) \u2014 not just camera cost.",
+      questions_to_ask: [
+        "What is your relationship with major robot OEMs and pick robot vendors? Who do you sell through?",
+        "Show me complete deployments where Photoneo is the primary 3D vision \u2014 what was the integration complexity?",
+        "What is your US support model \u2014 is there local engineering support?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "3D vision systems for robotic guidance and bin picking",
     category: "Vision & AI", industry: ["Manufacturing", "Warehouse & DC", "Automotive", "Pharma & Healthcare"],
@@ -1644,6 +2118,17 @@ export const vendors = [
   },
   {
     id: 67, name: "Sick Inc.", slug: "sick-inc",
+    practitioner_notes: {
+      deployment_reality: "SICK is one of the global leaders in industrial sensors \u2014 photoelectric, safety light curtains, lidar (used in AMR/AGV navigation), and industrial vision. North American presence is strong, particularly in industrial Midwest. Their lidar sensors are embedded in many AMR and AGV platforms.",
+      what_vendors_wont_tell_you: "SICK is premium-priced \u2014 for high-volume standard photoelectric applications, lower-cost alternatives may be acceptable. Their value is in safety-rated products, lidar, and complex sensing applications where engineering depth matters. Service network is solid but verify your specific region.",
+      best_environments: "Safety-critical applications, AMR/AGV navigation (lidar), and complex industrial sensing where SICK's engineering depth justifies the premium.",
+      watch_outs: "Premium pricing \u2014 evaluate vs. Pepperl+Fuchs, Banner, and Keyence for standard sensing applications.",
+      questions_to_ask: [
+        "For our specific application, what is the cost differential vs. Pepperl+Fuchs and is the SICK premium justified?",
+        "What is your service team size in our region?",
+        "For safety-rated applications, what is your certification and what are the spare parts availability?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial sensors, safety systems, and vision for factory automation",
     category: "Controls & Sensing", industry: ["Manufacturing", "Warehouse & DC", "Food & Beverage", "Automotive"],
@@ -1665,6 +2150,17 @@ export const vendors = [
   },
   {
     id: 68, name: "Keyence", slug: "keyence",
+    practitioner_notes: {
+      deployment_reality: "Keyence is Japanese \u2014 premium industrial sensor and vision manufacturer with strongest position in machine vision, laser scanning, and measurement. Their direct sales model (no distributors) means you work directly with Keyence engineers, which is genuinely valuable for application engineering. Premium pricing reflects the support model.",
+      what_vendors_wont_tell_you: "Keyence's direct sales model creates pricing opacity \u2014 different customers get different pricing for the same product, and the lack of public list pricing is intentional. Procurement negotiation requires preparation. Hardware is excellent but the lock-in to Keyence support model (no third-party service) is a long-term consideration.",
+      best_environments: "Manufacturing inspection, precision measurement, and complex vision applications where Keyence's engineering support and premium hardware quality justify the cost.",
+      watch_outs: "Pricing is opaque \u2014 negotiate carefully. Evaluate vs. Cognex for vision and SICK or Pepperl+Fuchs for sensors.",
+      questions_to_ask: [
+        "What is the pricing structure and how do we benchmark against publicly-priced alternatives?",
+        "What is the support model and what happens to support if we reduce future purchases?",
+        "Show me three references with applications similar to ours, ideally in the same industry."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Vision systems, sensors, and measurement instruments for manufacturing",
     category: "Vision & AI", industry: ["Manufacturing", "Automotive", "Food & Beverage", "Pharma & Healthcare"],
@@ -1686,6 +2182,17 @@ export const vendors = [
   },
   {
     id: 69, name: "Rockwell Automation — Emulate3D", slug: "emulate3d",
+    practitioner_notes: {
+      deployment_reality: "Emulate3D (acquired by Rockwell Automation) is differentiated from FlexSim by its emulation capability \u2014 connecting simulation models to actual PLC/controls code for virtual commissioning. This is genuinely valuable for large automation projects where commissioning at the actual facility is expensive and risky. Used heavily by SIs (Dematic, Bastian) for pre-installation testing.",
+      what_vendors_wont_tell_you: "Emulate3D's emulation/virtual commissioning use case is powerful but specialized \u2014 most DC simulation projects don't need it and FlexSim is more cost-effective. Post-Rockwell acquisition, the product is increasingly aligned with Rockwell's controls ecosystem. Non-Rockwell controls environments may see slower integration improvements.",
+      best_environments: "Large automation projects ($10M+) where virtual commissioning of PLC/controls code reduces commissioning time and risk. SIs and equipment OEMs developing systems for customer deployment.",
+      watch_outs: "Overkill for standard DC simulation \u2014 FlexSim or AnyLogic are more cost-effective. Verify Rockwell-vs-other-PLC support evolution.",
+      questions_to_ask: [
+        "What is your customer base by use case \u2014 virtual commissioning vs. standard DC simulation?",
+        "Post-Rockwell acquisition, what is the roadmap for non-Rockwell PLC support?",
+        "What is the cost differential vs. FlexSim for projects that don't need virtual commissioning?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Digital twin and simulation for controls and automation design",
     category: "Simulation & Digital Twin", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
@@ -1706,6 +2213,17 @@ export const vendors = [
   },
   {
     id: 70, name: "Interlake Mecalux", slug: "mecalux",
+    practitioner_notes: {
+      deployment_reality: "Interlake Mecalux is the North American arm of Spanish company Mecalux \u2014 one of the largest racking and AS/RS manufacturers globally. Strong in racking solutions and growing in AS/RS (Pallet Shuttle, miniload, Easy WMS). Cost competitive vs. Dematic and Schaefer in mid-market projects.",
+      what_vendors_wont_tell_you: "Mecalux is strongest in racking \u2014 the AS/RS product line is competent but less established than Dematic or Schaefer for complex deployments. The Easy WMS is functional for standalone use but may be underpowered for complex multi-site operations. Mid-market value proposition is good; enterprise complexity is less proven.",
+      best_environments: "Mid-market racking and storage projects with light-to-medium AS/RS automation \u2014 manufacturing, distribution, and 3PL where cost competitiveness matters.",
+      watch_outs: "For complex AS/RS deployments, verify reference base. Easy WMS may need supplementation for complex operations.",
+      questions_to_ask: [
+        "What is your AS/RS reference base at our scale and complexity?",
+        "How does Easy WMS handle our specific complexity vs. best-of-breed WMS?",
+        "What is the cost differential vs. Schaefer or Dematic for equivalent specs?"
+      ],
+    },
     vendor_type: "Manufacturer + SI",
     tagline: "Racking, shelving, and automated storage systems for warehouses",
     category: "AS/RS & Storage", industry: ["Warehouse & DC", "Manufacturing", "E-commerce & Fulfillment", "Food & Beverage"],
@@ -1727,6 +2245,17 @@ export const vendors = [
   },
   {
     id: 71, name: "Westfalia Technologies", slug: "westfalia-technologies",
+    practitioner_notes: {
+      deployment_reality: "Westfalia is a German-rooted, US-based AS/RS specialist with deep expertise in deep-lane (multi-deep) pallet storage \u2014 particularly valuable in food & beverage DCs where SKU count is moderate but pallet volume per SKU is high. Their Savanna.NET WCS is integrated with their hardware. Strong in dairy, frozen, and beverage distribution.",
+      what_vendors_wont_tell_you: "Westfalia's deep-lane AS/RS is differentiated for specific applications \u2014 high pallet volume per SKU, moderate SKU count. For broad-SKU operations or piece-pick, it's not the right technology. The company is smaller than Dematic, Schaefer, or Daifuku \u2014 verify long-term parts and service commitment.",
+      best_environments: "Food & beverage distribution (dairy, frozen, beverage) where SKU count is moderate, pallet volume per SKU is high, and deep-lane storage density is the value driver.",
+      watch_outs: "Wrong technology for broad-SKU or piece-pick operations. Verify long-term service commitment.",
+      questions_to_ask: [
+        "What is the SKU profile and pallet velocity that justifies deep-lane vs. single-deep AS/RS?",
+        "What is your service team size and parts availability in our region?",
+        "Show me three references in our specific industry and product profile."
+      ],
+    },
     vendor_type: "Manufacturer + SI",
     tagline: "High-density pallet AS/RS and warehouse management software",
     category: "AS/RS & Storage", industry: ["Food & Beverage", "Warehouse & DC", "Manufacturing", "Cold Storage"],
@@ -1748,6 +2277,17 @@ export const vendors = [
   },
   {
     id: 72, name: "Tennant Company", slug: "tennant-company",
+    practitioner_notes: {
+      deployment_reality: "Tennant is the largest industrial floor cleaning equipment manufacturer in North America \u2014 sweepers, scrubbers, and increasingly autonomous variants powered by Brain Corp. Strong service network and broad distribution. For traditional floor cleaning, Tennant is the standard.",
+      what_vendors_wont_tell_you: "Tennant's autonomous products are built on Brain Corp's software \u2014 Tennant is the hardware OEM. For standard manual cleaning equipment, Tennant is straightforward; for autonomous, you're partnering with both Tennant (hardware) and Brain Corp (software).",
+      best_environments: "Any industrial or commercial facility needing floor cleaning equipment \u2014 Tennant's broad product line covers most use cases.",
+      watch_outs: "For autonomous cleaning, understand the Tennant + Brain Corp service split.",
+      questions_to_ask: [
+        "For autonomous cleaning, what is the service responsibility split between Tennant and Brain Corp?",
+        "What is your service team coverage in our region?",
+        "What is the typical TCO of autonomous vs. manual equipment at our facility scale?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial floor care — scrubbers, sweepers, and autonomous cleaning",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "Food & Beverage"],
@@ -1768,6 +2308,17 @@ export const vendors = [
   },
   {
     id: 73, name: "Fortna (formerly DMW&H)", slug: "dmwh",
+    practitioner_notes: {
+      deployment_reality: "DMW&H (now part of Fortna following the 2023 merger) has historically been one of the strongest mid-market systems integrators in North America, particularly for brownfield DC retrofits where the operation must stay running during construction. Project sizes typically $3M-$25M. The integration with Fortna is still playing out \u2014 the DMW&H brand and team continue to operate but the long-term organizational structure is evolving.",
+      what_vendors_wont_tell_you: "Post-merger, sales engagements may involve both DMW&H and Fortna brands \u2014 clarify which entity is contracting and which project team will execute. The DMW&H controls engineering team has been historically strong but post-merger talent retention is worth verifying. Project timelines and budgets are largely consistent with industry norms \u2014 10\u201315% contingency is appropriate.",
+      best_environments: "Mid-market brownfield DC automation retrofits ($3M-$25M) where active-operation construction expertise is critical. Strong in food & beverage and retail DC.",
+      watch_outs: "Verify post-merger organizational stability and team assignment. For very large projects ($25M+), evaluate whether Fortna's full-service model is a better fit.",
+      questions_to_ask: [
+        "Post-Fortna merger, will my project be branded DMW&H or Fortna, and what is the project team continuity?",
+        "Show me brownfield retrofit references where the DC stayed operational throughout \u2014 what went wrong and how did you handle it?",
+        "What is your in-house controls engineering team size and retention post-merger?"
+      ],
+    },
     implementation_pilot: "6–14 months",
     implementation_rollout: "10–24 months",
     implementation_risks: "Active-DC brownfield expertise — manages timeline risk well",
@@ -1791,6 +2342,17 @@ export const vendors = [
   },
   {
     id: 74, name: "Numina Group", slug: "numina-group",
+    practitioner_notes: {
+      deployment_reality: "Numina is a focused WCS/WES integrator with deep operational expertise \u2014 30+ years of DC automation experience shows in their software platform (RDS) and project execution. They're not equipment manufacturers, so they select best-fit equipment per project. Implementation timelines for WCS layered on existing WMS are typically 3-6 months \u2014 faster than tier-1 SI implementations.",
+      what_vendors_wont_tell_you: "Numina is a smaller company than Bastian, Fortna, or DMW&H \u2014 their capacity for very large projects is limited. They excel in the $1M-$10M project range where senior team attention is the differentiator. Some customers report that Numina's strength in WCS doesn't always translate to leading large multi-vendor projects requiring deep integrator capacity.",
+      best_environments: "Mid-market WCS/WES implementations and pick-system automation in food & beverage, retail DC, and 3PL operations where you need experienced project leadership without tier-1 SI overhead.",
+      watch_outs: "Not the right partner for very large ($15M+) multi-technology projects. Verify project team capacity at the time of contracting.",
+      questions_to_ask: [
+        "What is the senior team's project capacity in the next 12 months \u2014 will the team I meet during sales be the team running the project?",
+        "Show me WCS layered onto an existing WMS at our scale \u2014 what's the integration architecture?",
+        "What is your retention rate among customers 3+ years post-go-live?"
+      ],
+    },
     implementation_pilot: "3–6 months (WCS only)",
     implementation_rollout: "8–18 months",
     implementation_risks: "WCS layer faster than full SI — WMS dependency adds complexity",
@@ -1814,6 +2376,17 @@ export const vendors = [
   },
   {
     id: 75, name: "Conveyco Technologies", slug: "conveyco",
+    practitioner_notes: {
+      deployment_reality: "Conveyco fills the mid-market SI gap \u2014 too large for local integrators, too small to be a tier-1 SI's priority. Their project execution at the $1M-$15M scale is consistently strong because senior team attention is available. Vendor-agnostic equipment selection avoids the conflicts of integrators with proprietary product lines.",
+      what_vendors_wont_tell_you: "As a mid-market SI, Conveyco's bench depth is limited compared to Bastian or Fortna. If your project requires highly specialized expertise (e.g., specific automation OEMs), verify the project team has the right capabilities. Their geographic coverage is primarily East Coast \u2014 projects in the West may face higher mobilization costs and longer response times.",
+      best_environments: "Mid-market ($1M-$15M) DC automation projects in the eastern US where vendor-agnostic equipment selection and responsive project teams matter more than tier-1 SI brand.",
+      watch_outs: "Verify geographic coverage and project team availability for your specific timeline. Smaller SIs have less ability to absorb scheduling disruptions.",
+      questions_to_ask: [
+        "What is your geographic service coverage and what is the cost impact of being outside your primary region?",
+        "Show me three projects of similar scope in the last 24 months \u2014 actual cost and timeline vs. quote.",
+        "What is your in-house controls engineering capacity vs. subcontracted?"
+      ],
+    },
     implementation_pilot: "6–12 months",
     implementation_rollout: "10–20 months",
     implementation_risks: "Mid-market scope — faster than tier-1 SI timelines",
@@ -1839,6 +2412,17 @@ export const vendors = [
   // ─── WMS PLATFORMS ───────────────────────────────────────────────
   {
     id: 76, name: "Oracle WMS Cloud", slug: "oracle-wms",
+    practitioner_notes: {
+      deployment_reality: "Oracle WMS Cloud (formerly LogFire) is a cloud-native WMS that Oracle acquired and integrated into their broader supply chain cloud. Implementation is typically 4\u20138 months for mid-market operations. The platform's competitive advantage is for operations already running Oracle ERP or Oracle Fusion Cloud \u2014 single-vendor accountability and pre-built integration.",
+      what_vendors_wont_tell_you: "Oracle's WMS is more aligned with the Oracle Cloud ecosystem than as a best-of-breed WMS. Customers not on Oracle ERP often find the WMS competitive but not differentiated. The product team has been through reorganizations \u2014 verify your account team stability and the long-term roadmap commitment. Implementation services quality varies significantly by partner.",
+      best_environments: "Operations already running Oracle ERP, Oracle Fusion Cloud, or Oracle Manufacturing Cloud, where single-vendor stack integration is a strategic priority.",
+      watch_outs: "Not the most automation-friendly WMS \u2014 automation integration depth is below Manhattan and Blue Yonder. For complex automation-heavy DCs, evaluate carefully.",
+      questions_to_ask: [
+        "What is the product roadmap commitment for standalone WMS vs. ERP-embedded warehouse modules?",
+        "What are the pre-built automation integrations and which are production-validated at our scale?",
+        "What does the support model look like for non-Oracle ERP customers?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Enterprise cloud WMS with deep Oracle ERP integration",
     category: "WMS Platforms", industry: ["Warehouse & DC", "Manufacturing", "Retail", "3PL"],
@@ -1860,6 +2444,17 @@ export const vendors = [
   },
   {
     id: 77, name: "SAP Extended Warehouse Management", slug: "sap-ewm",
+    practitioner_notes: {
+      deployment_reality: "SAP EWM is the dominant WMS in operations already running SAP S/4HANA or SAP ECC. Implementation typically runs 12\u201324 months for a complex single-site deployment. The platform's depth is unmatched for operations needing tight integration with SAP financials, production, and procurement. SAP EWM's automation integration through MFS (Material Flow System) is mature and proven.",
+      what_vendors_wont_tell_you: "SAP EWM is complex \u2014 even simple operations end up with implementation costs that surprise leadership. The configuration depth is both the strength and the trap. SAP's licensing model is opaque and renegotiation leverage is limited once you're embedded. The customer base reports support quality variance depending on region and which SAP partner you use. Also: many implementations end up using Longbow Advantage's Rebus platform for the operational analytics SAP EWM doesn't natively provide well.",
+      best_environments: "Large operations already on SAP ECC or S/4HANA where deep ERP integration is a non-negotiable strategic requirement. Particularly strong in manufacturing where production and warehouse data flow together.",
+      watch_outs: "Avoid if you're not on SAP ERP \u2014 the integration advantage is the only reason to choose SAP EWM. Standalone SAP EWM implementations are nearly always more expensive and less flexible than best-of-breed alternatives.",
+      questions_to_ask: [
+        "What is the all-in cost (license + maintenance + implementation + ongoing partner) over 5 years vs. best-of-breed alternatives?",
+        "Which SI partner will run our implementation, and what is their EWM-specific certification and track record at our scale?",
+        "What operational analytics tools do customers like us layer on top of SAP EWM, and why?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Tier-1 WMS for SAP ERP environments with deep supply chain integration",
     category: "WMS Platforms", industry: ["Manufacturing", "Warehouse & DC", "Retail", "CPG"],
@@ -1879,51 +2474,20 @@ export const vendors = [
     implementation_risks: "SAP consultant availability, customization scope creep, change management",
     apps: ["Manufacturing warehouse", "Global distribution", "Automotive supply chain", "CPG multi-DC"],
   },
-  {
-    id: 78, name: "Extensiv (3PL Central)", slug: "extensiv",
-    vendor_type: "Software",
-    tagline: "Cloud WMS purpose-built for 3PL multi-client fulfillment",
-    category: "WMS Platforms", industry: ["3PL", "E-commerce & Fulfillment", "Warehouse & DC"],
-    tags: ["WMS", "3PL", "Multi-client", "Cloud", "E-commerce"],
-    featured: false, rating: 4.3, reviews: 67,
-    hq: "El Segundo, CA", website: "extensiv.com",
-    founded: "2008", installs: "2,000+", employees: "300+", logo: "EX", color: "#6366f1",
-    desc: "Extensiv (formerly 3PL Central) is the dominant WMS for small-to-mid-market 3PLs managing e-commerce fulfillment for multiple clients. The platform handles multi-client billing, client portal access, and carrier integrations that 3PLs need out of the box with minimal setup time.",
-    specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Target", v: "Small-mid 3PL" }, { l: "Clients", v: "Multi-client billing" }, { l: "Carriers", v: "150+ carrier integrations" }],
-    integrations: ["Shopify", "Amazon", "WooCommerce", "UPS", "FedEx", "USPS", "ShipStation", "QuickBooks"],
-    price_range: "$$",
-    best_for: "Small to mid-size 3PLs managing 5–50 e-commerce clients who need fast setup and client billing",
-    not_for: "Large complex 3PLs with advanced automation or non-3PL operations",
-    strengths: ["Fastest time-to-live of any 3PL WMS — days not months", "Client portal lets clients see their own inventory and orders", "150+ carrier integrations pre-built", "Transparent affordable pricing"],
-    weaknesses: ["Depth limits emerge at larger scale", "Automation integration is limited vs. Körber or Manhattan", "Less suitable as 3PL scales to enterprise complexity"],
-    implementation_pilot: "1–4 weeks", implementation_rollout: "1–3 months",
-    implementation_risks: "Client data migration, carrier setup, client onboarding process",
-    apps: ["E-commerce 3PL", "DTC fulfillment", "B2B distribution", "Returns processing"],
-  },
-  {
-    id: 79, name: "Logiwa WMS", slug: "logiwa",
-    vendor_type: "Software",
-    tagline: "Cloud WMS for high-volume DTC and e-commerce fulfillment",
-    category: "WMS Platforms", industry: ["E-commerce & Fulfillment", "3PL", "Warehouse & DC"],
-    tags: ["WMS", "DTC", "E-commerce", "Cloud", "High-velocity"],
-    featured: false, rating: 4.4, reviews: 38,
-    hq: "Chicago, IL", website: "logiwa.com",
-    founded: "2017", installs: "200+", employees: "200+", logo: "LW", color: "#0ea5e9",
-    desc: "Logiwa is a cloud WMS built specifically for high-velocity DTC and e-commerce fulfillment. Their AI-driven order routing and wave optimization is designed for e-commerce velocity, not traditional distribution.",
-    specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Throughput", v: "Designed for 100k+ orders/day" }, { l: "Integration", v: "API-first" }, { l: "AI", v: "Wave and routing optimization" }],
-    integrations: ["Shopify", "Amazon", "Walmart", "TikTok Shop", "ShipBob", "EasyPost"],
-    price_range: "$$",
-    best_for: "High-volume DTC brands and e-commerce 3PLs processing large daily order volumes with tight SLAs",
-    not_for: "Traditional B2B distribution, manufacturing warehousing, or complex non-parcel freight",
-    strengths: ["Purpose-built for e-commerce velocity", "API-first architecture", "AI-driven wave planning", "Fast implementation for DTC"],
-    weaknesses: ["Less suited for complex B2B distribution", "Newer with shorter enterprise track record", "Automation integration less mature than tier-1 platforms"],
-    implementation_pilot: "4–8 weeks", implementation_rollout: "2–4 months",
-    implementation_risks: "Integration with existing e-commerce platforms, order volume scaling",
-    apps: ["DTC e-commerce", "E-commerce 3PL", "Subscription box", "Flash sale fulfillment"],
-  },
   // ─── AMR / MOBILE ROBOTS ─────────────────────────────────────────
   {
     id: 80, name: "Quicktron", slug: "quicktron",
+    practitioner_notes: {
+      deployment_reality: "Quicktron (acquired by Hai Robotics in 2023) is a Chinese AMR manufacturer with significant deployments in Asia and growing globally. Goods-to-person AMRs similar to Geek+ Quicktron-class robots. The Hai acquisition has consolidated their North American strategy with Hai's expanding presence.",
+      what_vendors_wont_tell_you: "Chinese company origin creates procurement sensitivity in some contexts. Post-Hai acquisition, product roadmap and brand strategy is evolving \u2014 verify current product positioning vs. Hai's own AMR products. North American service capacity is growing but not yet at Locus or Geek+ scale.",
+      best_environments: "Cost-sensitive AMR deployments where Chinese vendor pricing advantage matters and procurement policy permits.",
+      watch_outs: "Procurement acceptance of Chinese technology. Post-Hai product strategy clarity.",
+      questions_to_ask: [
+        "What is the post-Hai acquisition product roadmap and how does Quicktron differentiate from Hai's own AMR products?",
+        "What is your North American service team size and capacity?",
+        "What is your organization's procurement policy on Chinese technology?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Goods-to-person AMR systems for e-commerce and retail fulfillment",
     category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "Warehouse & DC", "Retail"],
@@ -1944,28 +2508,18 @@ export const vendors = [
     apps: ["E-commerce goods-to-person", "Retail fulfillment", "3PL unit picking"],
   },
   {
-    id: 81, name: "HAI Robotics", slug: "hai-robotics",
-    vendor_type: "Manufacturer",
-    tagline: "Autonomous case-handling robots for high-density tote and case storage",
-    category: "AMR / Mobile Robots", industry: ["E-commerce & Fulfillment", "Warehouse & DC", "Pharmaceutical"],
-    tags: ["AMR", "Case-handling", "HAIPICK", "High-density"],
-    featured: false, rating: 4.2, reviews: 11,
-    hq: "Shenzhen, China (US: San Jose, CA)", website: "hairobotics.com",
-    founded: "2016", installs: "400+", employees: "1,500+", logo: "HR", color: "#7c3aed",
-    desc: "HAI Robotics HAIPICK system uses autonomous case-handling robots that climb racking to retrieve individual totes or cases — achieving higher storage density than floor-based goods-to-person systems while eliminating the need for AutoStore-style grid infrastructure.",
-    specs: [{ l: "System", v: "HAIPICK (case-handling AMR)" }, { l: "Height", v: "Up to 12m racking" }, { l: "Payload", v: "30 kg per tote" }, { l: "Navigation", v: "SLAM" }],
-    integrations: ["WMS via API", "Pharmacy systems", "SAP EWM"],
-    price_range: "$$$",
-    best_for: "High-density tote storage where existing racking can be utilized without a dedicated grid structure",
-    not_for: "Operations with very high throughput requirements — HAIPICK throughput per robot is lower than AutoStore",
-    strengths: ["Works with existing racking — no dedicated grid required", "High storage density in vertical dimension", "Strong in pharmacy and healthcare DC"],
-    weaknesses: ["US service organization still developing", "Throughput ceiling lower than AutoStore", "Less proven at large North American scale"],
-    implementation_pilot: "10–16 weeks", implementation_rollout: "5–9 months",
-    implementation_risks: "Racking compatibility, WMS integration, local service coverage",
-    apps: ["Pharmacy distribution", "E-commerce high-density storage", "Industrial parts storage"],
-  },
-  {
     id: 82, name: "OMRON Mobile Robots", slug: "omron-mobile",
+    practitioner_notes: {
+      deployment_reality: "OMRON Mobile Robots (acquired Adept Technologies' AMR line) deploys AMRs for manufacturing material transport \u2014 line-side delivery, WIP movement, finished goods to staging. Strong fit for manufacturing environments where OMRON's automation footprint already exists. Implementation through OMRON's industrial automation channel.",
+      what_vendors_wont_tell_you: "OMRON's AMR strategy is integrated with their broader industrial automation portfolio \u2014 strongest fit for existing OMRON automation customers. For pure-play DC environments without OMRON automation, MiR or OTTO may be better fits.",
+      best_environments: "Manufacturing operations already using OMRON industrial automation where AMR integration with broader OMRON ecosystem is strategic.",
+      watch_outs: "Less competitive in pure DC environments without OMRON automation footprint.",
+      questions_to_ask: [
+        "What is your reference base specifically in pure DC environments (no OMRON automation)?",
+        "What is the integration story with non-OMRON WMS and automation?",
+        "How does the product compare to MiR and OTTO for non-manufacturing applications?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Autonomous mobile robots for manufacturing material transport and line feeding",
     category: "AMR / Mobile Robots", industry: ["Manufacturing", "Warehouse & DC", "Pharmaceutical"],
@@ -1987,6 +2541,17 @@ export const vendors = [
   },
   {
     id: 83, name: "Addverb Technologies", slug: "addverb",
+    practitioner_notes: {
+      deployment_reality: "Addverb Technologies is an Indian automation company with comprehensive product line \u2014 AMRs, AS/RS, ASRS, and WCS software. Growing North American presence. Cost-competitive vs. Western AMR vendors for similar capabilities.",
+      what_vendors_wont_tell_you: "Indian company with significant Asian customer base but North American reference base is still building. Verify service capacity and support coverage in your region. The product range is broad \u2014 verify which specific products are production-validated at your scale.",
+      best_environments: "Operations where Addverb has specific North American reference deployments and competitive pricing vs. established Western AMR vendors.",
+      watch_outs: "Verify North American service capacity and reference depth. Procurement may have geographic origin questions.",
+      questions_to_ask: [
+        "What is your North American customer base specifically and what is the deployment scale?",
+        "What is your service team size and SLA in our region?",
+        "Show me operational data from North American customers 12+ months post-go-live."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Full-stack warehouse robotics from India's leading robotics company",
     category: "AMR / Mobile Robots", industry: ["Warehouse & DC", "E-commerce & Fulfillment", "Manufacturing"],
@@ -2008,6 +2573,17 @@ export const vendors = [
   },
   {
     id: 84, name: "BALYO", slug: "balyo",
+    practitioner_notes: {
+      deployment_reality: "Balyo is a French company that retrofits standard forklifts (typically Linde and Crown) with autonomous navigation kits, creating AGV functionality from existing or new forklifts. The retrofit approach is differentiated \u2014 you get standard forklift residual value and serviceability while adding AGV capability.",
+      what_vendors_wont_tell_you: "The retrofit approach has tradeoffs \u2014 you're combining two vendor relationships (forklift OEM + Balyo) which can create finger-pointing during service issues. Throughput per AGV may be lower than purpose-built AGVs. Balyo has had financial challenges \u2014 verify current company status.",
+      best_environments: "Operations wanting to start with AGV capability without full commitment to purpose-built AGV vendor \u2014 particularly when standard forklift residual value matters.",
+      watch_outs: "Verify Balyo financial stability. Confirm forklift OEM partnership and service responsibility split.",
+      questions_to_ask: [
+        "What is your current financial position and customer base trajectory?",
+        "How does service responsibility split between Balyo and the forklift OEM (Linde/Crown) work in practice?",
+        "Show me references operating 24+ months with retrofitted forklift AGVs."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Autonomous navigation technology for forklift automation via Linde and STILL",
     category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage"],
@@ -2031,6 +2607,17 @@ export const vendors = [
   // ─── INDUSTRIAL ROBOTICS ─────────────────────────────────────────
   {
     id: 85, name: "Kawasaki Robotics", slug: "kawasaki-robotics",
+    practitioner_notes: {
+      deployment_reality: "Kawasaki is a top-five global industrial robot manufacturer with particular strength in painting and handling for automotive. Less common in North American material handling than FANUC, ABB, Yaskawa, but well-established in automotive Tier 1 suppliers. Implementation through integrator network.",
+      what_vendors_wont_tell_you: "Kawasaki's North American footprint is smaller than the top-three OEMs \u2014 verify service coverage and parts availability in your region. The controller and programming environment are functional but less developed than FANUC's. Pricing can be competitive against FANUC and ABB in some applications.",
+      best_environments: "Automotive Tier 1 supplier applications, particularly painting and palletizing, where Kawasaki's reference base is strong.",
+      watch_outs: "Verify service coverage. Less common choice outside automotive Tier 1.",
+      questions_to_ask: [
+        "What is your North American service team size and regional coverage?",
+        "Show me three reference customers in our specific industry and application.",
+        "What is the pricing differential vs. FANUC for our specific cell?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial robots for welding, assembly, palletizing, and material handling",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Food & Beverage"],
@@ -2052,6 +2639,17 @@ export const vendors = [
   },
   {
     id: 86, name: "Epson Robots", slug: "epson-robots",
+    practitioner_notes: {
+      deployment_reality: "Epson Robots specializes in SCARA and compact 6-axis robots for precision assembly and electronics manufacturing. Different segment from FANUC/ABB/Yaskawa \u2014 Epson is the leader in SCARA for high-precision applications. Implementation through integrator partners or in-house engineering.",
+      what_vendors_wont_tell_you: "Epson SCARA is dominant in electronics assembly but rarely the right choice for DC/warehouse applications \u2014 different category. For high-precision benchtop applications, Epson is excellent. For DC palletizing or material handling, FANUC/ABB are better fits.",
+      best_environments: "Precision assembly, electronics manufacturing, and benchtop automation requiring high-speed, high-accuracy SCARA performance.",
+      watch_outs: "Not the right choice for DC/warehouse material handling \u2014 wrong category.",
+      questions_to_ask: [
+        "What is your customer base in DC/warehouse applications vs. electronics assembly?",
+        "What is your service model \u2014 direct or through integrators?",
+        "How does your 6-axis lineup compare to FANUC LR Mate for similar applications?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "SCARA and 6-axis robots for precision assembly and packaging",
     category: "Industrial Robotics", industry: ["Manufacturing", "Pharmaceutical", "Electronics", "Food & Beverage"],
@@ -2073,6 +2671,17 @@ export const vendors = [
   },
   {
     id: 87, name: "Doosan Robotics", slug: "doosan-robotics",
+    practitioner_notes: {
+      deployment_reality: "Doosan Robotics is a Korean cobot manufacturer growing rapidly in North America \u2014 competitive on price with Universal Robots and with a broader payload range (up to 25kg in some models). Recent IPO (2023) has provided growth capital. Implementation through partners or direct.",
+      what_vendors_wont_tell_you: "Doosan is newer than UR in North American deployments \u2014 verify reference base and service capacity. The cost advantage vs. UR is real but UR's ecosystem (UR+ accessories) and software maturity are still ahead. For commodity cobot applications, Doosan is competitive; for complex deployments, UR's ecosystem may justify the premium.",
+      best_environments: "Cost-sensitive cobot applications where Doosan's pricing advantage matters and the application is standard enough not to require UR's ecosystem depth.",
+      watch_outs: "Verify North American service capacity and reference base. UR's ecosystem advantage is real for complex applications.",
+      questions_to_ask: [
+        "What is your North American customer base and how does it compare to UR's?",
+        "Show me your accessory/gripper ecosystem \u2014 how does it compare to UR+?",
+        "What is the typical pricing differential vs. UR and how is it structured?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Collaborative robots for flexible manufacturing and assembly",
     category: "Industrial Robotics", industry: ["Manufacturing", "Automotive", "Electronics", "Food & Beverage"],
@@ -2094,49 +2703,18 @@ export const vendors = [
   },
   // ─── CONVEYOR & SORTATION ────────────────────────────────────────
   {
-    id: 88, name: "Beumer Group", slug: "beumer-group",
-    vendor_type: "Manufacturer + SI",
-    tagline: "High-speed sortation and baggage handling systems for parcel and airport",
-    category: "Conveyor & Sortation", industry: ["Parcel & Postal", "Airport", "E-commerce & Fulfillment"],
-    tags: ["Sortation", "Crossbelt sorter", "Airport baggage", "High-speed"],
-    featured: false, rating: 4.3, reviews: 16,
-    hq: "Beckum, Germany (US: Somerset, NJ)", website: "beumergroup.com",
-    founded: "1935", installs: "1,000+", employees: "5,000+", logo: "BG", color: "#1e40af",
-    desc: "Beumer Group is the global leader in high-speed cross-belt sortation for parcel, postal, and airport applications. Their BS 6 cross-belt sorter handles 20,000+ items per hour with near-perfect sort accuracy — the benchmark for high-throughput parcel sortation globally.",
-    specs: [{ l: "Throughput", v: "Up to 25,000 items/hr" }, { l: "Technology", v: "Cross-belt sorter" }, { l: "Sort accuracy", v: ">99.9%" }, { l: "Industries", v: "Parcel, postal, airport, retail" }],
-    integrations: ["All major WCS platforms", "Postal sortation software", "Airport DCS systems"],
-    price_range: "$$$$",
-    best_for: "High-throughput parcel and postal sortation where speed and accuracy are the primary requirements",
-    not_for: "Smaller operations or applications not requiring high-speed sortation",
-    strengths: ["Global benchmark for cross-belt sortation throughput and accuracy", "Deep airport and parcel expertise", "Strong global service organization", "85+ years material handling experience"],
-    weaknesses: ["Very high capital cost — positioned for tier-1 parcel and postal", "Less presence in general DC vs. Honeywell or Dematic", "Long implementation timelines"],
-    implementation_pilot: "12–18 months", implementation_rollout: "18–36 months",
-    implementation_risks: "Civil scope, high-speed controls complexity, sort accuracy validation",
-    apps: ["Parcel sortation", "Postal automation", "Airport baggage", "Retail high-speed sort"],
-  },
-  {
-    id: 89, name: "Vanderlande", slug: "vanderlande",
-    vendor_type: "Manufacturer + SI",
-    tagline: "Global leader in automated parcel, baggage, and warehouse logistics systems",
-    category: "Conveyor & Sortation", industry: ["Parcel & Postal", "Airport", "Warehouse & DC"],
-    tags: ["Sortation", "Conveyor", "Airport baggage", "Parcel automation"],
-    featured: false, rating: 4.3, reviews: 27,
-    hq: "Veghel, Netherlands (US: Atlanta, GA)", website: "vanderlande.com",
-    founded: "1949", installs: "2,000+", employees: "9,000+", logo: "VL", color: "#0f766e",
-    desc: "Vanderlande (Toyota Industries subsidiary) is the global market leader in automated logistics systems for parcel, airport, and warehouse. Their systems process 70% of global air freight and handle sortation at major parcel carriers including UPS and FedEx.",
-    specs: [{ l: "Markets", v: "Parcel, airport, warehousing" }, { l: "Throughput", v: "Up to 100k+ items/hr" }, { l: "WCS", v: "VISION WCS" }, { l: "Parent", v: "Toyota Industries" }],
-    integrations: ["VISION WCS", "All major WMS", "Airline DCS", "Postal systems"],
-    price_range: "$$$$",
-    best_for: "Large-scale parcel sortation and airport baggage handling where proven high-throughput technology is non-negotiable",
-    not_for: "Small to mid-market operations — Vanderlande is optimized for very large-scale programs",
-    strengths: ["Global market leader in parcel and airport automation", "Toyota Industries backing", "VISION WCS is one of the most mature warehouse control systems", "Reference installations at every major global carrier"],
-    weaknesses: ["Very high capital and implementation cost", "Long implementation timelines", "Primarily for tier-1 operations"],
-    implementation_pilot: "18–30 months", implementation_rollout: "24–48 months",
-    implementation_risks: "Civil scope, system integration complexity, throughput ramp-up",
-    apps: ["Parcel carrier sortation", "Airport baggage handling", "E-commerce mega-DC", "Postal automation"],
-  },
-  {
     id: 90, name: "Geek+ Sorting Robots", slug: "geekplus-sorting",
+    practitioner_notes: {
+      deployment_reality: "Geek+ Sorting Robots extends Geek+'s AMR platform into parcel and case sortation \u2014 robots autonomously route parcels to destination chutes based on barcode scanning. Differentiated from traditional fixed cross-belt sortation by lower capital cost and flexible reconfiguration.",
+      what_vendors_wont_tell_you: "Robotic sortation throughput is typically lower than fixed cross-belt sortation at peak rates \u2014 verify the throughput at your peak hour matches your operational need. Footprint may be larger than equivalent fixed sortation. The flexibility advantage is real but specific use case fit matters.",
+      best_environments: "Mid-volume parcel sortation operations (under 10,000 packages/hour) where flexibility, lower capital cost, and reconfigurability matter more than maximum throughput.",
+      watch_outs: "Verify peak throughput vs. fixed cross-belt sortation alternatives.",
+      questions_to_ask: [
+        "What is the realistic peak throughput vs. fixed cross-belt sortation at our specific package mix?",
+        "What is the footprint differential vs. fixed sortation for equivalent throughput?",
+        "Show me three deployments at our scale with operational throughput data."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Robotic cross-belt sorting for e-commerce and parcel without fixed conveyor infrastructure",
     category: "Conveyor & Sortation", industry: ["E-commerce & Fulfillment", "Parcel & Postal", "Retail"],
@@ -2158,28 +2736,18 @@ export const vendors = [
   },
   // ─── LABOR MANAGEMENT ────────────────────────────────────────────
   {
-    id: 91, name: "UKG (Kronos)", slug: "ukg-kronos",
-    vendor_type: "Software",
-    tagline: "Market-leading workforce management and labor scheduling for operations at scale",
-    category: "Labor Management", industry: ["Warehouse & DC", "Manufacturing", "Retail", "Healthcare"],
-    tags: ["Labor management", "Workforce scheduling", "Time & attendance", "WFM"],
-    featured: false, rating: 4.0, reviews: 52,
-    hq: "Lowell, MA", website: "ukg.com",
-    founded: "1977", installs: "50,000+", employees: "13,000+", logo: "UK", color: "#7c3aed",
-    desc: "UKG (Ultimate Kronos Group) is the market leader in workforce management for large operations — time and attendance, scheduling, and labor analytics for operations with thousands of hourly workers. UKG Pro Workforce Management is widely deployed in distribution, manufacturing, and retail.",
-    specs: [{ l: "Modules", v: "Time & attendance, scheduling, analytics" }, { l: "Deployment", v: "Cloud SaaS" }, { l: "Scale", v: "Enterprise (1,000+ employees)" }, { l: "Integration", v: "SAP, Oracle, ADP, Workday" }],
-    integrations: ["SAP HCM", "Oracle HCM", "ADP", "Workday", "All major WMS via API"],
-    price_range: "$$$",
-    best_for: "Large operations (1,000+ hourly employees) needing enterprise-grade time, attendance, and scheduling",
-    not_for: "Small to mid-size operations — UKG pricing and complexity are calibrated for enterprise scale",
-    strengths: ["Market leader — most proven at large enterprise scale", "Deep integration with major HCM and payroll platforms", "Strong compliance features for hourly workforce", "Large partner ecosystem"],
-    weaknesses: ["Implementation complexity significant for large deployments", "Not specialized for DC labor standards (MOST/MTM)", "Less competitive at mid-market scale"],
-    implementation_pilot: "3–6 months", implementation_rollout: "8–18 months",
-    implementation_risks: "Data migration, scheduling complexity, change management at scale",
-    apps: ["Distribution center workforce", "Manufacturing shift scheduling", "Retail labor management"],
-  },
-  {
     id: 92, name: "Legion Technologies", slug: "legion-technologies",
+    practitioner_notes: {
+      deployment_reality: "Legion is a newer entrant in workforce management focused on AI-driven scheduling and frontline labor optimization. Their AI scheduling claims meaningful productivity improvement (10\u201320%) by matching labor supply to demand more dynamically than rule-based systems. Implementation is faster than tier-1 WFM (3\u20136 months) because the AI does much of the configuration work.",
+      what_vendors_wont_tell_you: "Legion is newer and unproven at the enterprise scale of UKG. Their AI claims require clean demand and operational data \u2014 operations with poor data quality won't see the promised gains. Customer base is growing but still concentrated in retail and hospitality, less proven in DC and manufacturing.",
+      best_environments: "Retail, hospitality, and service operations where labor demand is highly variable and AI-driven scheduling has measurable upside vs. rule-based scheduling.",
+      watch_outs: "Less proven in DC and manufacturing \u2014 verify references in your specific industry.",
+      questions_to_ask: [
+        "What is your customer base by industry, and how many are DC/manufacturing vs. retail/hospitality?",
+        "Show me AI scheduling outcomes \u2014 what was the baseline rule-based productivity and what was the post-Legion result?",
+        "What is the data quality requirement and what happens if our demand forecasting isn't clean?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "AI-powered workforce management for hourly workers in DC and retail",
     category: "Labor Management", industry: ["Warehouse & DC", "Retail", "Food & Beverage"],
@@ -2202,6 +2770,17 @@ export const vendors = [
   // ─── DOCK AUTOMATION ─────────────────────────────────────────────
   {
     id: 93, name: "Rite-Hite", slug: "rite-hite",
+    practitioner_notes: {
+      deployment_reality: "Rite-Hite is the dominant manufacturer of dock equipment in North America \u2014 dock levelers, vehicle restraints, dock doors, and seals. Not automation per se, but critical dock infrastructure that automation systems depend on. Strong service network and reliable products.",
+      what_vendors_wont_tell_you: "Rite-Hite is premium-priced \u2014 for standard dock equipment, lower-cost alternatives exist. Their value is in service network, longevity, and integration with their automation products (interlocks, vehicle restraints). For dock automation projects, Rite-Hite equipment is often the spec because of its compatibility with automated dock workflows.",
+      best_environments: "Standard dock infrastructure for any DC or manufacturing facility where reliability and service network matter. Particularly valuable in operations integrating with dock automation systems.",
+      watch_outs: "Premium pricing \u2014 for budget-constrained projects, alternatives like McGuire, Pentalift, or 4Front may deliver acceptable quality at lower cost.",
+      questions_to_ask: [
+        "What is the cost differential vs. McGuire and 4Front for equivalent dock equipment specs?",
+        "What is the integration story for our dock automation system (Slip Robotics, Fox, etc.)?",
+        "What is the typical service response SLA in our region?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Global market leader in loading dock safety, vehicle restraints, and dock levelers",
     category: "Dock Automation", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage"],
@@ -2223,6 +2802,17 @@ export const vendors = [
   },
   {
     id: 94, name: "4Front Engineered Solutions", slug: "4front",
+    practitioner_notes: {
+      deployment_reality: "4Front Engineered Solutions (formerly Systems, Inc.) is a Rite-Hite competitor offering dock equipment, industrial doors, and air curtains. Privately-held with growing market share against Rite-Hite. Their HVLS (high-volume, low-speed) fans are competitive with Big Ass Fans in industrial facility air movement.",
+      what_vendors_wont_tell_you: "4Front is smaller than Rite-Hite \u2014 verify regional service coverage before committing. Their products are competitive on price but the service network is less mature than Rite-Hite's. For multi-site rollouts, regional service coverage matters significantly.",
+      best_environments: "DC and manufacturing operations seeking competitive alternative to Rite-Hite for dock equipment, particularly in regions with strong 4Front dealer presence.",
+      watch_outs: "Verify service coverage in all your sites before standardizing. Smaller dealer network than Rite-Hite.",
+      questions_to_ask: [
+        "What is your dealer service coverage in our specific regions, and what is the SLA?",
+        "Show me cost comparison vs. Rite-Hite for equivalent specifications.",
+        "What is your warranty structure and how does it compare to Rite-Hite?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Dock equipment, levelers, restraints, and connected dock management technology",
     category: "Dock Automation", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage"],
@@ -2245,6 +2835,17 @@ export const vendors = [
   // ─── VISION & AI ─────────────────────────────────────────────────
   {
     id: 95, name: "Mujin", slug: "mujin",
+    practitioner_notes: {
+      deployment_reality: "Mujin's value proposition is robot-agnostic motion planning and AI software that makes any robot arm capable of handling complex picking and palletizing tasks. The MujinController is integrated with FANUC, Yaskawa, ABB, and other major robot OEMs. Used in production deployments by major Japanese and increasingly North American manufacturers.",
+      what_vendors_wont_tell_you: "Mujin is software primarily \u2014 you still buy robots, grippers, and integration. The integration complexity for full Mujin-enabled cells is real, and the value depends on whether the AI motion planning solves problems your specific application has. Less mature in North America than in Japan.",
+      best_environments: "Complex robotic manipulation applications (mixed-SKU palletizing, irregular item picking) where AI motion planning is critical and you have systems integration capacity.",
+      watch_outs: "Verify North American support and integration capacity. Mujin's value depends on integration quality.",
+      questions_to_ask: [
+        "What is your North American implementation capacity and integrator partner network?",
+        "Show me production deployments at our scale with our specific picking application type.",
+        "What is your typical project structure and who is responsible for end-to-end integration?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial robot intelligence platform for autonomous picking and palletizing",
     category: "Vision & AI", industry: ["Warehouse & DC", "Manufacturing", "Automotive"],
@@ -2266,6 +2867,17 @@ export const vendors = [
   },
   {
     id: 96, name: "Mech-Mind Robotics", slug: "mech-mind",
+    practitioner_notes: {
+      deployment_reality: "Mech-Mind is a Chinese 3D vision and AI software company for industrial robotics \u2014 bin picking, depalletizing, and assembly applications. Growing fast globally with significant deployments in Asia and increasing North American presence. Software-plus-hardware approach with their own 3D cameras and AI motion planning.",
+      what_vendors_wont_tell_you: "Chinese company origin creates procurement sensitivity in some North American organizations \u2014 verify your procurement policy. North American support is growing but less mature than Photoneo or Cognex. The product is genuinely capable but newer customers are taking on some technology risk.",
+      best_environments: "Bin picking, depalletizing, and AI-driven robotic manipulation where Mech-Mind's combined hardware-software offering simplifies integration vs. assembling components from multiple vendors.",
+      watch_outs: "Verify procurement acceptance of Chinese-origin technology. North American support coverage may be limited.",
+      questions_to_ask: [
+        "What is your procurement and data security posture for Chinese-origin technology?",
+        "What is your North American implementation and support team size?",
+        "Show me three deployed customers in North America at our scale."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "3D vision and AI software for industrial robot guidance and bin picking",
     category: "Vision & AI", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
@@ -2288,6 +2900,17 @@ export const vendors = [
   // ─── SYSTEMS INTEGRATION ─────────────────────────────────────────
   {
     id: 97, name: "Haskell", slug: "haskell",
+    practitioner_notes: {
+      deployment_reality: "Haskell is a design-build construction firm with growing automation integration capability \u2014 different from pure-play SIs like Bastian or Fortna. Their value is integrated facility design + automation integration, particularly for greenfield projects where the building, racking, and automation are designed as a unified system. Project sizes typically $20M-$200M+.",
+      what_vendors_wont_tell_you: "Haskell's primary business is construction \u2014 automation systems integration is a complementary capability, not their core competency. For complex automation projects, you may want a dedicated SI in parallel with Haskell's construction role. Their controls engineering depth is less mature than tier-1 SIs.",
+      best_environments: "Large greenfield facility projects where building design, racking, and automation are integrated from concept. Food & beverage, pharma, and large retail/e-commerce DC development.",
+      watch_outs: "Don't rely on Haskell as the primary automation systems integrator for complex multi-vendor automation programs \u2014 pair them with a dedicated SI.",
+      questions_to_ask: [
+        "What is your automation integration team size vs. your construction team, and how are they organized on projects?",
+        "Show me three projects where you led both facility construction and automation integration end-to-end.",
+        "How do you handle responsibility split between building construction and automation systems performance?"
+      ],
+    },
     vendor_type: "Systems Integrator",
     tagline: "Integrated architecture, engineering, construction and automation for industrial projects",
     category: "Systems Integration", industry: ["Manufacturing", "Food & Beverage", "Warehouse & DC"],
@@ -2309,6 +2932,17 @@ export const vendors = [
   },
   {
     id: 98, name: "Wynright (Daifuku)", slug: "wynright",
+    practitioner_notes: {
+      deployment_reality: "Wynright is a Daifuku Group company focused on systems integration of conveyor, sortation, and automation primarily for parcel and retail DC. As a Daifuku subsidiary, they have access to Daifuku's hardware portfolio and engineering resources. Project sizes typically $5M-$50M.",
+      what_vendors_wont_tell_you: "Wynright integrations typically use Daifuku equipment by default \u2014 the vendor-agnostic claim is real but Daifuku is the favored partner. For projects where Daifuku equipment is the right choice anyway, this isn't an issue. For projects considering other equipment vendors, Wynright may not be the most neutral integrator.",
+      best_environments: "Parcel and retail DC automation projects where Daifuku equipment is a likely or preferred solution, leveraging the Daifuku-Wynright integrated delivery model.",
+      watch_outs: "If you're committed to specific non-Daifuku equipment vendors, a more truly vendor-agnostic SI (Bastian, DMW&H, Conveyco) may give you better outcomes.",
+      questions_to_ask: [
+        "What percentage of your projects use Daifuku equipment vs. other vendors, and what's the typical equipment selection process?",
+        "Show me three projects with non-Daifuku equipment as the primary platform.",
+        "What is the project team's incentive structure around equipment selection?"
+      ],
+    },
     vendor_type: "Systems Integrator",
     tagline: "Daifuku subsidiary specializing in conveyor, sortation, and robotics for retail DC",
     category: "Systems Integration", industry: ["Retail", "E-commerce & Fulfillment", "Warehouse & DC"],
@@ -2329,51 +2963,20 @@ export const vendors = [
     apps: ["Retail DC automation", "E-commerce fulfillment", "Omnichannel distribution", "Apparel DC"],
   },
   // ─── AGV SYSTEMS ─────────────────────────────────────────────────
-  {
-    id: 99, name: "Jungheinrich", slug: "jungheinrich",
-    vendor_type: "Manufacturer",
-    tagline: "Automated guided vehicles and intralogistics solutions from Europe top forklift maker",
-    category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Automotive"],
-    tags: ["AGV", "Automated forklift", "Intralogistics", "European"],
-    featured: false, rating: 4.2, reviews: 22,
-    hq: "Hamburg, Germany (US: Norcross, GA)", website: "jungheinrich.com",
-    founded: "1953", installs: "5,000+ AGVs", employees: "20,000+", logo: "JU", color: "#0f766e",
-    desc: "Jungheinrich is Europe second-largest forklift manufacturer with a comprehensive AGV and automated intralogistics portfolio including automated reach trucks, VNA trucks, and pallet AGVs proven in automotive and retail DC environments.",
-    specs: [{ l: "AGV Types", v: "Counterbalance, reach, VNA, pallet" }, { l: "Navigation", v: "Natural + laser" }, { l: "Fleet mgmt", v: "Jungheinrich WMS/FMS" }, { l: "Payload", v: "1,000–5,000 kg" }],
-    integrations: ["Jungheinrich WMS (native)", "SAP EWM", "All major WMS via API"],
-    price_range: "$$$",
-    best_for: "European-footprint operations and North American DCs wanting automated forklifts from a proven intralogistics manufacturer",
-    not_for: "Operations prioritizing cutting-edge AMR — Jungheinrich strength is proven AGV, not next-gen AMR",
-    strengths: ["One of deepest AGV portfolios from a single manufacturer", "Strong European automotive track record", "Complete intralogistics approach — forklifts, AGV, racking, WMS"],
-    weaknesses: ["AGV approach less flexible for dynamic environments than AMR", "North American presence smaller than KION (Linde) or Crown", "US implementation resources less robust than European"],
-    implementation_pilot: "8–14 weeks", implementation_rollout: "4–10 months",
-    implementation_risks: "Floor flatness requirements, WMS integration, North American service coverage",
-    apps: ["High-bay racking automation", "Manufacturing AGV", "Automotive supply chain", "DC pallet movement"],
-  },
-  {
-    id: 100, name: "Crown Equipment", slug: "crown-equipment",
-    vendor_type: "Manufacturer",
-    tagline: "Forklift manufacturer with InfoLink fleet management and automation solutions",
-    category: "AGV Systems", industry: ["Warehouse & DC", "Manufacturing", "Food & Beverage"],
-    tags: ["Forklift", "Fleet management", "InfoLink", "Automation"],
-    featured: false, rating: 4.1, reviews: 28,
-    hq: "New Bremen, OH", website: "crown.com",
-    founded: "1945", installs: "500,000+ forklifts", employees: "19,000+", logo: "CR", color: "#dc2626",
-    desc: "Crown Equipment is one of the world largest forklift manufacturers with InfoLink fleet management and autonomous lift truck solutions. Crown manufacturing heritage and dealer network make them practical for operations standardizing on Crown equipment.",
-    specs: [{ l: "Products", v: "Forklifts + InfoLink fleet management + automation" }, { l: "Fleet mgmt", v: "InfoLink (IoT, utilization, safety)" }, { l: "Automation", v: "QuickPick Remote, autonomous trucks" }, { l: "Network", v: "Largest dealer network in North America" }],
-    integrations: ["InfoLink fleet management", "WMS via API", "Telematics systems"],
-    price_range: "$$",
-    best_for: "Operations standardizing on Crown forklifts who want unified fleet management and a path to partial automation",
-    not_for: "Operations wanting cutting-edge autonomous technology — Crown automation is newer and less mature than OTTO or MiR",
-    strengths: ["Largest forklift dealer service network in North America", "InfoLink best-in-class forklift fleet analytics", "Practical path from manual to semi-automated", "Deep customer relationships through dealer network"],
-    weaknesses: ["Automation portfolio less mature than pure-play AMR vendors", "Less suitable for complex goods-to-person or AS/RS applications"],
-    implementation_pilot: "4–8 weeks", implementation_rollout: "2–6 months",
-    implementation_risks: "Fleet transition planning, operator training, WMS integration",
-    apps: ["DC fleet management", "Manufacturing intralogistics", "Semi-automated pallet handling"],
-  },
   // ─── AS/RS & STORAGE ─────────────────────────────────────────────
   {
     id: 101, name: "Hänel Storage Systems", slug: "hanel",
+    practitioner_notes: {
+      deployment_reality: "H\u00e4nel is a German VLM and carousel manufacturer \u2014 direct competitor to Modula and Kardex Remstar. Smaller global presence than Modula but established product line. Implementation is fast for standard VLM deployments (2\u20136 weeks per unit).",
+      what_vendors_wont_tell_you: "H\u00e4nel's North American presence is smaller than Modula or Kardex \u2014 verify service coverage and parts availability in your region. The product is competitive but the support ecosystem may be less mature.",
+      best_environments: "VLM applications similar to Modula \u2014 MRO, parts distribution, manufacturing kitting \u2014 particularly where H\u00e4nel pricing is competitive with Modula.",
+      watch_outs: "Verify North American service coverage. Smaller presence than Modula.",
+      questions_to_ask: [
+        "What is your North American service team and parts availability vs. Modula?",
+        "What is the typical cost differential vs. Modula and Kardex for equivalent specs?",
+        "Show me three North American customers similar to ours."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Vertical lift modules and carousels for dense parts and tools storage",
     category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Aerospace", "Automotive"],
@@ -2394,28 +2997,18 @@ export const vendors = [
     apps: ["Manufacturing parts storage", "Aerospace MRO", "Automotive tooling", "Hospital supply"],
   },
   {
-    id: 102, name: "Modula", slug: "modula",
-    vendor_type: "Manufacturer",
-    tagline: "Vertical lift modules for manufacturing, distribution, and parts storage",
-    category: "AS/RS & Storage", industry: ["Manufacturing", "Warehouse & DC", "Automotive", "MRO"],
-    tags: ["Vertical lift module", "VLM", "Storage", "High-density"],
-    featured: false, rating: 4.3, reviews: 21,
-    hq: "Montagnana, Italy (US: Lewiston, ME)", website: "modula.com",
-    founded: "1987", installs: "20,000+", employees: "700+", logo: "MO", color: "#0369a1",
-    desc: "Modula is a leading vertical lift module manufacturer competing directly with Kardex Remstar. Their Lift series VLMs and horizontal carousels are strong in manufacturing, aerospace, and automotive parts storage.",
-    specs: [{ l: "Products", v: "Modula Lift VLM, Modula Horizontal Carousel" }, { l: "Height", v: "Up to 16.5m" }, { l: "Payload", v: "Up to 990 kg/tray" }, { l: "Software", v: "Copilot WMS lite" }],
-    integrations: ["WMS via API", "ERP", "Modula Copilot software"],
-    price_range: "$$",
-    best_for: "Manufacturing and industrial parts operations needing dense vertical storage at competitive pricing vs. Kardex",
-    not_for: "Very high throughput goods-to-person e-commerce applications",
-    strengths: ["Competitive pricing vs. Kardex", "Strong North American distribution network", "High payload options for heavy industrial parts", "Copilot software provides basic WMS functionality"],
-    weaknesses: ["US service network slightly smaller than Kardex", "Less brand recognition than Kardex in North America"],
-    implementation_pilot: "2–4 weeks per unit", implementation_rollout: "1–3 months",
-    implementation_risks: "Floor load capacity, ceiling height requirements, WMS integration",
-    apps: ["Manufacturing parts storage", "Automotive tooling", "Aerospace MRO", "DC parts distribution"],
-  },
-  {
     id: 103, name: "Attabotics", slug: "attabotics",
+    practitioner_notes: {
+      deployment_reality: "Attabotics is a Canadian goods-to-person automation company with a unique 3D vertical grid storage system \u2014 robots travel both horizontally and vertically through dense rack structure. The technology is differentiated but newer than AutoStore or Exotec. Implementation timelines are similar (12\u201318 months).",
+      what_vendors_wont_tell_you: "Attabotics has had organizational challenges and operational stability questions \u2014 verify current company status, leadership, and customer references actively post-go-live. The technology is real but the company stability has been a concern. Less proven at scale than AutoStore.",
+      best_environments: "E-commerce and retail DC operations where the 3D vertical grid storage density is differentiated and willing to take on technology risk for unique capability.",
+      watch_outs: "Verify company financial stability and customer base actively operating post-go-live. This is higher technology risk than AutoStore or Exotec.",
+      questions_to_ask: [
+        "What is the current customer base actively operating systems post-go-live, with throughput data?",
+        "What is the company's financial position and leadership stability?",
+        "What happens to existing deployments if Attabotics has corporate restructuring?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "3D robotic storage system using vertical and horizontal robot movement",
     category: "AS/RS & Storage", industry: ["E-commerce & Fulfillment", "Retail", "Grocery"],
@@ -2437,49 +3030,18 @@ export const vendors = [
   },
   // ─── CONTROLS & SENSING ──────────────────────────────────────────
   {
-    id: 104, name: "Banner Engineering", slug: "banner-engineering",
-    vendor_type: "Manufacturer",
-    tagline: "Industrial sensors, machine safety, and wireless monitoring for automation",
-    category: "Controls & Sensing", industry: ["Manufacturing", "Warehouse & DC", "Automotive"],
-    tags: ["Industrial sensors", "Safety", "Wireless", "Machine vision"],
-    featured: false, rating: 4.3, reviews: 24,
-    hq: "Minneapolis, MN", website: "bannerengineering.com",
-    founded: "1966", installs: "1,000,000+", employees: "1,500+", logo: "BE", color: "#0369a1",
-    desc: "Banner Engineering is a leading North American manufacturer of industrial sensors, safety systems, and wireless monitoring. Their presence in DC and manufacturing automation is ubiquitous — from presence detection on conveyors to safety light curtains on robotic cells.",
-    specs: [{ l: "Products", v: "Sensors, safety, vision, wireless, indicators" }, { l: "Connectivity", v: "IO-Link, EtherNet/IP, PROFINET" }, { l: "Safety", v: "SIL 2, PLd" }, { l: "Wireless", v: "Sure Cross wireless sensors" }],
-    integrations: ["All major PLCs", "Rockwell EtherNet/IP", "Siemens PROFINET", "IO-Link masters"],
-    price_range: "$",
-    best_for: "Any automation project requiring sensing, safety, or wireless monitoring — Banner is the default sensor choice for most North American integrators",
-    not_for: "Process sensing (pressure, temperature) — Banner is discrete sensing, not process instrumentation",
-    strengths: ["Most widely deployed industrial sensor brand in North America", "Strong application engineering support", "Sure Cross wireless sensors enable sensing without wiring in DC environments", "Broad product range"],
-    weaknesses: ["Premium pricing vs. lower-cost Asian alternatives", "Machine vision less mature than Cognex or Keyence for complex inspection"],
-    implementation_pilot: "N/A — component", implementation_rollout: "N/A",
-    implementation_risks: "Sensor selection, environmental ratings, wiring integration",
-    apps: ["Conveyor presence detection", "Robot cell safety", "AGV/AMR safety sensing", "DC monitoring"],
-  },
-  {
-    id: 105, name: "Datalogic", slug: "datalogic",
-    vendor_type: "Manufacturer",
-    tagline: "Barcode readers, machine vision, and sensors for industrial automation",
-    category: "Controls & Sensing", industry: ["Warehouse & DC", "Manufacturing", "Retail", "Healthcare"],
-    tags: ["Barcode reader", "Machine vision", "Sensors", "Fixed scanner"],
-    featured: false, rating: 4.1, reviews: 16,
-    hq: "Bologna, Italy (US: Eugene, OR)", website: "datalogic.com",
-    founded: "1972", installs: "5,000,000+", employees: "3,000+", logo: "DL", color: "#cc0000",
-    desc: "Datalogic is a world leading manufacturer of automatic data capture equipment — fixed barcode readers, mobile computers, machine vision systems, and safety sensors. Their Matrix series fixed readers are widely deployed in parcel and DC conveyor applications.",
-    specs: [{ l: "Products", v: "Fixed readers, handhelds, vision, sensors" }, { l: "Reading", v: "1D/2D barcodes, DPM, OCR" }, { l: "Connectivity", v: "EtherNet/IP, PROFINET, serial" }, { l: "Applications", v: "Conveyor ID, sortation, receiving" }],
-    integrations: ["All major PLCs", "WMS via middleware", "Conveyor WCS systems"],
-    price_range: "$$",
-    best_for: "Conveyor and sortation barcode reading where high read rates at speed are required",
-    not_for: "Handheld scanning in DC operations — Zebra dominates that market",
-    strengths: ["Strong fixed scanning portfolio for conveyor applications", "Good read rates at high conveyor speeds", "Competitive pricing vs. Cognex for barcode-specific applications", "Global service presence"],
-    weaknesses: ["Less dominant than Zebra for handheld DC scanning", "Machine vision less specialized than Cognex for complex inspection"],
-    implementation_pilot: "N/A — component", implementation_rollout: "N/A",
-    implementation_risks: "Conveyor speed and read distance validation, WCS/WMS integration",
-    apps: ["Conveyor barcode reading", "Sortation induction scanning", "Receiving tunnel scanning"],
-  },
-  {
     id: 106, name: "Impinj", slug: "impinj",
+    practitioner_notes: {
+      deployment_reality: "Impinj is the dominant RAIN RFID (UHF) silicon and software company \u2014 their chips and readers power most enterprise RFID deployments. Used in apparel retail (inventory accuracy), DC tracking, and increasingly returns processing. Pure RFID infrastructure play.",
+      what_vendors_wont_tell_you: "RFID success depends on tag cost economics, read environment design, and operational process redesign \u2014 the technology works but the project economics require careful evaluation. Impinj is the silicon \u2014 you'll also need tags (from Avery Dennison, Smartrac) and integration. Total ecosystem cost is the relevant number.",
+      best_environments: "Apparel retail and high-value item tracking where item-level RFID delivers inventory accuracy improvement that justifies the per-tag cost. Returns processing is a growing application.",
+      watch_outs: "Calculate total project cost including tags, readers, integration, and process redesign \u2014 not just silicon/reader cost.",
+      questions_to_ask: [
+        "What is the per-item RFID cost economics at our specific item value and turn rate?",
+        "What is the typical ROI period for item-level RFID in our industry?",
+        "Show me three deployments at our scale with operational data on inventory accuracy improvement."
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "RAIN RFID platform for real-time item-level inventory visibility",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Retail", "Manufacturing"],
@@ -2502,6 +3064,17 @@ export const vendors = [
   // ─── MANUFACTURING AUTOMATION ────────────────────────────────────
   {
     id: 107, name: "Beckhoff Automation", slug: "beckhoff",
+    practitioner_notes: {
+      deployment_reality: "Beckhoff Automation is a German manufacturer of PC-based industrial controls \u2014 their TwinCAT software runs PLC functions on standard industrial PCs. Differentiated approach from traditional dedicated PLCs (Rockwell, Siemens). Strong in high-performance applications and operations integrated with broader IT.",
+      what_vendors_wont_tell_you: "PC-based controls is differentiated technology but requires different engineering skills than traditional PLCs. The skills market for Beckhoff is smaller than Rockwell or Siemens \u2014 verify your engineering team capacity and integrator availability. Best for specific high-performance use cases, not general-purpose automation.",
+      best_environments: "High-performance applications requiring PC-class computing in industrial controls \u2014 semiconductor, advanced manufacturing, specialized automation.",
+      watch_outs: "Verify engineering skills availability \u2014 smaller talent pool than Rockwell or Siemens.",
+      questions_to_ask: [
+        "What is your North American integrator network and engineering talent availability?",
+        "Show me applications similar to ours where Beckhoff PC-based controls vs. traditional PLC delivered measurable advantage.",
+        "What is the typical engineering team skills profile for Beckhoff deployments?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "PC-based control and EtherCAT for high-performance machine and robot automation",
     category: "Manufacturing Automation", industry: ["Manufacturing", "Warehouse & DC", "Robotics"],
@@ -2523,28 +3096,18 @@ export const vendors = [
   },
   // ─── SIMULATION ──────────────────────────────────────────────────
   {
-    id: 108, name: "AnyLogic", slug: "anylogic",
-    vendor_type: "Software",
-    tagline: "Multi-method simulation platform for supply chain and logistics modeling",
-    category: "Simulation & Digital Twin", industry: ["Warehouse & DC", "Manufacturing", "Supply Chain"],
-    tags: ["Simulation", "Supply chain modeling", "Discrete event", "Agent-based"],
-    featured: false, rating: 4.3, reviews: 18,
-    hq: "Chicago, IL", website: "anylogic.com",
-    founded: "1992", installs: "40,000+", employees: "200+", logo: "AL", color: "#7c3aed",
-    desc: "AnyLogic is the only simulation platform supporting discrete event, agent-based, and system dynamics modeling in one environment — making it powerful for complex supply chain modeling where different abstraction levels are needed simultaneously.",
-    specs: [{ l: "Methods", v: "Discrete event + agent-based + system dynamics" }, { l: "Language", v: "Java-based" }, { l: "GIS", v: "Built-in geographic modeling" }, { l: "Cloud", v: "AnyLogic Cloud for sharing" }],
-    integrations: ["Python", "Java", "MATLAB", "Excel", "Databases via JDBC"],
-    price_range: "$$",
-    best_for: "Complex supply chain modeling and DC design studies where multiple simulation methods are needed",
-    not_for: "Simple DC layout visualization or quick throughput estimates — AnyLogic has a learning curve",
-    strengths: ["Only platform supporting all three simulation methods", "AnyLogic Cloud for sharing models with stakeholders", "Large academic and consultant community"],
-    weaknesses: ["Steeper learning curve than FlexSim for pure material handling", "Java requirement may not suit all IE teams", "Some geopolitical concerns about Russian-origin software"],
-    implementation_pilot: "N/A — software tool", implementation_rollout: "N/A",
-    implementation_risks: "Model validation, staff training, data quality for model inputs",
-    apps: ["DC capacity modeling", "Supply chain network design", "Port and logistics optimization"],
-  },
-  {
     id: 109, name: "Visual Components", slug: "visual-components",
+    practitioner_notes: {
+      deployment_reality: "Visual Components is a Finnish manufacturing simulation tool with strong robotics and automation cell modeling. Used by industrial engineers and SIs for designing robotic work cells, manufacturing lines, and validating automation throughput. The component library covers most major robot OEMs.",
+      what_vendors_wont_tell_you: "Visual Components is less common in DC/warehouse simulation \u2014 primarily a manufacturing tool. The customer base is smaller than FlexSim or AnyLogic. Finnish company with growing US presence but support coverage is still primarily European.",
+      best_environments: "Manufacturing cell design and robotic work cell simulation \u2014 automotive, electronics, and discrete manufacturing.",
+      watch_outs: "Not the right tool for DC/warehouse simulation. Verify US support coverage if you're not in Europe.",
+      questions_to_ask: [
+        "What is your customer base in DC/warehouse simulation vs. manufacturing cell simulation?",
+        "What is your US support team size and SLA coverage?",
+        "How does the robot library compare to RobotStudio (ABB) or RoboGuide (FANUC)?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "3D manufacturing simulation and digital twin for production planning and robot cells",
     category: "Simulation & Digital Twin", industry: ["Manufacturing", "Automotive", "Robotics"],
@@ -2566,28 +3129,18 @@ export const vendors = [
   },
   // ─── WMS ADDITIONS ───────────────────────────────────────────────
   {
-    id: 110, name: "SnapFulfil", slug: "snapfulfil",
-    vendor_type: "Software",
-    tagline: "Cloud WMS for 3PL and mid-market distribution between entry-level and enterprise",
-    category: "WMS Platforms", industry: ["3PL", "Warehouse & DC", "E-commerce & Fulfillment"],
-    tags: ["WMS", "3PL", "Cloud", "Mid-market"],
-    featured: false, rating: 4.2, reviews: 24,
-    hq: "Birmingham, UK (US: Denver, CO)", website: "snapfulfil.com",
-    founded: "2006", installs: "300+", employees: "200+", logo: "SN", color: "#7c3aed",
-    desc: "SnapFulfil is a cloud WMS with strong presence in 3PL and mid-market distribution — for operations that have outgrown Extensiv but do not need the complexity and cost of Körber or Manhattan.",
-    specs: [{ l: "Deployment", v: "Cloud SaaS" }, { l: "Target", v: "Mid-market 3PL and distribution" }, { l: "Go-live", v: "8–12 weeks typical" }, { l: "Billing", v: "Multi-client 3PL billing" }],
-    integrations: ["Shopify", "NetSuite", "Magento", "EDI", "Major carriers"],
-    price_range: "$$",
-    best_for: "Mid-market 3PLs that have outgrown Extensiv but are not ready for Körber or Manhattan cost and complexity",
-    not_for: "Very large complex operations requiring deep automation integration or extensive customization",
-    strengths: ["Fast implementation — 8–12 weeks achievable for standard 3PL", "Strong multi-client billing", "Good value at mid-market price point"],
-    weaknesses: ["Less automation integration depth than Körber", "Smaller North American support team", "Feature limits at large enterprise scale"],
-    implementation_pilot: "8–12 weeks", implementation_rollout: "2–4 months",
-    implementation_risks: "Client data migration, carrier integration, client onboarding",
-    apps: ["3PL multi-client distribution", "E-commerce fulfillment", "B2B distribution"],
-  },
-  {
     id: 111, name: "Lucas Systems", slug: "lucas-systems",
+    practitioner_notes: {
+      deployment_reality: "Lucas Systems is a focused voice-directed picking specialist with deep DC operational expertise. Their voice solution layers onto any WMS and delivers measurable productivity improvement (15\u201330% typical) in pick-intensive operations. Implementation runs 8\u201314 weeks for a standard deployment including WMS integration.",
+      what_vendors_wont_tell_you: "Voice-directed picking is a mature category with diminishing competitive differentiation \u2014 modern AMR pick-assist and screen-based workflows can deliver similar productivity gains. Lucas remains strong in pure voice deployments but operations evaluating AMR + voice should validate the incremental productivity vs. complexity. Hardware refresh cycles add ongoing cost.",
+      best_environments: "Mid-to-large DC operations with high pick volume in cold/freezer environments (where hands-free is mandatory) or operations where deploying mobile devices to every picker is impractical.",
+      watch_outs: "Voice has aging tech perception \u2014 verify it's the right solution vs. modern alternatives. Cold storage and hands-free use cases are voice's strongest case.",
+      questions_to_ask: [
+        "What is the typical productivity gain at our specific operation type \u2014 cold storage vs. ambient, e-commerce vs. wholesale?",
+        "How does Lucas voice compete with AMR pick-assist solutions in modern DCs?",
+        "What is the hardware refresh cycle and total 5-year cost of ownership including devices and headsets?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Voice and AI-powered work direction that improves DC productivity 15–35%",
     category: "Labor Management", industry: ["Warehouse & DC", "Food & Beverage", "3PL"],
@@ -2609,6 +3162,17 @@ export const vendors = [
   },
   {
     id: 112, name: "Honeywell Scanning & Mobility", slug: "honeywell-scanning",
+    practitioner_notes: {
+      deployment_reality: "Honeywell Scanning and Mobility (formerly Intermec, Hand Held Products) is the second-largest enterprise mobile computer vendor after Zebra. Their handheld and forklift-mounted devices are widely deployed in DC operations. The merger of multiple acquired brands (Intermec, LXE, Vocollect) creates a comprehensive portfolio.",
+      what_vendors_wont_tell_you: "Honeywell's enterprise mobility is competitive with Zebra but ecosystem (MDM integration, accessories) is somewhat smaller. The post-merger product line consolidation continues \u2014 some legacy product lines have been deprecated. Verify long-term product support for your specific models.",
+      best_environments: "DC operations needing enterprise handhelds, forklift mounts, or voice devices (Vocollect) where Honeywell's specific product fit and pricing is competitive vs. Zebra.",
+      watch_outs: "Verify product roadmap continuity for specific models you're standardizing on.",
+      questions_to_ask: [
+        "What is the product lifecycle and support commitment for the specific models we're evaluating?",
+        "How does Honeywell Vocollect integrate with non-Honeywell handhelds vs. Zebra voice solutions?",
+        "What is the cost differential vs. Zebra for equivalent specs?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Enterprise barcode scanners and mobile computers for DC and field operations",
     category: "Controls & Sensing", industry: ["Warehouse & DC", "Retail", "Healthcare", "Field Service"],
@@ -2635,6 +3199,17 @@ export const vendors = [
   // CROWN EQUIPMENT
   {
     id: 113, name: "Crown Equipment", slug: "crown-equipment",
+    practitioner_notes: {
+      deployment_reality: "Crown is the largest US-headquartered forklift manufacturer with the strongest factory-direct service network in North America. The InfoLink fleet management system is the category benchmark for utilization tracking, impact detection, and operator certification management. Fleet deployment is typically 2-6 weeks; InfoLink integration with WMS adds 2-4 weeks.",
+      what_vendors_wont_tell_you: "Crown's premium pricing is real \u2014 typically 15-25% above import brands for equivalent specs. The value is the service network and InfoLink ecosystem, not the truck itself. For operations that don't fully utilize InfoLink data, you're paying for capability you don't use. Also: Crown is primarily electric and indoor \u2014 for heavy IC outdoor applications, Hyster-Yale or Mitsubishi may be better fits.",
+      best_environments: "North American DC operations with 20+ truck fleets where factory-direct service response time and fleet management data justify the premium. Particularly strong in retail, food & beverage, and 3PL.",
+      watch_outs: "Overkill for small fleets that won't use InfoLink. Limited for heavy outdoor IC applications.",
+      questions_to_ask: [
+        "What is the realistic 5-year TCO including InfoLink, service, and parts vs. Toyota Material Handling or Hyster-Yale?",
+        "What is the factory-direct service response SLA in our specific region?",
+        "How does InfoLink integrate with our specific WMS \u2014 pre-built or middleware required?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "North American forklift market leader with connected fleet management",
     category: "AGV Systems",
@@ -2658,6 +3233,17 @@ export const vendors = [
   // RAYMOND (TOYOTA)
   {
     id: 114, name: "Raymond (Toyota)", slug: "raymond-toyota",
+    practitioner_notes: {
+      deployment_reality: "Raymond is Toyota Industries' North American electric forklift brand \u2014 strong in narrow-aisle reach trucks, order pickers, and pallet jacks. iWarehouse fleet management is competitive with Crown InfoLink. Implementation through Toyota Material Handling dealer network. Fleet deployment is typically 2-6 weeks.",
+      what_vendors_wont_tell_you: "Raymond's North American dealer quality varies significantly by region \u2014 Toyota Material Handling regional dealers operate semi-independently. Vet the specific dealer in your region as carefully as the equipment. The Toyota corporate connection brings stability but service experience is dealer-dependent.",
+      best_environments: "Narrow-aisle DC operations where Raymond's reach truck and order picker portfolio is competitive. Particularly strong in e-commerce and high-bay storage operations.",
+      watch_outs: "Dealer quality varies \u2014 verify your specific regional dealer's service track record before committing.",
+      questions_to_ask: [
+        "Who is our specific regional Toyota Material Handling dealer and what is their track record?",
+        "What is the cost differential vs. Crown for equivalent specs in our region?",
+        "How does iWarehouse compare to Crown InfoLink for fleet management depth?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Toyota-backed forklift manufacturer with iWAREHOUSE fleet management",
     category: "AGV Systems",
@@ -2681,6 +3267,17 @@ export const vendors = [
   // HYSTER-YALE
   {
     id: 115, name: "Hyster-Yale Group", slug: "hyster-yale",
+    practitioner_notes: {
+      deployment_reality: "Hyster-Yale operates two brands (Hyster for industrial, Yale for DC) with the broadest forklift product range of any major OEM \u2014 from 1-ton walkies to 52-ton container handlers. Strong in heavy industrial and IC counterbalance applications where Crown is weaker. The Nuvera fuel cell subsidiary is positioning for hydrogen-powered heavy forklifts.",
+      what_vendors_wont_tell_you: "Dual-brand structure (Hyster vs. Yale) can create dealer and service complexity \u2014 verify which brand and which dealer covers your specific application. Fleet management software (Hyster Tracker, Yale Vision) is less developed than Crown InfoLink. North American service density is below Crown and Raymond in many regions.",
+      best_environments: "Operations requiring heavy IC counterbalance (ports, lumber, steel, container handling) where Crown and Raymond's electric-focused product lines don't fit.",
+      watch_outs: "Verify which Hyster-Yale brand and dealer covers your application. Fleet management is less mature.",
+      questions_to_ask: [
+        "For our application, is Hyster or Yale the right brand and what is the dealer service coverage?",
+        "What is the Nuvera hydrogen fuel cell roadmap and commercial availability timeline?",
+        "How does the dealer network compare to Crown for our specific geography?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Global forklift manufacturer with Hyster and Yale brands plus Nuvera fuel cell technology",
     category: "AGV Systems",
@@ -2704,6 +3301,17 @@ export const vendors = [
   // LINDE MATERIAL HANDLING
   {
     id: 116, name: "Linde Material Handling", slug: "linde-mh",
+    practitioner_notes: {
+      deployment_reality: "Linde Material Handling (KION Group, same parent as Dematic) is the European market leader in forklifts. Strongest in ergonomics, energy efficiency, and advanced driver assistance systems (ADAS) including pedestrian detection. North American presence has grown through KION expansion but service network is less mature than Crown or Raymond.",
+      what_vendors_wont_tell_you: "Linde's premium European engineering shows in operator comfort and safety features \u2014 but the North American service network is materially less dense than Crown's. For multi-site North American operations, verify regional service coverage carefully. Premium pricing reflects European positioning.",
+      best_environments: "Automotive and complex manufacturing operations where ADAS, ergonomics, and energy efficiency justify the premium. Particularly strong fit when KION's broader portfolio (Dematic automation) creates strategic alignment.",
+      watch_outs: "North American service coverage is less mature than Crown or Raymond. Premium pricing.",
+      questions_to_ask: [
+        "What is your North American service network density vs. Crown and Raymond in our specific regions?",
+        "How does ADAS pedestrian detection integrate with our facility safety program?",
+        "What is the strategic value of KION integration if we're considering Dematic automation?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "European forklift market leader with advanced driver assistance and fleet management",
     category: "AGV Systems",
@@ -2727,6 +3335,17 @@ export const vendors = [
   // MITSUBISHI LOGISNEXT
   {
     id: 117, name: "Mitsubishi Logisnext", slug: "mitsubishi-logisnext",
+    practitioner_notes: {
+      deployment_reality: "Mitsubishi Logisnext is Japan's largest forklift manufacturer with three brands (Mitsubishi, Jungheinrich Americas, Nichiyu). Competitive pricing vs. premium Western brands, with strong IC counterbalance for outdoor and heavy industrial. US operations through dealer network.",
+      what_vendors_wont_tell_you: "Three-brand structure creates organizational complexity and some product line overlap. Service network is less mature than Crown, Raymond, or Hyster-Yale in many North American regions. Fleet management tools lag behind Crown InfoLink. Cost advantage is real but service tradeoffs are real too.",
+      best_environments: "Cost-sensitive forklift fleet operations with moderate fleet size where pricing advantage matters more than premium service network.",
+      watch_outs: "Verify regional service coverage and parts availability. Fleet management software is less developed.",
+      questions_to_ask: [
+        "Which Mitsubishi Logisnext brand and dealer covers our region, and what is the service SLA?",
+        "What is the cost differential vs. Crown and what tradeoffs come with that pricing?",
+        "What is the parts availability and turnaround time in our specific geography?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Japanese forklift conglomerate with Mitsubishi, Jungheinrich, and Nichiyu brands",
     category: "AGV Systems",
@@ -2781,6 +3400,17 @@ export const vendors = [
   // BEUMER GROUP
   {
     id: 119, name: "Beumer Group", slug: "beumer-group",
+    practitioner_notes: {
+      deployment_reality: "Beumer Group is a German systems integrator strong in airport baggage handling, parcel sortation, and bulk material handling. Their cross-belt sortation is particularly competitive with Vanderlande and Honeywell Intelligrated for high-throughput parcel applications.",
+      what_vendors_wont_tell_you: "Beumer's strongest North American practice is airport baggage and parcel \u2014 DC warehouse automation is less established than their European business. Verify specific reference base for your application type and region.",
+      best_environments: "Airport baggage handling, parcel sortation hubs, and bulk material handling projects where Beumer's specific industry expertise is differentiated.",
+      watch_outs: "Less established in pure DC/warehouse automation in North America.",
+      questions_to_ask: [
+        "What is your North American DC/warehouse reference base specifically (not airport/parcel)?",
+        "Show me high-throughput cross-belt sortation deployments at our scale.",
+        "What is your North American implementation team size and project capacity?"
+      ],
+    },
     vendor_type: "Manufacturer + SI",
     tagline: "German conveyor and sortation systems for airports, parcel, and retail distribution",
     category: "Conveyor & Sortation",
@@ -2802,31 +3432,20 @@ export const vendors = [
   },
 
   // VANDERLANDE
-  {
-    id: 120, name: "Vanderlande", slug: "vanderlande",
-    vendor_type: "Manufacturer + SI",
-    tagline: "Global leader in automated material handling for airports, parcel, and warehousing",
-    category: "Conveyor & Sortation",
-    industry: ["Airport & Cargo", "Parcel & Courier", "E-commerce & Fulfillment", "Retail"],
-    tags: ["Sortation", "Conveyor", "Airport", "AS/RS", "Parcel", "Toyota Group"],
-    featured: false, rating: 4.3, reviews: 0,
-    hq: "Veghel, Netherlands (US: Atlanta, GA)", website: "vanderlande.com",
-    founded: "1949", installs: "5,000+", employees: "9,000+", logo: "VL", color: "#0369a1",
-    desc: "Vanderlande is one of the two largest global material handling systems integrators (alongside Dematic), part of Toyota Industries. Their airport baggage and parcel sortation systems are deployed at major hubs worldwide, and their warehouse automation division covers AS/RS, conveyor, goods-to-person, and robotics for retail and e-commerce DCs. ADAPTO shuttle and FASTPICK goods-to-person systems are competitive with Dematic and KNAPP.",
-    specs: [{ l: "Products", v: "Conveyor, sortation, AS/RS, GTP, robotics" }, { l: "Markets", v: "Airport, parcel, warehouse" }, { l: "Parent", v: "Toyota Industries Corporation" }, { l: "WCS", v: "Vanderlande VISION WCS" }],
-    integrations: ["VISION WCS (proprietary)", "SAP", "Manhattan", "Blue Yonder", "Oracle"],
-    price_range: "$$$$",
-    best_for: "Large-scale warehouse automation programs ($20M+) at major retailers and e-commerce operations requiring full turnkey design-build-operate",
-    not_for: "Mid-market operations or projects under $10M — Vanderlande is scaled for large programs",
-    strengths: ["Toyota Industries backing — financial stability and manufacturing quality", "Full-system capability: airport to warehouse, conveyor to robotics", "ADAPTO shuttle is competitive with Dematic Multishuttle", "Global service organization"],
-    weaknesses: ["Longest implementation timelines in the SI category", "Premium pricing", "Large organization means smaller projects may get less senior attention"],
-    implementation_pilot: "18–30 months", implementation_rollout: "24–48 months",
-    implementation_risks: "Civil scope, project team assignment quality, controls integration, go-live timing vs. peak",
-  },
-
   // SIEMENS LOGISTICS
   {
     id: 121, name: "Siemens Logistics", slug: "siemens-logistics",
+    practitioner_notes: {
+      deployment_reality: "Siemens Logistics is the logistics division of Siemens AG \u2014 primarily focused on airport baggage handling and parcel/postal sortation. Strong in high-throughput cross-belt and tilt-tray sortation. North American DC warehouse automation practice is less developed than airport/parcel.",
+      what_vendors_wont_tell_you: "Siemens Logistics has been through organizational changes within Siemens AG \u2014 verify product roadmap commitment and account team stability. The North American DC automation business is smaller than their European or airport business. For pure DC warehouse automation, evaluate vs. Beumer, Vanderlande, and Honeywell Intelligrated.",
+      best_environments: "Airport baggage handling, parcel sortation hubs, and postal automation where Siemens Logistics' specific industry expertise is differentiated.",
+      watch_outs: "Less established in DC/warehouse automation. Verify Siemens AG organizational commitment to logistics division.",
+      questions_to_ask: [
+        "What is the long-term Siemens AG commitment to the logistics division and what is the product roadmap?",
+        "What is your North American DC warehouse reference base specifically (not airport/parcel)?",
+        "How does your cross-belt sortation compare to Beumer and Vanderlande on throughput and reliability?"
+      ],
+    },
     vendor_type: "Manufacturer + SI",
     tagline: "High-throughput parcel and airport sortation with Siemens engineering heritage",
     category: "Conveyor & Sortation",
@@ -2850,6 +3469,17 @@ export const vendors = [
   // EXTENSIV (3PL CENTRAL / WARE2GO)
   {
     id: 122, name: "Extensiv", slug: "extensiv",
+    practitioner_notes: {
+      deployment_reality: "Extensiv (formerly 3PL Central) has the largest small-3PL customer base in North America. Implementation is genuinely fast \u2014 4\u20138 weeks for a standard 3PL deployment is realistic. Their pre-built integration library (750+) covers nearly every channel and carrier a small 3PL needs. The Ware2Go acquisition strengthened their network and fulfillment capabilities.",
+      what_vendors_wont_tell_you: "Extensiv is built for small-to-mid 3PL operations \u2014 operations processing under 500k orders/month per site. Above that, you'll hit performance and configuration limits. The platform handles e-commerce fulfillment well but is weaker for B2B wholesale or operations requiring complex EDI. Also: support quality has been a customer complaint as Extensiv has scaled rapidly post-rebrand.",
+      best_environments: "Small-to-mid 3PL operations (1\u201310 sites) primarily serving DTC e-commerce brands with high SKU velocity and standard fulfillment workflows.",
+      watch_outs: "Not the right fit for large 3PL operations, B2B wholesale-focused 3PLs, or operations needing deep automation integration.",
+      questions_to_ask: [
+        "What is the typical performance ceiling per site (orders/day, SKUs, picks/hour) before customers migrate up-market?",
+        "What is your current support SLA and how has support quality trended as Extensiv has grown?",
+        "Walk me through your 3PL billing module for a 10-client operation with mixed contract structures."
+      ],
+    },
     vendor_type: "Software",
     tagline: "Cloud WMS platform built for 3PL, e-commerce fulfillment, and omnichannel brands",
     category: "WMS Platforms",
@@ -2874,6 +3504,17 @@ export const vendors = [
   // SNAPFULFIL
   {
     id: 123, name: "Snapfulfil", slug: "snapfulfil",
+    practitioner_notes: {
+      deployment_reality: "Snapfulfil's go-live timeline (6\u201310 weeks) is among the fastest in the WMS market, achieved through configurable rule engines rather than custom code. The subscription pricing model makes it accessible to mid-market e-commerce brands who can't justify Manhattan or K\u00f6rber investment. Strong in the \u00a35M-\u00a3100M revenue band.",
+      what_vendors_wont_tell_you: "Snapfulfil is owned by Synergy Logistics (UK origin), and US presence has grown but the support team is still primarily UK-based. Time zone coverage for US customers can be limited. Automation integration is basic \u2014 no production-validated AMR or AS/RS connectors at scale. Configuration depth is good for standard workflows but hits limits in highly customized operations.",
+      best_environments: "Mid-market e-commerce brands (5k\u2013100k orders/month) and small 3PLs needing fast WMS go-live with modern UI and modest customization needs.",
+      watch_outs: "Not suited for large enterprise operations, automation-heavy DCs, or operations requiring 24/7 US-based support.",
+      questions_to_ask: [
+        "What is your US-based support team size and SLA coverage for P1 issues?",
+        "Show me automation integrations live in production (AMR, AS/RS) \u2014 not roadmap.",
+        "What configuration limits will we hit at 100k orders/month and beyond?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Agile cloud WMS for fast-moving e-commerce and 3PL operations",
     category: "WMS Platforms",
@@ -2897,6 +3538,17 @@ export const vendors = [
   // LOGIWA
   {
     id: 124, name: "Logiwa", slug: "logiwa",
+    practitioner_notes: {
+      deployment_reality: "Logiwa's purpose-built design for high-volume DTC fulfillment shows in operational details \u2014 wave planning, batch picking, and carrier rate shopping that's better than legacy WMS retrofitted for e-commerce. Implementation runs 6\u201310 weeks for a standard DTC deployment. The platform handles the 1,000\u201350,000 orders/day band well.",
+      what_vendors_wont_tell_you: "Logiwa is newer (founded 2017) than tier-1 WMS vendors \u2014 proven at scale but with shorter customer history. Their B2B and wholesale capabilities are less mature than DTC. Automation integration is limited \u2014 they're not a fit for operations planning AMR or AS/RS investment. Support quality has been a customer concern during their rapid growth phase.",
+      best_environments: "Pure-play DTC and e-commerce operations processing 1,000\u201350,000 orders/day, particularly multi-channel brands selling on Shopify, Amazon, and their own site.",
+      watch_outs: "Not a fit for B2B-heavy operations, automation-intensive DCs, or 3PLs with complex multi-client billing requirements.",
+      questions_to_ask: [
+        "What is your largest production customer by daily order volume and how long have they been live?",
+        "Show me your B2B/wholesale workflows \u2014 are they on roadmap or production-ready?",
+        "What is your support response SLA and team capacity?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Cloud fulfillment WMS purpose-built for high-volume DTC and e-commerce operations",
     category: "WMS Platforms",
@@ -2920,6 +3572,17 @@ export const vendors = [
   // NETSUITE WMS
   {
     id: 125, name: "NetSuite WMS", slug: "netsuite-wms",
+    practitioner_notes: {
+      deployment_reality: "NetSuite WMS is the warehouse module within Oracle NetSuite ERP \u2014 bundled functionality for NetSuite ERP customers. Implementation is typically 2-4 months for operations already on NetSuite ERP. Functionality is competent for basic pick/pack/ship workflows but not differentiated for complex DC operations.",
+      what_vendors_wont_tell_you: "NetSuite WMS makes sense only if you're on NetSuite ERP \u2014 outside that context, dedicated WMS platforms (Extensiv, Snapfulfil, Logiwa) are stronger. The 'free' bundling is misleading \u2014 the WMS module typically requires additional NetSuite licensing tiers. For complex 3PL multi-client operations or automation-heavy DCs, NetSuite WMS hits limits quickly.",
+      best_environments: "Mid-market operations already on NetSuite ERP with relatively simple DC workflows where ERP-WMS integration value outweighs functional limitations.",
+      watch_outs: "Functional limits for complex operations. Verify additional licensing requirements beyond base NetSuite.",
+      questions_to_ask: [
+        "What additional NetSuite licensing tiers does the WMS module require?",
+        "What are the documented functional limits for 3PL multi-client billing and complex pick workflows?",
+        "Show me three references operating at our scale with similar operational complexity."
+      ],
+    },
     vendor_type: "Software",
     tagline: "Native WMS module for NetSuite ERP — no integration required",
     category: "WMS Platforms",
@@ -2943,6 +3606,17 @@ export const vendors = [
   // UKG (KRONOS)
   {
     id: 126, name: "UKG (Kronos)", slug: "ukg-kronos",
+    practitioner_notes: {
+      deployment_reality: "UKG (formed by the merger of Kronos and Ultimate Software) is the enterprise workforce management standard \u2014 most large DC and manufacturing operations are either UKG customers or are considering UKG. The platform's depth in scheduling, time and attendance, compliance, and HR is unmatched. Implementation runs 6\u201318 months for enterprise deployments.",
+      what_vendors_wont_tell_you: "UKG is workforce management, not labor management. It handles scheduling and time, not engineered labor standards or productivity tracking. Don't conflate the two \u2014 you may need both UKG and a WMS LMS module. UKG's implementation complexity is real, particularly in union environments. Cost is enterprise-tier \u2014 small operations should evaluate alternatives like Deputy or Shiftboard.",
+      best_environments: "Large DC, manufacturing, retail, and healthcare operations (1,000+ employees) with complex compliance requirements and mature HR organizations.",
+      watch_outs: "Don't expect UKG to replace WMS-based labor management \u2014 different category. Also: implementation complexity and cost are not for the faint-hearted.",
+      questions_to_ask: [
+        "What is the all-in implementation cost including UKG services, partner services, and our internal effort?",
+        "How does UKG complement vs. compete with our WMS labor management module?",
+        "Show me three references with complex union environments live 18+ months."
+      ],
+    },
     vendor_type: "Software",
     tagline: "Enterprise workforce management — scheduling, time tracking, and labor analytics",
     category: "Labor Management",
@@ -2966,6 +3640,17 @@ export const vendors = [
   // WORKFORCE SOFTWARE
   {
     id: 127, name: "WorkForce Software", slug: "workforce-software",
+    practitioner_notes: {
+      deployment_reality: "WorkForce Software is differentiated from UKG primarily in complex compliance environments \u2014 multi-jurisdiction labor law, union contract automation, predictive scheduling compliance. Their SAP integration is the strongest in the WFM category. Implementation runs 6\u201312 months for enterprise deployments.",
+      what_vendors_wont_tell_you: "WorkForce Software has less brand recognition than UKG and a smaller customer base \u2014 this can be a procurement disadvantage when presenting to leadership. The product is strong but the company is smaller, which affects support capacity and innovation pace. Their SAP partnership is genuine but verify how it handles SAP version transitions.",
+      best_environments: "Large unionized DC and manufacturing operations on SAP where complex compliance and SAP HCM integration are non-negotiable.",
+      watch_outs: "Smaller company than UKG \u2014 verify financial stability and product roadmap commitment.",
+      questions_to_ask: [
+        "What is your customer base by industry and how does it compare to UKG?",
+        "Show me complex union contract automation \u2014 what union types and jurisdictions are pre-configured?",
+        "What is your SAP integration roadmap as SAP moves to S/4HANA?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Enterprise workforce management with strong compliance and frontline worker experience",
     category: "Labor Management",
@@ -2991,6 +3676,17 @@ export const vendors = [
   // ANYLOGIC
   {
     id: 128, name: "AnyLogic", slug: "anylogic",
+    practitioner_notes: {
+      deployment_reality: "AnyLogic is the most versatile simulation platform \u2014 agent-based, discrete event, and system dynamics methods support modeling across warehouse operations, supply chain networks, transportation, and business strategy. Strong in academic and consulting environments where modeling problems vary by engagement.",
+      what_vendors_wont_tell_you: "AnyLogic's flexibility comes with steeper learning curve and less built-in MHE library than FlexSim. Russian company origin creates procurement sensitivity in some government and Fortune 500 contexts. AnyLogic Cloud is genuinely useful for sharing models with stakeholders but adds cost.",
+      best_environments: "Supply chain engineers and consultants modeling across warehouse, transportation, and network problems. Academic environments. Multi-method modeling problems.",
+      watch_outs: "Verify procurement acceptance of Russian-origin software in your organization. Learning curve is real \u2014 commit to training time.",
+      questions_to_ask: [
+        "What is the procurement and export compliance posture for our specific industry and geography?",
+        "What is the typical learning curve for an IE with no agent-based modeling background?",
+        "How does AnyLogic Cloud handle our IP and data security requirements?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Multi-method simulation platform for supply chain, warehouse, and logistics modeling",
     category: "Simulation & Digital Twin",
@@ -3014,6 +3710,17 @@ export const vendors = [
   // SIEMENS TECNOMATIX
   {
     id: 129, name: "Siemens Tecnomatix", slug: "siemens-tecnomatix",
+    practitioner_notes: {
+      deployment_reality: "Siemens Tecnomatix Plant Simulation is the dominant tool in automotive and discrete manufacturing simulation, particularly in environments already using Siemens NX CAD and Teamcenter PLM. The animation and visualization is excellent for presenting to engineering leadership. Implementation is straightforward for engineers familiar with Siemens PLM ecosystem.",
+      what_vendors_wont_tell_you: "Tecnomatix is expensive and complex \u2014 overkill for pure DC/warehouse simulation. Best value comes when you're already deeply embedded in Siemens NX and Teamcenter. Outside that ecosystem, FlexSim or AnyLogic provide better simulation-specific value.",
+      best_environments: "Automotive, aerospace, and industrial manufacturing operations on Siemens PLM ecosystem needing simulation tightly integrated with CAD and PLM.",
+      watch_outs: "Don't choose Tecnomatix for pure DC simulation unless you're already on Siemens PLM. Cost is enterprise-tier.",
+      questions_to_ask: [
+        "What is the all-in cost including Tecnomatix license, Siemens PLM dependencies, and training?",
+        "Show me DC/warehouse use cases \u2014 how does Tecnomatix compare to FlexSim for non-manufacturing simulation?",
+        "What is the learning curve for engineers not already on Siemens NX?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Enterprise digital manufacturing and simulation — from plant layout to throughput analysis",
     category: "Simulation & Digital Twin",
@@ -3037,6 +3744,17 @@ export const vendors = [
   // PEPPERL+FUCHS
   {
     id: 130, name: "Pepperl+Fuchs", slug: "pepperl-fuchs",
+    practitioner_notes: {
+      deployment_reality: "Pepperl+Fuchs is a German industrial sensor manufacturer \u2014 proximity, photoelectric, and process automation sensors. Particularly strong in explosion-proof and hazardous environment sensors. Used widely in chemical, pharma, oil & gas, and DC sortation applications.",
+      what_vendors_wont_tell_you: "P+F is premium-priced vs. Asian alternatives. Their value is in hazardous environment certifications (ATEX, IECEx), engineering depth, and reliability. For standard photoelectric in non-hazardous DC environments, lower-cost alternatives may be acceptable. Service is typically via integrator channel.",
+      best_environments: "Hazardous environment applications (chemical, pharma, oil & gas), and any application requiring ATEX/IECEx-certified sensors. Strong in process industries.",
+      watch_outs: "Premium pricing \u2014 evaluate vs. SICK, Banner, and Pepperl+Fuchs for non-hazardous DC sortation.",
+      questions_to_ask: [
+        "For our specific application, are hazardous environment certifications required, and is the premium justified?",
+        "What is the cost differential vs. SICK for equivalent non-hazardous specs?",
+        "What is the typical lead time and parts availability in our region?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "German sensor and automation component manufacturer for industrial and DC environments",
     category: "Controls & Sensing",
@@ -3060,6 +3778,17 @@ export const vendors = [
   // BANNER ENGINEERING
   {
     id: 131, name: "Banner Engineering", slug: "banner-engineering",
+    practitioner_notes: {
+      deployment_reality: "Banner Engineering is a US-based industrial sensor manufacturer \u2014 photoelectric, safety light curtains, vision, and wireless sensors. Strong reputation for reliability and US-based manufacturing. Comprehensive safety product portfolio is a particular strength.",
+      what_vendors_wont_tell_you: "Banner is premium-priced vs. Asian alternatives but reasonable vs. SICK or Keyence. Strong in standard photoelectric and safety applications; vision system is less mature than Cognex. Service is typically via integrator channel.",
+      best_environments: "Standard photoelectric, safety light curtain, and wireless sensor applications across DC and manufacturing automation.",
+      watch_outs: "Vision system less mature than Cognex/Keyence. Verify safety product certifications for your specific applications.",
+      questions_to_ask: [
+        "For our specific safety application, what are the safety ratings and certifications?",
+        "What is the cost differential vs. SICK for equivalent specs?",
+        "What is the typical lead time for standard products?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Industrial sensor manufacturer with strong presence in DC and manufacturing automation",
     category: "Controls & Sensing",
@@ -3083,6 +3812,17 @@ export const vendors = [
   // DATALOGIC
   {
     id: 132, name: "Datalogic", slug: "datalogic",
+    practitioner_notes: {
+      deployment_reality: "Datalogic is the leading European industrial barcode reader and mobile computer manufacturer. Strong in retail point-of-sale, manufacturing, and parcel sortation. Fixed industrial barcode readers are particularly capable for high-throughput sortation. Mobile computers compete with Zebra in some accounts.",
+      what_vendors_wont_tell_you: "Datalogic's mobile computer line is less dominant than Zebra in North American DC \u2014 for handheld scanning, Zebra and Honeywell are usually preferred. Fixed industrial readers for sortation are more competitive. Verify your specific application fit.",
+      best_environments: "High-throughput parcel and DC sortation requiring fixed industrial barcode readers, and retail POS environments.",
+      watch_outs: "Mobile computer line is less established than Zebra in North American DC. Verify application fit.",
+      questions_to_ask: [
+        "For our specific application (fixed sortation vs. mobile DC handhelds), what is your competitive position?",
+        "What is your North American service and parts availability?",
+        "What is the cost differential vs. Zebra for equivalent specs?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Italian barcode reader and machine vision manufacturer for industrial automation",
     category: "Controls & Sensing",
@@ -3106,6 +3846,17 @@ export const vendors = [
   // SEALED AIR
   {
     id: 133, name: "Sealed Air", slug: "sealed-air",
+    practitioner_notes: {
+      deployment_reality: "Sealed Air is the dominant manufacturer of protective packaging (Bubble Wrap is their trademark, plus Cryovac food packaging). Their AUTOBAG automation systems can significantly reduce packing labor at high-volume DC operations. Implementation is straightforward \u2014 install AUTOBAG units at packing stations.",
+      what_vendors_wont_tell_you: "Sealed Air consumables (bubble wrap, air pillows) create ongoing vendor lock-in \u2014 the AUTOBAG machine requires Sealed Air-supplied materials. Total cost over 5 years includes meaningful consumable spend. Evaluate consumable costs as carefully as equipment cost. Sustainability pressure is shifting some customers to Ranpak's paper-based alternatives.",
+      best_environments: "High-volume e-commerce DC operations (5,000+ shipments/day) where packing labor reduction and packaging consistency justify automation investment.",
+      watch_outs: "Consumable lock-in. Sustainability strategy may push toward paper alternatives (Ranpak).",
+      questions_to_ask: [
+        "What is the 5-year total cost including equipment, consumables, and service?",
+        "What are the sustainability alternatives and what is the roadmap for recyclable/sustainable packaging?",
+        "How does the operation transition if we want to switch from Sealed Air consumables?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Packaging automation and protective packaging solutions for e-commerce and DC operations",
     category: "Manufacturing Automation",
@@ -3129,6 +3880,17 @@ export const vendors = [
   // RANPAK
   {
     id: 134, name: "Ranpak", slug: "ranpak",
+    practitioner_notes: {
+      deployment_reality: "Ranpak is the leading paper-based protective packaging manufacturer. Their FillPak and PadPak systems are increasingly preferred as sustainability requirements grow and customers move away from plastic. Strong in DTC e-commerce, specialty retail, and any operation facing customer or regulatory pressure on plastic packaging.",
+      what_vendors_wont_tell_you: "Paper-based packaging costs more per unit than plastic alternatives \u2014 the sustainability premium is real. The case is operational (less storage volume) and marketing (sustainability story to consumers), not raw cost. Verify ROI at your specific volume.",
+      best_environments: "DTC e-commerce, specialty retail, and operations where customer perception of packaging sustainability matters more than raw packaging cost.",
+      watch_outs: "Higher per-unit cost than plastic \u2014 ROI requires operational and marketing benefits.",
+      questions_to_ask: [
+        "What is the per-shipment cost differential vs. plastic alternatives at our volume?",
+        "What is the typical adoption pattern \u2014 full replacement or hybrid plastic/paper?",
+        "What is the consumable supply chain and what happens at peak demand?"
+      ],
+    },
     vendor_type: "Manufacturer",
     tagline: "Paper-based protective packaging automation for sustainable e-commerce fulfillment",
     category: "Manufacturing Automation",
@@ -3152,6 +3914,17 @@ export const vendors = [
   // C3 SOLUTIONS (YARD MANAGEMENT)
   {
     id: 135, name: "C3 Solutions", slug: "c3-solutions",
+    practitioner_notes: {
+      deployment_reality: "C3 Solutions is the leading specialized YMS vendor \u2014 purpose-built yard management with deeper capabilities than WMS-embedded yard modules. Implementation runs 6\u201312 weeks. Strong in food & beverage (temperature zone management) and operations with high trailer volume.",
+      what_vendors_wont_tell_you: "Specialized YMS makes sense for operations with 15+ dock doors and significant detention costs \u2014 below that scale, WMS-embedded YMS modules may be adequate. Carrier adoption of dock appointment portals requires change management \u2014 some carriers resist using new portals. C3 is a smaller company than Descartes \u2014 verify long-term roadmap commitment.",
+      best_environments: "DC and manufacturing operations with 15+ dock doors, significant trailer detention costs, and the ability to enforce carrier appointment scheduling.",
+      watch_outs: "Carrier adoption is the implementation risk \u2014 without carrier buy-in, the appointment portal value diminishes.",
+      questions_to_ask: [
+        "What is the typical carrier adoption rate and how do customers drive carrier compliance?",
+        "What is the integration with our specific WMS \u2014 pre-built or custom development?",
+        "What is the typical detention cost reduction at customers like us?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Yard management system for dock scheduling, trailer tracking, and gate management",
     category: "Dock Automation",
@@ -3175,6 +3948,17 @@ export const vendors = [
   // DESCARTES YARD (YARD MANAGEMENT)
   {
     id: 136, name: "Descartes Yard", slug: "descartes-yard",
+    practitioner_notes: {
+      deployment_reality: "Descartes Yard is the YMS within the broader Descartes logistics network platform. Best value comes when you're already using Descartes TMS or carrier network \u2014 the integration is native. For standalone YMS needs, C3 Solutions has deeper YMS-specific capabilities.",
+      what_vendors_wont_tell_you: "Descartes Yard is one of many modules in the Descartes platform \u2014 not always the development priority. Verify roadmap commitment to YMS-specific functionality vs. broader Descartes investment areas.",
+      best_environments: "Operations on Descartes TMS or using Descartes Global Logistics Network where YMS integration with broader logistics platform is strategic.",
+      watch_outs: "If you're not on Descartes TMS, the integration advantage disappears \u2014 evaluate C3 or others.",
+      questions_to_ask: [
+        "What is the product investment roadmap for YMS specifically vs. broader Descartes platform priorities?",
+        "Show me YMS implementations where Descartes is not the existing TMS \u2014 what's the value proposition?",
+        "How does the carrier portal compare to C3's in adoption and capabilities?"
+      ],
+    },
     vendor_type: "Software",
     tagline: "Cloud yard management integrated with Descartes logistics network and TMS",
     category: "Dock Automation",
