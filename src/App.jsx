@@ -2,6 +2,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { vendors, categories, industries } from "./data/vendors";
 import { products as allProducts } from "./data/products";
+import { categoryLandscape } from "./data/landscape";
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
 const Icon = ({ d, size = 16 }) => (
@@ -521,7 +522,7 @@ function getProfileScore(vendor) {
     Boolean(vendor?.integrations?.length >= 2),
     Boolean(vendor?.specs?.length >= 4),
     productCount >= 2,
-    Boolean(vendor?.reviews_data?.length >= 1),
+    Boolean(vendor?.practitioner_notes),
     Boolean(vendor?.website),
   ];
   const score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
@@ -2173,6 +2174,23 @@ function CategoryHubPage({ setPage, setCategoryFilter, openDetail, categoryPageC
               </div>
             </div>
           </div>
+
+          {categoryLandscape[activeCategory] && (
+            <div style={{ ...S.sideCard, marginBottom: 16 }}>
+              <div style={S.sideCardTitle}>Technology landscape — what you can actually buy</div>
+              {[
+                { label: "PROVEN & BUYABLE TODAY", key: "mature", color: "#22c55e" },
+                { label: "EMERGING — PILOT, DON'T BET THE NETWORK", key: "emerging", color: "#f59e0b" },
+                { label: "DOESN'T EXIST YET (DESPITE THE MARKETING)", key: "gaps", color: "#ef4444" },
+              ].map(({ label, key, color }) => (
+                <div key={key} style={{ marginBottom: 12, paddingLeft: 12, borderLeft: `3px solid ${color}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color, letterSpacing: "0.4px", marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.7 }}>{categoryLandscape[activeCategory][key]}</div>
+                </div>
+              ))}
+              <div style={{ fontSize: 11, color: "#475569", marginTop: 4 }}>OpEx Scout editorial assessment · reviewed July 2026</div>
+            </div>
+          )}
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
             <div style={S.sideCard}>
@@ -4547,11 +4565,14 @@ export default function App() {
     document.title = pageTitles[nextPage] || "OpEx Scout";
   };
 
-  // Browser back/forward button support + shortlist URL detection
+  // Browser back/forward button support + deep-link URL detection
   useEffect(() => {
-    // Check if URL is a shared shortlist link
     const hash = window.location.hash;
     const shortlistMatch = hash.match(/^#shortlist\/([a-z0-9]+)$/);
+    const vendorMatch = hash.match(/^#vendor\/([a-z0-9-]+)$/);
+    const knownPages = Object.keys(pageTitles).concat(["vendors", "lead-ops", "media-ops", "contact", "privacy", "terms"]);
+    const plainPage = hash.replace(/^#/, "");
+
     if (shortlistMatch) {
       const id = shortlistMatch[1];
       const list = getShortlistById(id);
@@ -4560,10 +4581,26 @@ export default function App() {
         rawSetPage("compare");
         window.history.replaceState({ page: "compare" }, "", hash);
       } else {
-        // Shared list not found in this browser — show shortlists page with message
         rawSetPage("shortlists");
         window.history.replaceState({ page: "shortlists" }, "", "#shortlists");
       }
+    } else if (vendorMatch) {
+      const v = vendors.find(x => x.slug === vendorMatch[1]);
+      if (v) {
+        setDetailVendor(v);
+        setDetailBack({ page: "directory", label: "directory" });
+        rawSetPage("detail");
+        window.history.replaceState({ page: "detail", slug: v.slug }, "", hash);
+        document.title = `${v.name} — OpEx Scout`;
+        addRecentlyViewed(v.id);
+      } else {
+        rawSetPage("directory");
+        window.history.replaceState({ page: "directory" }, "", "#directory");
+      }
+    } else if (plainPage && knownPages.includes(plainPage)) {
+      rawSetPage(plainPage);
+      window.history.replaceState({ page: plainPage }, "", hash);
+      document.title = pageTitles[plainPage] || "OpEx Scout";
     } else {
       window.history.replaceState({ page: "home" }, "", "#home");
     }
