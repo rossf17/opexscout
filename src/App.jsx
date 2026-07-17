@@ -46,6 +46,29 @@ function PriceBadge({ tier, large = false }) {
   );
 }
 
+// Labeled input for a default value the user is expected to override — never presented as fact.
+function AssumptionInput({ label, value, onChange, hint, type = "number", placeholder, suffix, select, options }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+        <label style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{label}</label>
+        <span style={{ fontSize: 9, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 4, padding: "1px 6px", textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>Editable assumption</span>
+      </div>
+      <div style={{ position: "relative" }}>
+        {select ? (
+          <select style={{ ...S.rfiInput, marginBottom: 0 }} value={value} onChange={e => onChange(e.target.value)}>
+            {options.map(o => <option key={o} value={o}>{o}</option>)}
+          </select>
+        ) : (
+          <input style={{ ...S.rfiInput, marginBottom: 0, paddingRight: suffix ? 34 : undefined }} type={type} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} />
+        )}
+        {suffix && <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "#475569", pointerEvents: "none" }}>{suffix}</span>}
+      </div>
+      {hint && <div style={{ fontSize: 11, color: "#475569", marginTop: 4, lineHeight: 1.6 }}>{hint}</div>}
+    </div>
+  );
+}
+
 // ─── RESPONSIVE HOOK ─────────────────────────────────────────────────────────
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -247,7 +270,34 @@ const DEFAULT_WORKSPACE = {
     errorRatePercent: "",
     currentOvertimeHours: "",
     automationCapturePercent: "70",
+    // TCO
+    equipmentCost: "",
+    implementationCost: "",
+    softwareCost: "",
+    maintenancePercent: "8",
+    sparePartsAllowance: "",
+    trainingCost: "",
+    rampMonths: "3",
+    rampCapturePercent: "50",
+    discountRate: "10",
+    analysisPeriod: "5",
+    // Scenario haircuts / uplifts — editable planning assumptions
+    conservativeSavingsPercent: "70",
+    conservativeCapexContingencyPercent: "20",
+    conservativeExtraRampMonths: "3",
+    optimisticSavingsPercent: "115",
+    optimisticCapexAdjustPercent: "-5",
+    optimisticRampAdjustMonths: "-1",
   },
+  // Cost of inaction — do-nothing trajectory inputs
+  costOfInaction: {
+    wageInflationPercent: "4",
+    turnoverPercent: "",
+    costPerBackfill: "",
+    overtimeGrowthPercent: "",
+  },
+  // Objection pre-emption answers: { [promptId]: freeText }
+  objections: {},
   // RFI tracker: { vendorId: { contacted, contactDate, contactName, contactEmail, responseStatus, demoScheduled, demoDate, notes } }
   rfis: {},
   // File links: [{ id, label, url, type, notes, added }]
@@ -509,6 +559,219 @@ function inferImplementationLevel(vendor) {
 
 function getVendorProducts(vendor) {
   return allProducts[vendor?.slug] || [];
+}
+
+// ─── BUSINESS CASE MATH — scenarios, TCO, cost of inaction ───────────────────
+// Two-tier cash flow: year 1 can differ from steady-state years (ramp-up).
+function calcNetPresentValue(capex, year1Benefit, steadyBenefit, discountRate, period) {
+  let npv = -capex;
+  for (let yr = 1; yr <= period; yr++) {
+    npv += (yr === 1 ? year1Benefit : steadyBenefit) / Math.pow(1 + discountRate, yr);
+  }
+  return npv;
+}
+
+// Bisection search for the discount rate that zeroes NPV — same approach as the
+// original single-scenario calculator, generalized to a two-tier cash flow.
+function calcIRR(capex, year1Benefit, steadyBenefit, period) {
+  if (capex <= 0 || steadyBenefit <= 0) return null;
+  let lo = 0, hi = 5;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (calcNetPresentValue(capex, year1Benefit, steadyBenefit, mid, period) > 0) lo = mid; else hi = mid;
+  }
+  return lo * 100;
+}
+
+function calcPaybackMonths(capex, year1Benefit, steadyBenefit) {
+  if (capex <= 0) return null;
+  const y1Monthly = year1Benefit / 12;
+  const steadyMonthly = steadyBenefit / 12;
+  if (y1Monthly <= 0 && steadyMonthly <= 0) return null;
+  let remaining = capex;
+  for (let m = 1; m <= 600; m++) {
+    remaining -= m <= 12 ? y1Monthly : steadyMonthly;
+    if (remaining <= 0) return m;
+  }
+  return null;
+}
+
+const SCENARIO_DEFS = {
+  conservative: {
+    label: "Conservative",
+    tagline: "The committed case — lead with this number in front of finance.",
+    savingsField: "conservativeSavingsPercent", savingsDefault: 70,
+    capexField: "conservativeCapexContingencyPercent", capexDefault: 20,
+    rampField: "conservativeExtraRampMonths", rampDefault: 3,
+  },
+  base: {
+    label: "Base",
+    tagline: "Most likely case at current assumptions.",
+    savingsField: null, savingsDefault: 100,
+    capexField: null, capexDefault: 0,
+    rampField: null, rampDefault: 0,
+  },
+  optimistic: {
+    label: "Optimistic",
+    tagline: "Best-case — vendor executes on schedule and capture exceeds plan.",
+    savingsField: "optimisticSavingsPercent", savingsDefault: 115,
+    capexField: "optimisticCapexAdjustPercent", capexDefault: -5,
+    rampField: "optimisticRampAdjustMonths", rampDefault: -1,
+  },
+};
+
+// base: { annualLaborCost, captureRate, totalCapexBase, annualOpex, rampMonths, rampCapturePercent, discountRate, period }
+function buildScenario(key, r, base) {
+  const def = SCENARIO_DEFS[key];
+  const savingsFactor = (def.savingsField ? parseFloat(r[def.savingsField]) : null) ?? def.savingsDefault;
+  const capexAdjust = (def.capexField ? parseFloat(r[def.capexField]) : null) ?? def.capexDefault;
+  const rampAdjust = (def.rampField ? parseFloat(r[def.rampField]) : null) ?? def.rampDefault;
+
+  const captureRate = base.captureRate * (savingsFactor / 100);
+  const capex = base.totalCapexBase * (1 + capexAdjust / 100);
+  const rampMonths = Math.max(0, Math.min(12, base.rampMonths + rampAdjust));
+  const rampCaptureRate = captureRate * (base.rampCapturePercent / 100);
+
+  const steadyBenefit = base.annualLaborCost * captureRate - base.annualOpex;
+  const monthsFull = 12 - rampMonths;
+  const blendedCaptureYear1 = (rampCaptureRate * rampMonths + captureRate * monthsFull) / 12;
+  const year1Benefit = base.annualLaborCost * blendedCaptureYear1 - base.annualOpex;
+
+  return {
+    key, label: def.label, tagline: def.tagline,
+    savingsFactor, capexAdjust, rampAdjust,
+    captureRate, capex, rampMonths, steadyBenefit, year1Benefit,
+    payback: calcPaybackMonths(capex, year1Benefit, steadyBenefit),
+    npv: calcNetPresentValue(capex, year1Benefit, steadyBenefit, base.discountRate, base.period),
+    irr: calcIRR(capex, year1Benefit, steadyBenefit, base.period),
+  };
+}
+
+// Do-nothing trajectory vs. automate trajectory, cumulative by year, plus crossover.
+// Overtime is modeled at a 1.5x premium over base rate — a standard assumption, not vendor-specific.
+function buildCostOfInactionSeries({ annualLaborCost, laborRate, headcount, currentOvertimeHours, wageInflationPercent, turnoverPercent, costPerBackfill, overtimeGrowthPercent, period, totalCapexBase, annualOpexBase, captureRate }) {
+  const wageInfl = (parseFloat(wageInflationPercent) || 0) / 100;
+  const turnover = (parseFloat(turnoverPercent) || 0) / 100;
+  const backfillCost = parseFloat(costPerBackfill) || 0;
+  const otGrowth = (parseFloat(overtimeGrowthPercent) || 0) / 100;
+  const otHours = parseFloat(currentOvertimeHours) || 0;
+  const OT_PREMIUM = 1.5;
+
+  let doNothingCum = 0;
+  let automateCum = totalCapexBase;
+  const rows = [];
+  let crossoverYear = null;
+  for (let yr = 1; yr <= period; yr++) {
+    const laborYr = annualLaborCost * Math.pow(1 + wageInfl, yr);
+    const rateYr = laborRate * Math.pow(1 + wageInfl, yr);
+    const otYr = otHours * rateYr * OT_PREMIUM * Math.pow(1 + otGrowth, yr);
+    const turnoverYr = headcount * turnover * backfillCost * Math.pow(1 + wageInfl, yr);
+    const doNothingYr = laborYr + otYr + turnoverYr;
+    doNothingCum += doNothingYr;
+
+    const automateYr = (laborYr + otYr + turnoverYr) * (1 - captureRate) + annualOpexBase;
+    automateCum += automateYr;
+
+    rows.push({ year: yr, doNothingYr, automateYr, doNothingCum, automateCum });
+    if (crossoverYear === null && automateCum <= doNothingCum) crossoverYear = yr;
+  }
+  return { rows, crossoverYear };
+}
+
+const STANDARD_OBJECTIONS = [
+  { id: "std_volume_drop", q: "What happens to the payback if volumes drop 20%?" },
+  { id: "std_exit_path", q: "What's the exit or redeployment path if the vendor fails or underperforms?" },
+  { id: "std_maintenance_owner", q: "Who owns maintenance internally after go-live?" },
+  { id: "std_references", q: "What did reference customers say — including ones the vendor didn't hand-pick?" },
+];
+
+const STANDARD_COMMERCIAL_QUESTIONS = [
+  "What is the full pricing structure — capex, software/subscription, maintenance, spares — and what's explicitly excluded?",
+  "What are your support SLAs: response time by severity level, and geographic coverage for our site?",
+  "What are typical spare parts lead times for critical components, and what's stocked locally vs. special-order?",
+  "Can you provide 2–3 reference contacts at sites of comparable scale — including one where the deployment did not go smoothly?",
+  "What exactly is in scope vs. out of scope for integration with our existing WMS/ERP/controls?",
+];
+
+function esc(str) {
+  return String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Compiles category-specific diligence questions + standard commercial questions into a
+// printable, per-vendor questionnaire document.
+function buildRFPHtml(vendorList, title) {
+  const sections = vendorList.map(v => {
+    const playbook = getVendorPlaybook(v);
+    const catQs = playbook.questions || [];
+    return `
+    <div class="vendor-section">
+      <div class="vendor-header">
+        <div class="vendor-name">${esc(v.name)}</div>
+        <div class="vendor-meta">${esc(v.category)} · ${esc(v.website || "")}</div>
+      </div>
+      <div class="q-group">
+        <div class="q-group-title">Category-specific — ${esc(v.category)}</div>
+        <ol>${catQs.map(q => `<li>${esc(q)}<div class="answer-line"></div></li>`).join("")}</ol>
+      </div>
+      <div class="q-group">
+        <div class="q-group-title">Standard commercial diligence</div>
+        <ol>${STANDARD_COMMERCIAL_QUESTIONS.map(q => `<li>${esc(q)}<div class="answer-line"></div></li>`).join("")}</ol>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${esc(title)} — Vendor Questionnaire</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #111; background: #fff; font-size: 13px; line-height: 1.5; }
+  .page { max-width: 900px; margin: 0 auto; padding: 48px; }
+  .header { border-bottom: 3px solid #f59e0b; padding-bottom: 20px; margin-bottom: 28px; }
+  .logo { font-size: 13px; font-weight: 700; color: #f59e0b; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { font-size: 26px; font-weight: 800; color: #111; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .meta { font-size: 12px; color: #6b7280; }
+  .vendor-section { margin-bottom: 36px; page-break-inside: avoid; }
+  .vendor-header { background: #f9fafb; border-left: 3px solid #f59e0b; padding: 10px 14px; margin-bottom: 14px; }
+  .vendor-name { font-size: 17px; font-weight: 700; }
+  .vendor-meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .q-group { margin-bottom: 16px; }
+  .q-group-title { font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; border-bottom: 1px solid #f3f4f6; padding-bottom: 4px; }
+  ol { padding-left: 20px; }
+  li { margin-bottom: 14px; color: #374151; }
+  .answer-line { border-bottom: 1px solid #d1d5db; height: 22px; margin-top: 4px; }
+  .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .page { padding: 32px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo">OpEx Scout — Vendor Questionnaire</div>
+    <h1>${esc(title) || "Vendor Diligence Questionnaire"}</h1>
+    <div class="meta">Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} · ${vendorList.length} vendor${vendorList.length !== 1 ? "s" : ""}</div>
+  </div>
+  ${sections}
+  <div class="footer">Compiled by OpEx Scout — opexscout.com. Category-specific questions reflect known diligence risk points for this vendor category; add your own before sending.</div>
+</div>
+<script>window.onload = () => window.print();</script>
+</body>
+</html>`;
+}
+
+function openHtmlDoc(html, filename) {
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
 function getProfileScore(vendor) {
@@ -3051,6 +3314,12 @@ function ShortlistsPage({ setPage, setSelected, selectedProducts, setSelectedPro
                           onClick={() => handleCopy(list.id)}>
                           {copied === list.id ? "✓ Copied" : "Share link"}
                         </button>
+                        {listVendors.length >= 1 && (
+                          <button style={{ ...S.btnSecondary, width: "auto", padding: "6px 12px", fontSize: 12 }}
+                            onClick={() => openHtmlDoc(buildRFPHtml(listVendors, list.name), `${list.name.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "shortlist"}-vendor-questionnaire.html`)}>
+                            📑 Questionnaire
+                          </button>
+                        )}
                         {listVendors.length >= 2 && (
                           <button style={{ ...S.navCta, fontFamily: "inherit", padding: "6px 12px", fontSize: 12 }} onClick={() => handleLoad(list)}>
                             Compare
@@ -3202,6 +3471,107 @@ function WorkspaceFilesTab({ ws, wsVendors, save, isMobile, labelStyle, inputSty
   );
 }
 
+// Cumulative do-nothing vs. automate cost, drawn as an inline SVG line chart — the
+// crossover point (where automating becomes cheaper than the status quo) is the story.
+function CumulativeCostChart({ rows }) {
+  if (!rows.length) return null;
+  const W = 640, H = 220, padL = 56, padB = 24, padT = 12, padR = 12;
+  const maxVal = Math.max(...rows.map(row => Math.max(row.doNothingCum, row.automateCum)), 1);
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const xFor = i => padL + (rows.length > 1 ? (i / (rows.length - 1)) * innerW : innerW / 2);
+  const yFor = v => padT + innerH - (v / maxVal) * innerH;
+  const pathFor = key => rows.map((row, i) => `${i === 0 ? "M" : "L"} ${xFor(i).toFixed(1)} ${yFor(row[key]).toFixed(1)}`).join(" ");
+  let crossIdx = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if ((rows[i - 1].automateCum > rows[i - 1].doNothingCum) !== (rows[i].automateCum > rows[i].doNothingCum)) { crossIdx = i; break; }
+  }
+  return (
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
+      {[0, 0.25, 0.5, 0.75, 1].map(f => (
+        <g key={f}>
+          <line x1={padL} x2={W - padR} y1={padT + innerH * (1 - f)} y2={padT + innerH * (1 - f)} stroke="rgba(255,255,255,0.06)" />
+          <text x={padL - 8} y={padT + innerH * (1 - f) + 3} fontSize="9" fill="#475569" textAnchor="end">{`$${Math.round(maxVal * f / 1000)}k`}</text>
+        </g>
+      ))}
+      {rows.map((row, i) => (
+        <text key={row.year} x={xFor(i)} y={H - 6} fontSize="9" fill="#475569" textAnchor="middle">{`Y${row.year}`}</text>
+      ))}
+      <path d={pathFor("doNothingCum")} fill="none" stroke="#ef4444" strokeWidth="2" />
+      <path d={pathFor("automateCum")} fill="none" stroke="#22c55e" strokeWidth="2" />
+      {crossIdx > 0 && <circle cx={xFor(crossIdx)} cy={yFor(rows[crossIdx].automateCum)} r="4" fill="#f59e0b" />}
+    </svg>
+  );
+}
+
+function CostOfInactionTab({ ws, coi, setCoiField, costOfInaction, period, isMobile, labelStyle, inputStyle }) {
+  const lastRow = costOfInaction.rows[costOfInaction.rows.length - 1];
+  return (
+    <div>
+      <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+        The do-nothing option isn't free — labor cost inflates, turnover keeps costing you, and overtime creeps. Model it so "let's wait and see" has a number attached.
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
+        <div>
+          <AssumptionInput label="Annual wage inflation" type="number" suffix="%" value={coi.wageInflationPercent} onChange={v => setCoiField("wageInflationPercent", v)}
+            hint="Applied to current labor cost each year in the do-nothing trajectory." />
+          <label style={labelStyle}>Annual turnover rate (%)</label>
+          <input style={inputStyle} type="number" placeholder="e.g. 25 — DC/warehouse roles often run 20–40%/yr, validate against your own HR data" value={coi.turnoverPercent} onChange={e => setCoiField("turnoverPercent", e.target.value)} />
+          <label style={labelStyle}>Cost per backfill ($)</label>
+          <input style={inputStyle} type="number" placeholder="e.g. 4000 — recruiting + training + productivity ramp" value={coi.costPerBackfill} onChange={e => setCoiField("costPerBackfill", e.target.value)} />
+          <label style={labelStyle}>Overtime growth trend (%/year)</label>
+          <input style={inputStyle} type="number" placeholder="e.g. 5 — how fast OT hours grow if volume rises with no added headcount" value={coi.overtimeGrowthPercent} onChange={e => setCoiField("overtimeGrowthPercent", e.target.value)} />
+          <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.6, marginTop: 4 }}>Turnover and overtime growth have no default — they vary too much by facility to assume. Uses current overtime hours from the Scenarios &amp; TCO tab. Overtime is modeled at a 1.5× premium over base rate.</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{period}-year outlook</div>
+          {lastRow ? (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <span style={{ fontSize: 12, color: "#64748b" }}>Cumulative cost if nothing changes</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "#ef4444" }}>${Math.round(lastRow.doNothingCum).toLocaleString()}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <span style={{ fontSize: 12, color: "#64748b" }}>Cumulative cost to automate (base case)</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "#22c55e" }}>${Math.round(lastRow.automateCum).toLocaleString()}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", marginBottom: 16 }}>
+                <span style={{ fontSize: 12, color: "#64748b" }}>Crossover point</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b" }}>{costOfInaction.crossoverYear ? `Year ${costOfInaction.crossoverYear}` : `Beyond ${period}-yr horizon`}</span>
+              </div>
+              <CumulativeCostChart rows={costOfInaction.rows} />
+              <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11 }}>
+                <span style={{ color: "#ef4444" }}>● Do nothing</span>
+                <span style={{ color: "#22c55e" }}>● Automate</span>
+              </div>
+            </>
+          ) : (
+            <div style={{ color: "#475569", fontSize: 13 }}>Add labor inputs in Scenarios &amp; TCO to see the do-nothing comparison.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ObjectionsTab({ objectionPrompts, ws, setObjectionField, labelStyle, inputStyle, primaryCategory }) {
+  return (
+    <div>
+      <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+        Answer these before you present to finance — these are the questions that kill deals in the room, not in the deck. Category-specific prompts are pulled from the {primaryCategory || "general"} diligence playbook.
+      </div>
+      {objectionPrompts.map(p => (
+        <div key={p.id} style={{ marginBottom: 18 }}>
+          <label style={{ ...labelStyle, fontSize: 13, color: "#e8edf5", fontWeight: 600, marginBottom: 6, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {p.q}
+            {p.category && <span style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 4, padding: "1px 6px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Category-specific</span>}
+          </label>
+          <textarea style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} placeholder="Your answer..." value={ws.objections?.[p.id] || ""} onChange={e => setObjectionField(p.id, e.target.value)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function WorkspacePage({ setPage, openDetail, wsId }) {
   const isMobile = useIsMobile();
   const [ws, setWs] = useState(() => getWorkspace(wsId));
@@ -3231,6 +3601,8 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
     const rfis = { ...ws.rfis, [vendorId]: { ...(ws.rfis[vendorId] || {}), [field]: val } };
     save({ rfis });
   };
+  const setCoiField = (field, val) => save({ costOfInaction: { ...(ws.costOfInaction || DEFAULT_WORKSPACE.costOfInaction), [field]: val } });
+  const setObjectionField = (id, val) => save({ objections: { ...(ws.objections || {}), [id]: val } });
   const toggleVendor = (vendorId) => {
     const ids = ws.vendorIds.includes(vendorId) ? ws.vendorIds.filter(id => id !== vendorId) : [...ws.vendorIds, vendorId];
     save({ vendorIds: ids });
@@ -3238,14 +3610,49 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
 
   const wsVendors = vendors.filter(v => ws.vendorIds.includes(v.id));
 
-  // ── ROI CALCULATIONS ──────────────────────────────────────────────────────
+  // ── ROI CALCULATIONS — three-scenario model + full TCO ─────────────────────
   const r = ws.roi;
-  const annualLaborCost = (parseFloat(r.laborHeadcount) || 0) * (parseFloat(r.laborRate) || 0) * (parseFloat(r.shiftsPerDay) || 2) * (parseFloat(r.daysPerYear) || 250) * 8;
-  const captureRate = (parseFloat(r.automationCapturePercent) || 70) / 100;
-  const annualSavings = annualLaborCost * captureRate;
+  const coi = ws.costOfInaction || DEFAULT_WORKSPACE.costOfInaction;
+  const headcount = parseFloat(r.laborHeadcount) || 0;
+  const laborRate = parseFloat(r.laborRate) || 0;
+  const annualLaborCost = headcount * laborRate * (parseFloat(r.shiftsPerDay) || 2) * (parseFloat(r.daysPerYear) || 250) * 8;
+  const baseCaptureRate = (parseFloat(r.automationCapturePercent) || 70) / 100;
+  const annualSavings = annualLaborCost * baseCaptureRate; // used for legacy summary cards / progress checks
   const budgetMid = { "Under $50k": 50000, "$50k–$200k": 125000, "$200k–$500k": 350000, "$500k–$1M": 750000, "$1M+": 1500000, "Unknown": 500000 }[ws.budgetRange] || 500000;
-  const paybackMonths = annualSavings > 0 ? Math.round((budgetMid / annualSavings) * 12) : null;
-  const npv3yr = annualSavings > 0 ? Math.round(annualSavings * 3 - budgetMid) : null;
+
+  const equipmentCost = parseFloat(r.equipmentCost) || budgetMid;
+  const implementationCost = parseFloat(r.implementationCost) || 0;
+  const trainingCost = parseFloat(r.trainingCost) || 0;
+  const totalCapexBase = equipmentCost + implementationCost + trainingCost;
+  const maintenancePercent = r.maintenancePercent !== "" && r.maintenancePercent != null ? parseFloat(r.maintenancePercent) : 8;
+  const maintenanceAnnual = totalCapexBase * (maintenancePercent / 100);
+  const softwareCost = parseFloat(r.softwareCost) || 0;
+  const sparePartsAllowance = parseFloat(r.sparePartsAllowance) || 0;
+  const annualOpexBase = softwareCost + maintenanceAnnual + sparePartsAllowance;
+  const discountRate = (parseFloat(r.discountRate) || 10) / 100;
+  const period = parseInt(r.analysisPeriod) || 5;
+  const rampMonthsBase = Math.max(0, Math.min(12, r.rampMonths !== "" && r.rampMonths != null ? parseFloat(r.rampMonths) : 3));
+  const rampCapturePercentBase = r.rampCapturePercent !== "" && r.rampCapturePercent != null ? parseFloat(r.rampCapturePercent) : 50;
+
+  const scenarioBase = {
+    annualLaborCost, captureRate: baseCaptureRate, totalCapexBase, annualOpex: annualOpexBase,
+    rampMonths: rampMonthsBase, rampCapturePercent: rampCapturePercentBase, discountRate, period,
+  };
+  const scenarios = ["conservative", "base", "optimistic"].map(k => buildScenario(k, r, scenarioBase));
+  const conservativeScenario = scenarios[0];
+  const baseScenario = scenarios[1];
+
+  // Legacy fields kept for existing summary cards / text export — now sourced from the
+  // committed (conservative) scenario per finance convention, not a crude linear estimate.
+  const paybackMonths = conservativeScenario.payback ? Math.round(conservativeScenario.payback) : null;
+  const npv3yr = conservativeScenario.npv ? Math.round(conservativeScenario.npv) : null;
+
+  const costOfInaction = buildCostOfInactionSeries({
+    annualLaborCost, laborRate, headcount, currentOvertimeHours: r.currentOvertimeHours,
+    wageInflationPercent: coi.wageInflationPercent, turnoverPercent: coi.turnoverPercent,
+    costPerBackfill: coi.costPerBackfill, overtimeGrowthPercent: coi.overtimeGrowthPercent,
+    period, totalCapexBase, annualOpexBase, captureRate: baseCaptureRate,
+  });
 
   // ── SCORECARD ──────────────────────────────────────────────────────────────
   // Category-specific scorecard criteria
@@ -3311,8 +3718,22 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
     return { vendor: v, scores: sc, total };
   }).sort((a, b) => b.total - a.total);
 
-  // ── BUSINESS CASE EXPORT ──────────────────────────────────────────────────
+  // ── OBJECTION PRE-EMPTION ────────────────────────────────────────────────
+  const categoryQuestions = (primaryCategory ? categoryPlaybooks[primaryCategory]?.questions : null) || getVendorPlaybook(wsVendors[0]).questions;
+  const objectionPrompts = [
+    ...STANDARD_OBJECTIONS,
+    ...categoryQuestions.map((q, i) => ({ id: `cat_${i}`, q, category: true })),
+  ];
+
+  // ── VENDOR QUESTIONNAIRE (RFP) ───────────────────────────────────────────
+  const exportRFP = () => openHtmlDoc(buildRFPHtml(wsVendors, ws.projectName), `${(ws.projectName || "evaluation").replace(/[^a-z0-9]/gi, "-").toLowerCase()}-vendor-questionnaire.html`);
+
+  // ── BUSINESS CASE EXPORT — CFO-ready document ───────────────────────────
   const exportBusinessCase = () => {
+    const fmt = n => `$${Math.round(n).toLocaleString()}`;
+    const hasFinancials = totalCapexBase > 0 || annualSavings > 0;
+    const lastRow = costOfInaction.rows[costOfInaction.rows.length - 1];
+
     const scoreRows = vendorScores.filter(vs => vs.total > 0).map((vs, i) => `
       <tr style="border-bottom:1px solid #e5e7eb;">
         <td style="padding:8px 12px;font-weight:600;">#${i+1} ${vs.vendor.name}</td>
@@ -3320,26 +3741,94 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
         <td style="padding:8px 12px;">${vs.vendor.price_range || '—'}</td>
         <td style="padding:8px 12px;">${vs.vendor.vendor_type || '—'}</td>
         <td style="padding:8px 12px;font-weight:700;color:${vs.total >= 70 ? '#16a34a' : vs.total >= 50 ? '#d97706' : '#6b7280'};">${vs.total}%</td>
-        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${(ws.scorecard[vs.vendor.id]?.notes || '—').slice(0,60)}</td>
+        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${esc((ws.scorecard[vs.vendor.id]?.notes || '—').slice(0,60))}</td>
       </tr>`).join('');
 
     const rfiRows = wsVendors.map(v => {
       const rfi = ws.rfis[v.id] || {};
       return `<tr style="border-bottom:1px solid #e5e7eb;">
         <td style="padding:8px 12px;font-weight:600;">${v.name}</td>
-        <td style="padding:8px 12px;">${rfi.contactName || '—'}</td>
-        <td style="padding:8px 12px;">${rfi.contactEmail || '—'}</td>
+        <td style="padding:8px 12px;">${esc(rfi.contactName || '—')}</td>
+        <td style="padding:8px 12px;">${esc(rfi.contactEmail || '—')}</td>
         <td style="padding:8px 12px;">${rfi.responseStatus || 'Not contacted'}</td>
         <td style="padding:8px 12px;">${rfi.demoDate || '—'}</td>
-        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${(rfi.notes || '—').slice(0,80)}</td>
+        <td style="padding:8px 12px;font-size:12px;color:#6b7280;">${esc((rfi.notes || '—').slice(0,80))}</td>
       </tr>`;
     }).join('');
+
+    const scenarioMetricRows = [
+      ["Capital investment", s => fmt(s.capex)],
+      ["Year-1 net benefit (ramp-adjusted)", s => s.year1Benefit ? fmt(s.year1Benefit) : "—"],
+      ["Steady-state annual net benefit", s => s.steadyBenefit ? fmt(s.steadyBenefit) : "—"],
+      ["Payback period", s => s.payback ? `~${s.payback} months` : "—"],
+      [`NPV (${period}-yr @ ${Math.round(discountRate*100)}% discount)`, s => s.npv !== null ? fmt(s.npv) : "—"],
+      ["IRR", s => s.irr !== null ? `${s.irr.toFixed(1)}%` : "—"],
+    ].map(([label, fn]) => `<tr><td style="padding:8px 12px;color:#6b7280;">${label}</td>${scenarios.map(s => `<td style="padding:8px 12px;font-weight:700;text-align:center;${s.key === 'conservative' ? 'background:#fffbeb;' : ''}">${fn(s)}</td>`).join('')}</tr>`).join('');
+
+    const maxCum = Math.max(...costOfInaction.rows.map(row => Math.max(row.doNothingCum, row.automateCum)), 1);
+    const coiChartRows = costOfInaction.rows.map(row => `
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:3px;font-weight:${costOfInaction.crossoverYear === row.year ? 700 : 400};">Year ${row.year}${costOfInaction.crossoverYear === row.year ? ' — crossover: automating is now cheaper' : ''}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="width:68px;font-size:10px;color:#9ca3af;flex-shrink:0;">Do nothing</span>
+          <div style="flex:1;background:#f3f4f6;border-radius:3px;overflow:hidden;"><div style="width:${(row.doNothingCum/maxCum*100).toFixed(1)}%;background:#ef4444;height:10px;"></div></div>
+          <span style="width:90px;text-align:right;font-size:11px;color:#111;flex-shrink:0;">${fmt(row.doNothingCum)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="width:68px;font-size:10px;color:#9ca3af;flex-shrink:0;">Automate</span>
+          <div style="flex:1;background:#f3f4f6;border-radius:3px;overflow:hidden;"><div style="width:${(row.automateCum/maxCum*100).toFixed(1)}%;background:#16a34a;height:10px;"></div></div>
+          <span style="width:90px;text-align:right;font-size:11px;color:#111;flex-shrink:0;">${fmt(row.automateCum)}</span>
+        </div>
+      </div>`).join('');
+
+    const objectionRows = objectionPrompts.map(p => `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#111;margin-bottom:4px;">${esc(p.q)}${p.category ? ' <span style="font-weight:400;color:#9ca3af;">(category-specific)</span>' : ''}</div>
+        <div style="font-size:12px;color:#374151;background:#f9fafb;border-left:3px solid ${ws.objections?.[p.id] ? '#16a34a' : '#f59e0b'};padding:8px 12px;border-radius:0 6px 6px 0;">${ws.objections?.[p.id] ? esc(ws.objections[p.id]) : 'Not yet documented — flag before presenting to finance.'}</div>
+      </div>`).join('');
+
+    const assumptionRows = [
+      ["Headcount to automate (FTEs)", r.laborHeadcount || "not entered"],
+      ["Fully-loaded hourly rate", r.laborRate ? `${fmt(r.laborRate)}/hr` : "not entered"],
+      ["Shifts / operating days per year", `${r.shiftsPerDay || 2} shifts × ${r.daysPerYear || 250} days`],
+      ["Automation capture rate (base case)", `${r.automationCapturePercent || 70}%`],
+      ["Ramp-up period", `${rampMonthsBase} months at ${rampCapturePercentBase}% of target capture`],
+      ["Equipment / system cost", r.equipmentCost ? fmt(equipmentCost) : `${fmt(budgetMid)} (budget-range midpoint placeholder — not a quote)`],
+      ["Integration / installation cost", r.implementationCost ? fmt(implementationCost) : "not entered"],
+      ["Training / change-management cost", r.trainingCost ? fmt(trainingCost) : "not entered"],
+      ["Annual software / subscription cost", softwareCost ? fmt(softwareCost) : "not entered"],
+      ["Annual maintenance", `${maintenancePercent}% of capex = ${fmt(maintenanceAnnual)}/yr`],
+      ["Spare parts allowance (annual)", sparePartsAllowance ? fmt(sparePartsAllowance) : "not entered"],
+      ["Discount / hurdle rate", `${Math.round(discountRate*100)}%`],
+      ["Analysis period", `${period} years`],
+      ["Conservative case — % of projected savings", `${conservativeScenario.savingsFactor}%`],
+      ["Conservative case — capex contingency", `+${conservativeScenario.capexAdjust}%`],
+      ["Conservative case — extra ramp", `+${conservativeScenario.rampAdjust} months`],
+      ["Optimistic case — % of projected savings", `${scenarios[2].savingsFactor}%`],
+      ["Optimistic case — capex adjustment", `${scenarios[2].capexAdjust}%`],
+      ["Optimistic case — ramp adjustment", `${scenarios[2].rampAdjust} months`],
+      ["Wage inflation (cost of inaction)", `${coi.wageInflationPercent || 0}%/yr`],
+      ["Turnover rate", coi.turnoverPercent ? `${coi.turnoverPercent}%/yr` : "not entered"],
+      ["Cost per backfill", coi.costPerBackfill ? fmt(coi.costPerBackfill) : "not entered"],
+      ["Overtime growth trend", coi.overtimeGrowthPercent ? `${coi.overtimeGrowthPercent}%/yr` : "not entered"],
+      ["Current overtime hours (annual)", r.currentOvertimeHours || "not entered"],
+    ].map(([label, value]) => `<tr><td style="padding:6px 12px;color:#6b7280;">${label}</td><td style="padding:6px 12px;font-weight:600;">${esc(String(value))}</td></tr>`).join('');
+
+    const execSummaryHtml = hasFinancials ? `
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <div class="prose" style="font-size:14px;">
+      <strong>The ask:</strong> ${fmt(conservativeScenario.capex)} in capital over ${ws.timeline || "a timeline TBD"}${wsVendors.length ? ` to evaluate and deploy ${wsVendors.length === 1 ? wsVendors[0].name : `${wsVendors.length} shortlisted vendors`}` : ""} for ${ws.problemStatement ? "the problem described below" : "the automation project described below"}.
+      Under the <strong>conservative case — the number to lead with in front of finance</strong> — payback is ${conservativeScenario.payback ? `~${conservativeScenario.payback} months` : "not yet calculable from current inputs"}, with a ${period}-year NPV of ${conservativeScenario.npv !== null ? fmt(conservativeScenario.npv) : "—"}${conservativeScenario.irr !== null ? ` and an IRR of ${conservativeScenario.irr.toFixed(1)}%` : ""}.
+      ${lastRow ? `Doing nothing costs an estimated ${fmt(lastRow.doNothingCum)} over the same ${period}-year period in labor inflation, overtime, and turnover — ${costOfInaction.crossoverYear ? `automating becomes the cheaper path by year ${costOfInaction.crossoverYear}.` : `at current inputs the two paths do not clearly cross within this ${period}-year horizon — validate before presenting.`}` : ''}
+    </div>
+  </div>` : '';
 
     const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${ws.projectName} — Automation Evaluation</title>
+<title>${esc(ws.projectName)} — Business Case</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #111; background: #fff; font-size: 13px; line-height: 1.5; }
@@ -3348,7 +3837,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
   .logo { font-size: 13px; font-weight: 700; color: #f59e0b; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
   h1 { font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px; margin-bottom: 4px; }
   .meta { font-size: 12px; color: #6b7280; }
-  .section { margin-bottom: 28px; }
+  .section { margin-bottom: 28px; page-break-inside: avoid; }
   .section-title { font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid #f3f4f6; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
@@ -3364,6 +3853,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
   .roi-value { font-weight: 700; color: #111; }
   .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; display: flex; justify-content: space-between; }
   .tag { display: inline-block; background: #f3f4f6; border-radius: 4px; padding: 2px 8px; font-size: 11px; color: #6b7280; margin: 2px; }
+  .subnote { font-size: 11px; color: #9ca3af; margin-top: 8px; line-height: 1.6; }
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .page { padding: 32px; }
@@ -3373,38 +3863,61 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
 <body>
 <div class="page">
   <div class="header">
-    <div class="logo">OpEx Scout — Automation Evaluation</div>
-    <h1>${ws.projectName || 'Automation Evaluation'}</h1>
+    <div class="logo">OpEx Scout — Business Case</div>
+    <h1>${esc(ws.projectName) || 'Automation Business Case'}</h1>
     <div class="meta">Generated ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})} · Confidential</div>
   </div>
+
+  ${execSummaryHtml}
 
   <div class="section">
     <div class="section-title">Project Context</div>
     <div class="grid">
-      <div class="box"><div class="box-label">Facility Type</div><div class="box-value">${ws.facilityType}</div></div>
-      <div class="box"><div class="box-label">Facility Size</div><div class="box-value">${ws.facilitySqft ? ws.facilitySqft + ' sqft' : 'TBD'}</div></div>
-      <div class="box"><div class="box-label">Project Type</div><div class="box-value">${ws.projectType}</div></div>
-      <div class="box"><div class="box-label">Budget Range</div><div class="box-value">${ws.budgetRange}</div></div>
-      <div class="box"><div class="box-label">Timeline</div><div class="box-value">${ws.timeline}</div></div>
-      <div class="box"><div class="box-label">Current Systems</div><div class="box-value">${ws.currentWMS || 'TBD'}</div></div>
+      <div class="box"><div class="box-label">Facility Type</div><div class="box-value">${esc(ws.facilityType)}</div></div>
+      <div class="box"><div class="box-label">Facility Size</div><div class="box-value">${ws.facilitySqft ? esc(ws.facilitySqft) + ' sqft' : 'TBD'}</div></div>
+      <div class="box"><div class="box-label">Project Type</div><div class="box-value">${esc(ws.projectType)}</div></div>
+      <div class="box"><div class="box-label">Budget Range</div><div class="box-value">${esc(ws.budgetRange)}</div></div>
+      <div class="box"><div class="box-label">Timeline</div><div class="box-value">${esc(ws.timeline)}</div></div>
+      <div class="box"><div class="box-label">Current Systems</div><div class="box-value">${esc(ws.currentWMS) || 'TBD'}</div></div>
     </div>
-    ${ws.problemStatement ? `<div class="box-label" style="margin-bottom:6px">Problem Statement</div><div class="prose">${ws.problemStatement}</div>` : ''}
-    ${ws.successCriteria ? `<div class="box-label" style="margin-top:12px;margin-bottom:6px">Success Criteria</div><div class="prose">${ws.successCriteria}</div>` : ''}
+    ${ws.problemStatement ? `<div class="box-label" style="margin-bottom:6px">Problem Statement</div><div class="prose">${esc(ws.problemStatement)}</div>` : ''}
+    ${ws.successCriteria ? `<div class="box-label" style="margin-top:12px;margin-bottom:6px">Success Criteria</div><div class="prose">${esc(ws.successCriteria)}</div>` : ''}
   </div>
 
-  ${annualSavings > 0 ? `
+  ${hasFinancials ? `
   <div class="section">
-    <div class="section-title">ROI Analysis</div>
-    <div class="highlight">
-      <div class="highlight-title">Financial Summary</div>
-      <div class="roi-row"><span class="roi-label">Annual labor cost (current)</span><span class="roi-value">$${Math.round(annualLaborCost).toLocaleString()}</span></div>
-      <div class="roi-row"><span class="roi-label">Automation capture rate</span><span class="roi-value">${r.automationCapturePercent || 70}%</span></div>
-      <div class="roi-row"><span class="roi-label">Estimated annual savings</span><span class="roi-value">$${Math.round(annualSavings).toLocaleString()}</span></div>
-      <div class="roi-row"><span class="roi-label">Estimated investment (${ws.budgetRange})</span><span class="roi-value">$${budgetMid.toLocaleString()}</span></div>
-      ${paybackMonths ? `<div class="roi-row"><span class="roi-label">Payback period</span><span class="roi-value" style="color:#16a34a;">~${paybackMonths} months</span></div>` : ''}
-      ${npv3yr ? `<div class="roi-row"><span class="roi-label">3-year net savings</span><span class="roi-value" style="color:#16a34a;">$${npv3yr.toLocaleString()}</span></div>` : ''}
+    <div class="section-title">Scenario Comparison — Conservative / Base / Optimistic</div>
+    <table>
+      <thead><tr><th></th><th style="text-align:center;background:#fffbeb;color:#92400e;">Conservative</th><th style="text-align:center;">Base</th><th style="text-align:center;">Optimistic</th></tr></thead>
+      <tbody>${scenarioMetricRows}</tbody>
+    </table>
+    <p class="subnote">Conservative applies ${conservativeScenario.savingsFactor}% of projected savings, +${conservativeScenario.capexAdjust}% capex contingency, and +${conservativeScenario.rampAdjust} months of ramp — this is the committed case for capital approval. Optimistic assumes the vendor executes on schedule and capture exceeds plan. All figures are labor-displacement and TCO based; throughput, quality, and safety benefits are not included.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Total Cost of Ownership — Base Case</div>
+    <div class="grid">
+      <div class="box"><div class="box-label">Equipment / system cost</div><div class="box-value">${fmt(equipmentCost)}</div></div>
+      <div class="box"><div class="box-label">Integration / installation</div><div class="box-value">${fmt(implementationCost)}</div></div>
+      <div class="box"><div class="box-label">Training / change management</div><div class="box-value">${fmt(trainingCost)}</div></div>
+      <div class="box"><div class="box-value" style="color:#f59e0b;font-size:16px;">${fmt(totalCapexBase)}</div><div class="box-label">Total one-time capex</div></div>
+      <div class="box"><div class="box-label">Software / subscription (annual)</div><div class="box-value">${fmt(softwareCost)}</div></div>
+      <div class="box"><div class="box-label">Maintenance (annual, ${maintenancePercent}% of capex)</div><div class="box-value">${fmt(maintenanceAnnual)}</div></div>
+      <div class="box"><div class="box-label">Spare parts allowance (annual)</div><div class="box-value">${fmt(sparePartsAllowance)}</div></div>
+      <div class="box"><div class="box-value" style="color:#f59e0b;font-size:16px;">${fmt(annualOpexBase)}</div><div class="box-label">Total annual opex</div></div>
     </div>
-    <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Note: ROI estimates are directional and based on labor displacement only. Implementation costs, training, maintenance, and throughput improvement value should be validated with vendor proposals before capital approval.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">The Cost of Doing Nothing</div>
+    <div class="highlight">
+      <div class="highlight-title">Do-Nothing vs. Automate — ${period}-Year Cumulative Cost</div>
+      <div class="roi-row"><span class="roi-label">Cumulative cost if nothing changes</span><span class="roi-value">${lastRow ? fmt(lastRow.doNothingCum) : '—'}</span></div>
+      <div class="roi-row"><span class="roi-label">Cumulative cost to automate (base case)</span><span class="roi-value">${lastRow ? fmt(lastRow.automateCum) : '—'}</span></div>
+      <div class="roi-row"><span class="roi-label">Crossover point</span><span class="roi-value" style="color:#16a34a;">${costOfInaction.crossoverYear ? `Year ${costOfInaction.crossoverYear}` : `Beyond ${period}-yr horizon`}</span></div>
+    </div>
+    ${coiChartRows}
+    <p class="subnote">Do-nothing trajectory: current labor cost inflated at ${coi.wageInflationPercent || 0}%/yr, plus overtime and turnover/backfill cost at the assumptions in the appendix. Automate trajectory: base-case capex plus residual labor, overtime, and turnover after capture, plus annual opex. Overtime is modeled at a 1.5× premium.</p>
   </div>` : ''}
 
   ${wsVendors.length > 0 ? `
@@ -3433,7 +3946,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
       <thead><tr><th>Rank</th><th>Category</th><th>Price</th><th>Type</th><th>Score</th><th>Notes</th></tr></thead>
       <tbody>${scoreRows}</tbody>
     </table>
-    <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Weighted scoring: Use case fit ×3, Implementation risk ×2, Vendor support ×2, Integration ease ×2, Cost/value ×1</p>
+    <p class="subnote">Weighted scoring against ${primaryCategory || "general"} criteria — see Scorecard tab for full weighting.</p>
   </div>` : ''}
 
   ${wsVendors.length > 0 && Object.keys(ws.rfis).length > 0 ? `
@@ -3445,13 +3958,18 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
     </table>
   </div>` : ''}
 
+  <div class="section">
+    <div class="section-title">Objection Pre-emption</div>
+    ${objectionRows}
+  </div>
+
   ${vendorScores[0]?.total > 0 ? `
   <div class="section">
     <div class="section-title">Recommendation</div>
     <div class="highlight">
       <div class="highlight-title">Top Recommendation (Based on Scorecard)</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:6px;">${vendorScores[0].vendor.name}</div>
-      <div style="font-size:13px;color:#374151;">${vendorScores[0].vendor.best_for || vendorScores[0].vendor.tagline || ''}</div>
+      <div style="font-size:13px;color:#374151;">${esc(vendorScores[0].vendor.best_for || vendorScores[0].vendor.tagline || '')}</div>
       <div style="font-size:12px;color:#6b7280;margin-top:6px;">Weighted score: ${vendorScores[0].total}% · ${vendorScores[0].vendor.vendor_type || ''} · ${vendorScores[0].vendor.price_range || ''}</div>
     </div>
   </div>` : ''}
@@ -3460,43 +3978,44 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
     <div class="section-title">Recommended Next Steps</div>
     <ol style="padding-left:20px;color:#374151;line-height:2;">
       <li>Schedule demos with top 2–3 vendors based on scorecard rankings</li>
-      <li>Request formal proposals including full scope, integration cost, and implementation timeline</li>
-      <li>Conduct reference calls with existing customers at comparable operations</li>
-      <li>Validate ROI assumptions with vendor-provided throughput and uptime data</li>
-      <li>Present final shortlist and business case to leadership for capital approval</li>
+      <li>Send the vendor questionnaire (generated separately) and request formal proposals including full scope, integration cost, and implementation timeline</li>
+      <li>Conduct reference calls with existing customers at comparable operations — including at least one the vendor didn't hand-pick</li>
+      <li>Validate every assumption in the appendix below with vendor-provided data before final capital approval</li>
+      <li>Present the conservative case to leadership; hold base and optimistic in reserve as upside</li>
     </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Assumptions Appendix — Audit Every Input</div>
+    <table>
+      <tbody>${assumptionRows}</tbody>
+    </table>
+    <p class="subnote">Every default in this document is a labeled, editable planning assumption — not a vendor quote or fact. Validate against actual vendor proposals before presenting for capital approval.</p>
   </div>
 
   <div class="footer">
     <span>Generated by OpEx Scout — opexscout.com</span>
-    <span>${ws.projectName} · ${new Date().toLocaleDateString()}</span>
+    <span>${esc(ws.projectName)} · ${new Date().toLocaleDateString()}</span>
   </div>
 </div>
 <script>window.onload = () => window.print();</script>
 </body>
 </html>`;
 
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, '_blank');
-    if (!win) {
-      // Fallback if popup blocked
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${ws.projectName.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "evaluation"}-business-case.html`;
-      a.click();
-    }
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    openHtmlDoc(html, `${ws.projectName.replace(/[^a-z0-9]/gi, "-").toLowerCase() || "evaluation"}-business-case.html`);
   };
 
   const tabs = [
     { id: "context", label: "📋 Project context" },
     { id: "vendors", label: "🏭 Vendors" },
     { id: "scorecard", label: "⭐ Scorecard" },
-    { id: "roi", label: "💰 ROI calculator" },
+    { id: "roi", label: "💰 Scenarios & TCO" },
+    { id: "inaction", label: "📉 Cost of inaction" },
+    { id: "objections", label: "🛡️ Objection prep" },
     { id: "rfi", label: "📞 RFI tracker" },
     { id: "files", label: "📁 Files & links" },
     { id: "case", label: "📄 Business case" },
+    { id: "rfp", label: "📑 Vendor questionnaire" },
   ];
 
   const inputStyle = { ...S.rfiInput, marginBottom: 10 };
@@ -3521,7 +4040,8 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export PDF</button>
+            <button style={{ ...S.btnSecondary, width: "auto", fontFamily: "inherit" }} onClick={exportRFP} disabled={wsVendors.length === 0}>📑 Vendor questionnaire</button>
+            <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export business case</button>
           </div>
         </div>
 
@@ -3732,7 +4252,7 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             </div>
           )}
 
-          {/* ── TAB: ROI CALCULATOR ── */}
+          {/* ── TAB: SCENARIOS & TCO ── */}
           {tab === "roi" && (
             <div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 24 }}>
@@ -3748,149 +4268,150 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
                     {["1", "2", "3"].map(x => <option key={x}>{x}</option>)}
                   </select>
                   <label style={labelStyle}>Operating days per year</label>
-                  <input style={inputStyle} type="number" placeholder="250" value={r.daysPerYear} onChange={e => setRoiField("daysPerYear", e.target.value)} />
-                  <label style={labelStyle}>Automation capture rate (%)</label>
-                  <input style={inputStyle} type="number" placeholder="70" value={r.automationCapturePercent} onChange={e => setRoiField("automationCapturePercent", e.target.value)} />
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Capture rate = % of labor hours displaced. Typical: AMR pick-assist 40–60%, goods-to-person 70–85%, full dock automation 85–95%.</div>
+                  <input style={{ ...inputStyle, marginBottom: 14 }} type="number" placeholder="250" value={r.daysPerYear} onChange={e => setRoiField("daysPerYear", e.target.value)} />
+                  <AssumptionInput label="Automation capture rate" type="number" suffix="%" value={r.automationCapturePercent} onChange={v => setRoiField("automationCapturePercent", v)}
+                    hint="Base-case % of labor hours displaced. Typical: AMR pick-assist 40–60%, goods-to-person 70–85%, full dock automation 85–95% — validate against vendor throughput data." />
 
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Total cost of ownership</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", margin: "18px 0 14px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Ramp-up</div>
+                  <AssumptionInput label="Ramp-up period" type="number" suffix="months" value={r.rampMonths} onChange={v => setRoiField("rampMonths", v)}
+                    hint="Months of below-target capture after go-live. Reduces year-1 benefit pro-rata — later years assume full capture." />
+                  <AssumptionInput label="Capture rate during ramp" type="number" suffix="% of target" value={r.rampCapturePercent} onChange={v => setRoiField("rampCapturePercent", v)}
+                    hint="% of the target capture rate you realistically achieve while the team and vendor are still tuning the system." />
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", margin: "18px 0 14px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Total cost of ownership</div>
                   <label style={labelStyle}>System / equipment cost ($)</label>
                   <input style={inputStyle} type="number" placeholder="e.g. 500000" value={r.equipmentCost || ""} onChange={e => setRoiField("equipmentCost", e.target.value)} />
-                  <label style={labelStyle}>Implementation / integration cost ($)</label>
+                  <label style={labelStyle}>Integration / installation cost ($)</label>
                   <input style={inputStyle} type="number" placeholder="e.g. 150000" value={r.implementationCost || ""} onChange={e => setRoiField("implementationCost", e.target.value)} />
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, lineHeight: 1.6 }}>Typically 20–50% of equipment cost. Covers SI labor, controls, WMS integration, training, and commissioning.</div>
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, lineHeight: 1.6 }}>Typically 20–50% of equipment cost. Covers SI labor, controls, WMS integration, and commissioning.</div>
+                  <label style={labelStyle}>Training / change-management cost ($)</label>
+                  <input style={{ ...inputStyle, marginBottom: 14 }} type="number" placeholder="e.g. 20000" value={r.trainingCost || ""} onChange={e => setRoiField("trainingCost", e.target.value)} />
                   <label style={labelStyle}>Annual software / licensing cost ($)</label>
                   <input style={inputStyle} type="number" placeholder="e.g. 36000" value={r.softwareCost || ""} onChange={e => setRoiField("softwareCost", e.target.value)} />
-                  <label style={labelStyle}>Annual maintenance / service cost ($)</label>
-                  <input style={inputStyle} type="number" placeholder="e.g. 25000" value={r.maintenanceCost || ""} onChange={e => setRoiField("maintenanceCost", e.target.value)} />
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Typically 5–10% of equipment cost per year for robotics; 15–20% for complex conveyor/sortation.</div>
+                  <AssumptionInput label="Annual maintenance" type="number" suffix="% of capex" value={r.maintenancePercent} onChange={v => setRoiField("maintenancePercent", v)}
+                    hint={`Typically 5–10%/yr for robotics, 15–20% for complex conveyor/sortation — planning placeholder, validate with vendor quotes. At current capex this is ≈ ${totalCapexBase > 0 ? `$${Math.round(maintenanceAnnual).toLocaleString()}/yr` : "$0/yr (no capex entered yet)"}.`} />
+                  <label style={labelStyle}>Spare parts allowance ($/year)</label>
+                  <input style={{ ...inputStyle, marginBottom: 14 }} type="number" placeholder="e.g. 8000" value={r.sparePartsAllowance || ""} onChange={e => setRoiField("sparePartsAllowance", e.target.value)} />
 
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Financial assumptions</div>
-                  <label style={labelStyle}>Discount rate / hurdle rate (%)</label>
-                  <input style={inputStyle} type="number" placeholder="e.g. 10" value={r.discountRate || ""} onChange={e => setRoiField("discountRate", e.target.value)} />
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, lineHeight: 1.6 }}>Your company's required rate of return for capital projects. Typical range: 8–15%.</div>
-                  <label style={labelStyle}>Analysis period (years)</label>
-                  <select style={inputStyle} value={r.analysisPeriod || "5"} onChange={e => setRoiField("analysisPeriod", e.target.value)}>
-                    {["3", "5", "7", "10"].map(x => <option key={x}>{x}</option>)}
-                  </select>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", margin: "18px 0 14px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Financial assumptions</div>
+                  <AssumptionInput label="Discount / hurdle rate" type="number" suffix="%" value={r.discountRate} onChange={v => setRoiField("discountRate", v)}
+                    hint="Your company's required rate of return for capital projects. Typical range: 8–15%." />
+                  <AssumptionInput label="Analysis period" select options={["3", "5", "7", "10"]} value={r.analysisPeriod || "5"} onChange={v => setRoiField("analysisPeriod", v)} suffix="years" />
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", margin: "18px 0 14px", paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Scenario haircuts &amp; uplifts</div>
+                  <div style={{ fontSize: 11, color: "#64748b", marginBottom: 12, lineHeight: 1.6 }}>Applied on top of the base-case inputs above to produce the Conservative and Optimistic columns on the right.</div>
+                  <AssumptionInput label="Conservative: % of projected savings" type="number" suffix="%" value={r.conservativeSavingsPercent} onChange={v => setRoiField("conservativeSavingsPercent", v)} />
+                  <AssumptionInput label="Conservative: capex contingency" type="number" suffix="%" value={r.conservativeCapexContingencyPercent} onChange={v => setRoiField("conservativeCapexContingencyPercent", v)} />
+                  <AssumptionInput label="Conservative: extra ramp" type="number" suffix="months" value={r.conservativeExtraRampMonths} onChange={v => setRoiField("conservativeExtraRampMonths", v)} />
+                  <AssumptionInput label="Optimistic: % of projected savings" type="number" suffix="%" value={r.optimisticSavingsPercent} onChange={v => setRoiField("optimisticSavingsPercent", v)} />
+                  <AssumptionInput label="Optimistic: capex adjustment" type="number" suffix="%" value={r.optimisticCapexAdjustPercent} onChange={v => setRoiField("optimisticCapexAdjustPercent", v)}
+                    hint="Negative = capex reduction (e.g. negotiated discount)." />
+                  <AssumptionInput label="Optimistic: ramp adjustment" type="number" suffix="months" value={r.optimisticRampAdjustMonths} onChange={v => setRoiField("optimisticRampAdjustMonths", v)}
+                    hint="Negative = faster ramp than base case." />
                 </div>
 
-                {/* RIGHT: Results */}
+                {/* RIGHT: Scenario comparison */}
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Financial summary</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b", marginBottom: 14, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>Scenario comparison</div>
 
-                  {/* Key metrics cards */}
-                  {(() => {
-                    const headcount = parseFloat(r.laborHeadcount) || 0;
-                    const rate = parseFloat(r.laborRate) || 0;
-                    const shifts = parseFloat(r.shiftsPerDay) || 2;
-                    const days = parseFloat(r.daysPerYear) || 250;
-                    const capture = (parseFloat(r.automationCapturePercent) || 70) / 100;
-                    const annualLabor = headcount * rate * shifts * days * 8;
-                    const annualSavingsCalc = annualLabor * capture;
-
-                    const equipment = parseFloat(r.equipmentCost) || budgetMid;
-                    const implementation = parseFloat(r.implementationCost) || 0;
-                    const software = parseFloat(r.softwareCost) || 0;
-                    const maintenance = parseFloat(r.maintenanceCost) || 0;
-                    const totalCapex = equipment + implementation;
-                    const annualOpex = software + maintenance;
-                    const netAnnualBenefit = annualSavingsCalc - annualOpex;
-
-                    const discountRate = (parseFloat(r.discountRate) || 10) / 100;
-                    const period = parseInt(r.analysisPeriod) || 5;
-                    const payback = netAnnualBenefit > 0 ? (totalCapex / netAnnualBenefit) * 12 : null;
-
-                    // NPV calculation
-                    let npv = -totalCapex;
-                    for (let yr = 1; yr <= period; yr++) {
-                      npv += netAnnualBenefit / Math.pow(1 + discountRate, yr);
-                    }
-
-                    // IRR approximation
-                    let irr = null;
-                    if (netAnnualBenefit > 0 && totalCapex > 0) {
-                      let lo = 0, hi = 5;
-                      for (let i = 0; i < 50; i++) {
-                        const mid = (lo + hi) / 2;
-                        let npvTest = -totalCapex;
-                        for (let yr = 1; yr <= period; yr++) npvTest += netAnnualBenefit / Math.pow(1 + mid, yr);
-                        if (npvTest > 0) lo = mid; else hi = mid;
-                      }
-                      irr = Math.round(lo * 100);
-                    }
-
-                    const metrics = [
-                      ["Annual labor cost (current)", annualLabor > 0 ? `$${Math.round(annualLabor).toLocaleString()}` : "—", false],
-                      ["Annual labor savings", annualSavingsCalc > 0 ? `$${Math.round(annualSavingsCalc).toLocaleString()}` : "—", annualSavingsCalc > 0],
-                      ["Annual operating cost (software + maintenance)", annualOpex > 0 ? `$${Math.round(annualOpex).toLocaleString()}` : "—", false],
-                      ["Net annual benefit", netAnnualBenefit > 0 ? `$${Math.round(netAnnualBenefit).toLocaleString()}` : "—", netAnnualBenefit > 0],
-                      ["Total capital investment", totalCapex > 0 ? `$${Math.round(totalCapex).toLocaleString()}` : "—", false],
-                      ["Simple payback period", payback ? `${payback < 1 ? "<1" : Math.round(payback)} months` : "—", payback !== null && payback <= 36],
-                      [`NPV (${period}-yr @ ${r.discountRate || 10}% discount)`, npv && netAnnualBenefit > 0 ? `$${Math.round(npv).toLocaleString()}` : "—", npv > 0],
-                      ["IRR", irr !== null ? `${irr}%` : "—", irr !== null && irr > 15],
-                    ];
-
-                    return (
-                      <div>
-                        {metrics.map(([label, value, isGood]) => (
-                          <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                            <span style={{ fontSize: 12, color: "#64748b", maxWidth: "60%" }}>{label}</span>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: value === "—" ? "#334155" : isGood ? "#22c55e" : "#94a3b8" }}>{value}</span>
-                          </div>
-                        ))}
-
-                        {npv > 0 && netAnnualBenefit > 0 && (
-                          <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 10 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e", marginBottom: 6 }}>✓ Positive NPV — project meets hurdle rate</div>
-                            <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
-                              At a {r.discountRate || 10}% discount rate, this project generates ${Math.round(npv).toLocaleString()} of net present value over {period} years. IRR of {irr}% {irr > 20 ? "comfortably exceeds" : "meets"} typical capital hurdle rates.
-                            </div>
-                          </div>
-                        )}
-
-                        {npv < 0 && netAnnualBenefit > 0 && (
-                          <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#ef4444", marginBottom: 6 }}>⚠ Negative NPV at current assumptions</div>
-                            <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
-                              Try reducing implementation cost, increasing capture rate, or extending the analysis period. Or check if throughput improvements (not modeled here) close the gap.
-                            </div>
-                          </div>
-                        )}
-
-                        <div style={{ marginTop: 16, padding: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8, fontSize: 11, color: "#475569", lineHeight: 1.7 }}>
-                          <strong style={{ color: "#64748b" }}>Note:</strong> This model captures labor cost displacement only. Throughput improvement, error reduction, space savings, and safety benefits are not included — these often add 15–40% to the business case. Use vendor-provided throughput data to model these separately.
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
+                    {scenarios.map(s => (
+                      <div key={s.key} style={{
+                        background: s.key === "conservative" ? "rgba(245,158,11,0.07)" : "#0d1526",
+                        border: `1px solid ${s.key === "conservative" ? "rgba(245,158,11,0.35)" : "rgba(255,255,255,0.07)"}`,
+                        borderRadius: 10, padding: "10px 10px", minWidth: 0,
+                      }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: s.key === "conservative" ? "#f59e0b" : "#e8edf5", marginBottom: 2 }}>{s.label}</div>
+                        <div style={{ fontSize: 9, color: "#64748b", marginBottom: 8, lineHeight: 1.4, minHeight: 26 }}>{s.tagline}</div>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: s.payback ? (s.payback <= 36 ? "#22c55e" : "#94a3b8") : "#334155" }}>
+                          {s.payback ? `${s.payback}mo` : "—"}
                         </div>
-
-                        {/* Per-vendor payback comparison */}
-                        {wsVendors.filter(v => v.price_range).length > 0 && netAnnualBenefit > 0 && (
-                          <div style={{ marginTop: 20 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Payback by vendor price tier</div>
-                            {wsVendors.filter(v => v.price_range).map(v => {
-                              const tierEquip = { "$": 40000, "$$": 125000, "$$$": 350000, "$$$$": 900000, "RaaS": 0 }[v.price_range] || equipment;
-                              const tierImpl = tierEquip * 0.3;
-                              const tierTotal = tierEquip + tierImpl;
-                              const pb = tierTotal > 0 && netAnnualBenefit > 0 ? Math.round((tierTotal / netAnnualBenefit) * 12) : null;
-                              return (
-                                <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
-                                    <span style={{ color: "#94a3b8" }}>{v.name}</span>
-                                    <PriceBadge tier={v.price_range} />
-                                  </div>
-                                  <span style={{ color: pb && pb <= 24 ? "#22c55e" : pb && pb <= 36 ? "#f59e0b" : "#ef4444", fontWeight: 600 }}>
-                                    {v.price_range === "RaaS" ? "Compare vs labor $/pick" : pb ? `~${pb}mo payback` : "—"}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                        <div style={{ fontSize: 10, color: "#475569", marginBottom: 8 }}>payback</div>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 2 }}>NPV: <strong style={{ color: s.npv > 0 ? "#22c55e" : "#94a3b8" }}>{s.npv !== null ? `$${Math.round(s.npv).toLocaleString()}` : "—"}</strong></div>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 2 }}>IRR: <strong>{s.irr !== null ? `${s.irr.toFixed(1)}%` : "—"}</strong></div>
+                        <div style={{ fontSize: 11, color: "#94a3b8" }}>Capex: <strong>${Math.round(s.capex).toLocaleString()}</strong></div>
                       </div>
-                    );
-                  })()}
+                    ))}
+                  </div>
+
+                  {conservativeScenario.payback && (
+                    <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 10, fontSize: 11, color: "#f59e0b", lineHeight: 1.6 }}>
+                      Lead with the <strong>Conservative</strong> number in front of finance: ~{conservativeScenario.payback}mo payback, {conservativeScenario.npv !== null ? `$${Math.round(conservativeScenario.npv).toLocaleString()} NPV` : "NPV pending inputs"}. Base and optimistic are upside, not the ask.
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: 12 }}>
+                    <span style={{ color: "#64748b" }}>Total one-time capex (base case)</span>
+                    <span style={{ fontWeight: 700, color: "#94a3b8" }}>${Math.round(totalCapexBase).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: 12 }}>
+                    <span style={{ color: "#64748b" }}>Total annual opex — software + maintenance + spares</span>
+                    <span style={{ fontWeight: 700, color: "#94a3b8" }}>${Math.round(annualOpexBase).toLocaleString()}</span>
+                  </div>
+
+                  <div style={{ marginTop: 16, padding: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8, fontSize: 11, color: "#475569", lineHeight: 1.7 }}>
+                    <strong style={{ color: "#64748b" }}>Note:</strong> This model captures labor cost displacement only. Throughput improvement, error reduction, space savings, and safety benefits are not included — these often add 15–40% to the business case. Use vendor-provided throughput data to model these separately.
+                  </div>
+
+                  {/* Per-vendor payback comparison */}
+                  {wsVendors.filter(v => v.price_range).length > 0 && baseScenario.steadyBenefit > 0 && (
+                    <div style={{ marginTop: 20 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Payback by vendor price tier (base case)</div>
+                      {wsVendors.filter(v => v.price_range).map(v => {
+                        const tierEquip = { "$": 40000, "$$": 125000, "$$$": 350000, "$$$$": 900000, "RaaS": 0 }[v.price_range] || equipmentCost;
+                        const tierTotal = tierEquip * 1.3;
+                        const pb = tierTotal > 0 && baseScenario.steadyBenefit > 0 ? Math.round((tierTotal / baseScenario.steadyBenefit) * 12) : null;
+                        return (
+                          <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
+                              <span style={{ color: "#94a3b8" }}>{v.name}</span>
+                              <PriceBadge tier={v.price_range} />
+                            </div>
+                            <span style={{ color: pb && pb <= 24 ? "#22c55e" : pb && pb <= 36 ? "#f59e0b" : "#ef4444", fontWeight: 600 }}>
+                              {v.price_range === "RaaS" ? "Compare vs labor $/pick" : pb ? `~${pb}mo payback` : "—"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ── TAB: COST OF INACTION ── */}
+          {tab === "inaction" && (
+            <CostOfInactionTab ws={ws} coi={coi} setCoiField={setCoiField} costOfInaction={costOfInaction} period={period} isMobile={isMobile} labelStyle={labelStyle} inputStyle={inputStyle} />
+          )}
+
+          {/* ── TAB: OBJECTION PRE-EMPTION ── */}
+          {tab === "objections" && (
+            <ObjectionsTab objectionPrompts={objectionPrompts} ws={ws} setObjectionField={setObjectionField} labelStyle={labelStyle} inputStyle={inputStyle} primaryCategory={primaryCategory} />
+          )}
+
+          {/* ── TAB: VENDOR QUESTIONNAIRE (RFP) ── */}
+          {tab === "rfp" && (
+            <div>
+              <div style={{ fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.6 }}>
+                Compiles category-specific diligence questions plus standard commercial questions (pricing structure, SLAs, spare parts lead times, references, integration scope) into a printable questionnaire, addressed per shortlisted vendor.
+              </div>
+              {wsVendors.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "#475569" }}>Add vendors to the workspace first.</div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+                    {wsVendors.map(v => (
+                      <span key={v.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0d1526", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#94a3b8" }}>
+                        <div style={{ ...S.logoCircle, background: v.color, width: 18, height: 18, fontSize: 7, marginBottom: 0 }}>{v.logo}</div>
+                        {v.name}
+                      </span>
+                    ))}
+                  </div>
+                  <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportRFP}>📑 Generate vendor questionnaire</button>
+                </>
+              )}
             </div>
           )}
 
@@ -3966,20 +4487,22 @@ function WorkspacePage({ setPage, openDetail, wsId }) {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                 <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
-                  Auto-generated from your project context, scorecard, and ROI inputs. Export as a text file to paste into a PowerPoint or email.
+                  Auto-generated from your project context, scenarios, TCO, cost of inaction, scorecard, and objection prep. Numbers below are the conservative case — the one to lead with in front of finance.
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export PDF</button>
+                <button style={{ ...S.navCta, fontFamily: "inherit" }} onClick={exportBusinessCase}>📄 Export business case</button>
               </div>
               </div>
 
               {/* Summary cards */}
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 10, marginBottom: 24 }}>
                 {[
                   ["Vendors evaluated", wsVendors.length || "—"],
-                  ["Est. annual savings", annualSavings > 0 ? `$${Math.round(annualSavings / 1000)}k` : "—"],
-                  ["Payback period", paybackMonths ? `${paybackMonths}mo` : "—"],
+                  ["Payback (conservative)", paybackMonths ? `${paybackMonths}mo` : "—"],
+                  [`NPV (conservative, ${period}-yr)`, npv3yr ? `$${Math.round(npv3yr / 1000)}k` : "—"],
                   ["Top vendor", vendorScores[0]?.total > 0 ? vendorScores[0].vendor.name : "—"],
+                  ["Cost of inaction (" + period + "-yr)", costOfInaction.rows.length ? `$${Math.round(costOfInaction.rows[costOfInaction.rows.length - 1].doNothingCum / 1000)}k` : "—"],
+                  ["Crossover year", costOfInaction.crossoverYear ? `Year ${costOfInaction.crossoverYear}` : "—"],
                 ].map(([l, v]) => (
                   <div key={l} style={{ background: "#0d1526", borderRadius: 10, padding: 14, border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
                     <div style={{ fontSize: 20, fontWeight: 800, color: "#f59e0b", marginBottom: 4 }}>{v}</div>
@@ -4012,12 +4535,21 @@ ${wsVendors.length ? wsVendors.map(v => `• ${v.name} (${v.category}) — ${v.p
 ── SCORECARD RANKINGS ────────────────
 ${vendorScores.some(v => v.total > 0) ? vendorScores.filter(v => v.total > 0).map((vs, i) => `#${i + 1} ${vs.vendor.name} — ${vs.total}% score`).join("\n") : "(score vendors in Scorecard tab)"}
 
-── ROI ANALYSIS ──────────────────────
-Annual labor cost: $${Math.round(annualLaborCost).toLocaleString() || "—"}
-Est. annual savings: $${Math.round(annualSavings).toLocaleString() || "—"}
-Investment: $${budgetMid.toLocaleString()} (midpoint of ${ws.budgetRange})
-Payback: ${paybackMonths ? "~" + paybackMonths + " months" : "complete ROI inputs"}
-3-yr NPV: ${npv3yr ? "$" + npv3yr.toLocaleString() : "—"}
+── SCENARIOS ──────────────────────────
+${scenarios.map(s => `${s.label}: payback ${s.payback ? "~" + s.payback + "mo" : "—"} · NPV ${s.npv !== null ? "$" + Math.round(s.npv).toLocaleString() : "—"} · IRR ${s.irr !== null ? s.irr.toFixed(1) + "%" : "—"} · capex $${Math.round(s.capex).toLocaleString()}`).join("\n")}
+(Conservative is the committed case — lead with this number in front of finance.)
+
+── TOTAL COST OF OWNERSHIP ───────────
+One-time capex (base): $${Math.round(totalCapexBase).toLocaleString()} — equipment + integration + training
+Annual opex (base): $${Math.round(annualOpexBase).toLocaleString()} — software + maintenance (${maintenancePercent}% of capex) + spares
+
+── COST OF INACTION ──────────────────
+${costOfInaction.rows.length ? `Do-nothing, ${period}-yr cumulative: $${Math.round(costOfInaction.rows[costOfInaction.rows.length - 1].doNothingCum).toLocaleString()}
+Automate, ${period}-yr cumulative: $${Math.round(costOfInaction.rows[costOfInaction.rows.length - 1].automateCum).toLocaleString()}
+Crossover: ${costOfInaction.crossoverYear ? "Year " + costOfInaction.crossoverYear : "beyond " + period + "-yr horizon"}` : "(add labor + wage inflation inputs to model cost of inaction)"}
+
+── OBJECTION PRE-EMPTION ─────────────
+${Object.keys(ws.objections || {}).length}/${objectionPrompts.length} prompts answered — see Objection Prep tab
 
 ── RFI STATUS ────────────────────────
 ${wsVendors.length ? wsVendors.map(v => { const rfi = ws.rfis[v.id] || {}; return `• ${v.name}: ${rfi.responseStatus || "Not contacted"}${rfi.demoDate ? " | Demo: " + rfi.demoDate : ""}`; }).join("\n") : "(track outreach in RFI Tracker tab)"}
